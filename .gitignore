@@ -17,11 +17,6 @@ local.properties
 .loadpath
 .pmd
 
-############
-## Intellij
-############
-.idea
-
 # External tool builders
 .externalToolBuilders/
 
@@ -33,13 +28,6 @@ local.properties
 
 # PDT-specific
 .buildpath
-
-
-#################
-# Intellij
-#################
-.idea
-src/main/java/resources/
 
 #################
 ## Java
@@ -144,3 +132,25 @@ Thumbs.db
 Desktop.ini
 
 runtime.properties
+
+####################
+## IntelliJ       ##
+####################
+.idea/
+out/
+*.iml
+*.ipr
+*.iws
+
+# CMake
+cmake-build-*/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+

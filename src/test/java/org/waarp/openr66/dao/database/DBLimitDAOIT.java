@@ -1,4 +1,32 @@
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
+ *
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
+ *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
+ *  individual contributors.
+ *
+ *  All Waarp Project is free software: you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or (at your
+ *  option) any later version.
+ *
+ *  Waarp is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ *  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with
+ *  Waarp . If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 package org.waarp.openr66.dao.database;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.LimitDAO;
+import org.waarp.openr66.pojo.Limit;
+import org.waarp.openr66.pojo.UpdatedInfo;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,186 +36,185 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static  org.junit.Assert.*;
-
-import org.waarp.openr66.dao.LimitDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.pojo.Limit;
-import org.waarp.openr66.pojo.UpdatedInfo;
+import static org.junit.Assert.*;
 
 public abstract class DBLimitDAOIT {
 
-    private Connection con;
+  private Connection con;
 
-    public abstract Connection getConnection() throws SQLException;
-    public abstract void initDB() throws SQLException;
-    public abstract void cleanDB() throws SQLException;
-
-    public void runScript(String script) {
-        try {
-            ScriptRunner runner = new ScriptRunner(con, false, true);
-            URL url = Thread.currentThread().getContextClassLoader().getResource(script);
-            runner.runScript(new BufferedReader(new FileReader(url.getPath())));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  public void runScript(String script) {
+    try {
+      ScriptRunner runner = new ScriptRunner(con, false, true);
+      URL url =
+          Thread.currentThread().getContextClassLoader().getResource(script);
+      runner.runScript(new BufferedReader(new FileReader(url.getPath())));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Before
-    public void setUp() {
-        try {
-            con = getConnection();
-            initDB();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Before
+  public void setUp() {
+    try {
+      con = getConnection();
+      initDB();
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @After
-    public void wrapUp() {
-        try {
-            cleanDB();
-            con.close();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  public abstract Connection getConnection() throws SQLException;
+
+  public abstract void initDB() throws SQLException;
+
+  @After
+  public void wrapUp() {
+    try {
+      cleanDB();
+      con.close();
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testDeleteAll() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            dao.deleteAll();
+  public abstract void cleanDB() throws SQLException;
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM configuration");
-            assertEquals(false, res.next());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testDeleteAll() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      dao.deleteAll();
+
+      ResultSet res = con.createStatement()
+                         .executeQuery("SELECT * FROM configuration");
+      assertEquals(false, res.next());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testDelete() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            dao.delete(new Limit("server1", 0l));
+  @Test
+  public void testDelete() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      dao.delete(new Limit("server1", 0l));
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM configuration where hostid = 'server1'");
-            assertEquals(false, res.next());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      ResultSet res = con.createStatement()
+                         .executeQuery(
+                             "SELECT * FROM configuration where hostid = 'server1'");
+      assertEquals(false, res.next());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testGetAll() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            assertEquals(3, dao.getAll().size());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testGetAll() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      assertEquals(3, dao.getAll().size());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testSelect() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            Limit limit = dao.select("server1");
-            Limit limit2 = dao.select("ghost");
+  @Test
+  public void testSelect() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      Limit limit = dao.select("server1");
+      Limit limit2 = dao.select("ghost");
 
-            assertEquals("server1", limit.getHostid());
-            assertEquals(1, limit.getReadGlobalLimit());
-            assertEquals(2, limit.getWriteGlobalLimit());
-            assertEquals(3, limit.getReadSessionLimit());
-            assertEquals(4, limit.getWriteSessionLimit());
-            assertEquals(5, limit.getDelayLimit());
-            assertEquals(UpdatedInfo.NOTUPDATED, limit.getUpdatedInfo());
-            assertEquals(null, limit2);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      assertEquals("server1", limit.getHostid());
+      assertEquals(1, limit.getReadGlobalLimit());
+      assertEquals(2, limit.getWriteGlobalLimit());
+      assertEquals(3, limit.getReadSessionLimit());
+      assertEquals(4, limit.getWriteSessionLimit());
+      assertEquals(5, limit.getDelayLimit());
+      assertEquals(UpdatedInfo.NOTUPDATED, limit.getUpdatedInfo());
+      assertEquals(null, limit2);
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testExist() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            assertEquals(true, dao.exist("server1"));
-            assertEquals(false, dao.exist("ghost"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testExist() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      assertEquals(true, dao.exist("server1"));
+      assertEquals(false, dao.exist("ghost"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
 
-    @Test
-    public void testInsert() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            dao.insert(new Limit("chacha", 4l,
-                    1l, 5l, 13l, 12,
-                    UpdatedInfo.TOSUBMIT));
+  @Test
+  public void testInsert() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      dao.insert(new Limit("chacha", 4l,
+                           1l, 5l, 13l, 12,
+                           UpdatedInfo.TOSUBMIT));
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT COUNT(1) as count FROM configuration");
-            res.next();
-            assertEquals(4, res.getInt("count"));
+      ResultSet res = con.createStatement()
+                         .executeQuery(
+                             "SELECT COUNT(1) as count FROM configuration");
+      res.next();
+      assertEquals(4, res.getInt("count"));
 
-            ResultSet res2 = con.createStatement()
-                .executeQuery("SELECT * FROM configuration WHERE hostid = 'chacha'");
-            res2.next();
-            assertEquals("chacha", res2.getString("hostid"));
-            assertEquals(4, res2.getLong("delaylimit"));
-            assertEquals(1, res2.getLong("readGlobalLimit"));
-            assertEquals(5, res2.getLong("writeGlobalLimit"));
-            assertEquals(13, res2.getLong("readSessionLimit"));
-            assertEquals(12, res2.getLong("writeSessionLimit"));
-            assertEquals(UpdatedInfo.TOSUBMIT.ordinal(), res2.getInt("updatedInfo"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      ResultSet res2 = con.createStatement()
+                          .executeQuery(
+                              "SELECT * FROM configuration WHERE hostid = 'chacha'");
+      res2.next();
+      assertEquals("chacha", res2.getString("hostid"));
+      assertEquals(4, res2.getLong("delaylimit"));
+      assertEquals(1, res2.getLong("readGlobalLimit"));
+      assertEquals(5, res2.getLong("writeGlobalLimit"));
+      assertEquals(13, res2.getLong("readSessionLimit"));
+      assertEquals(12, res2.getLong("writeSessionLimit"));
+      assertEquals(UpdatedInfo.TOSUBMIT.ordinal(), res2.getInt("updatedInfo"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testUpdate() {
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            dao.update(new Limit("server2", 4l,
-                    1l, 5l, 13l, 12l,
-                    UpdatedInfo.RUNNING));
+  @Test
+  public void testUpdate() {
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      dao.update(new Limit("server2", 4l,
+                           1l, 5l, 13l, 12l,
+                           UpdatedInfo.RUNNING));
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM configuration WHERE hostid = 'server2'");
-            res.next();
-            assertEquals("server2", res.getString("hostid"));
-            assertEquals(4, res.getLong("delaylimit"));
-            assertEquals(1, res.getLong("readGlobalLimit"));
-            assertEquals(5, res.getLong("writeGlobalLimit"));
-            assertEquals(13, res.getLong("readSessionLimit"));
-            assertEquals(12, res.getLong("writeSessionLimit"));
-            assertEquals(UpdatedInfo.RUNNING.ordinal(), res.getInt("updatedInfo"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      ResultSet res = con.createStatement()
+                         .executeQuery(
+                             "SELECT * FROM configuration WHERE hostid = 'server2'");
+      res.next();
+      assertEquals("server2", res.getString("hostid"));
+      assertEquals(4, res.getLong("delaylimit"));
+      assertEquals(1, res.getLong("readGlobalLimit"));
+      assertEquals(5, res.getLong("writeGlobalLimit"));
+      assertEquals(13, res.getLong("readSessionLimit"));
+      assertEquals(12, res.getLong("writeSessionLimit"));
+      assertEquals(UpdatedInfo.RUNNING.ordinal(), res.getInt("updatedInfo"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
 
-    @Test
-    public void testFind() {
-        ArrayList<Filter> map = new ArrayList<Filter>();
-        map.add(new Filter(DBLimitDAO.READ_SESSION_LIMIT_FIELD, ">", 2));
-        try {
-            LimitDAO dao = new DBLimitDAO(getConnection());
-            assertEquals(2, dao.find(map).size());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testFind() {
+    ArrayList<Filter> map = new ArrayList<Filter>();
+    map.add(new Filter(DBLimitDAO.READ_SESSION_LIMIT_FIELD, ">", 2));
+    try {
+      LimitDAO dao = new DBLimitDAO(getConnection());
+      assertEquals(2, dao.find(map).size());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 }
 

@@ -1,4 +1,32 @@
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
+ *
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
+ *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
+ *  individual contributors.
+ *
+ *  All Waarp Project is free software: you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or (at your
+ *  option) any later version.
+ *
+ *  Waarp is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ *  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with
+ *  Waarp . If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 package org.waarp.openr66.dao.database;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.HostDAO;
+import org.waarp.openr66.pojo.Host;
+import org.waarp.openr66.pojo.UpdatedInfo;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,192 +36,194 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static  org.junit.Assert.*;
-
-import org.waarp.openr66.dao.HostDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.pojo.Host;
-import org.waarp.openr66.pojo.UpdatedInfo;
+import static org.junit.Assert.*;
 
 public abstract class DBHostDAOIT {
 
-    private Connection con;
+  private Connection con;
 
-    public abstract Connection getConnection() throws SQLException;
-    public abstract void initDB() throws SQLException;
-    public abstract void cleanDB() throws SQLException;
-
-    public void runScript(String script) {
-        try {
-            ScriptRunner runner = new ScriptRunner(con, false, true);
-            URL url = Thread.currentThread().getContextClassLoader().getResource(script);
-            runner.runScript(new BufferedReader(new FileReader(url.getPath())));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  public void runScript(String script) {
+    try {
+      ScriptRunner runner = new ScriptRunner(con, false, true);
+      URL url =
+          Thread.currentThread().getContextClassLoader().getResource(script);
+      runner.runScript(new BufferedReader(new FileReader(url.getPath())));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Before
-    public void setUp() {
-        try {
-            con = getConnection();
-            initDB();
-        } catch (Exception e) {
-            fail(e.toString());
-        }
+  @Before
+  public void setUp() {
+    try {
+      con = getConnection();
+      initDB();
+    } catch (Exception e) {
+      fail(e.toString());
     }
+  }
 
-    @After
-    public void wrapUp() {
-        try {
-            cleanDB();
-            con.close();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  public abstract Connection getConnection() throws SQLException;
+
+  public abstract void initDB() throws SQLException;
+
+  @After
+  public void wrapUp() {
+    try {
+      cleanDB();
+      con.close();
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testDeleteAll() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            dao.deleteAll();
+  public abstract void cleanDB() throws SQLException;
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hosts");
-            assertEquals(false, res.next());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testDeleteAll() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      dao.deleteAll();
+
+      ResultSet res = con.createStatement()
+                         .executeQuery("SELECT * FROM hosts");
+      assertEquals(false, res.next());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testDelete() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            dao.delete(new Host("server1", "", 666, null, false, false));
+  @Test
+  public void testDelete() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      dao.delete(new Host("server1", "", 666, null, false, false));
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hosts where hostid = 'server1'");
-            assertEquals(false, res.next());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      ResultSet res = con.createStatement()
+                         .executeQuery(
+                             "SELECT * FROM hosts where hostid = 'server1'");
+      assertEquals(false, res.next());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testGetAll() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            assertEquals(3, dao.getAll().size());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testGetAll() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      assertEquals(3, dao.getAll().size());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testSelect() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            Host host = dao.select("server1");
-            Host host2 = dao.select("ghost");
+  @Test
+  public void testSelect() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      Host host = dao.select("server1");
+      Host host2 = dao.select("ghost");
 
-            assertEquals("server1", host.getHostid());
-            assertEquals("127.0.0.1", host.getAddress());
-            assertEquals(6666, host.getPort());
-            //HostKey is tested in Insert and Update
-            assertEquals(true, host.isSSL());
-            assertEquals(true, host.isClient());
-            assertEquals(true, host.isProxified());
-            assertEquals(false, host.isAdmin());
-            assertEquals(false, host.isActive());
-            assertEquals(UpdatedInfo.TOSUBMIT, host.getUpdatedInfo());
+      assertEquals("server1", host.getHostid());
+      assertEquals("127.0.0.1", host.getAddress());
+      assertEquals(6666, host.getPort());
+      //HostKey is tested in Insert and Update
+      assertEquals(true, host.isSSL());
+      assertEquals(true, host.isClient());
+      assertEquals(true, host.isProxified());
+      assertEquals(false, host.isAdmin());
+      assertEquals(false, host.isActive());
+      assertEquals(UpdatedInfo.TOSUBMIT, host.getUpdatedInfo());
 
-            assertEquals(null, host2);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      assertEquals(null, host2);
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testExist() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            assertEquals(true, dao.exist("server1"));
-            assertEquals(false, dao.exist("ghost"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testExist() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      assertEquals(true, dao.exist("server1"));
+      assertEquals(false, dao.exist("ghost"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
 
-    @Test
-    public void testInsert() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            dao.insert(new Host("chacha", "address", 666, "aaa".getBytes("utf-8"), false, false));
+  @Test
+  public void testInsert() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      dao.insert(
+          new Host("chacha", "address", 666, "aaa".getBytes("utf-8"), false,
+                   false));
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT COUNT(1) as count FROM hosts");
-            res.next();
-            assertEquals(4, res.getInt("count"));
+      ResultSet res = con.createStatement()
+                         .executeQuery("SELECT COUNT(1) as count FROM hosts");
+      res.next();
+      assertEquals(4, res.getInt("count"));
 
-            ResultSet res2 = con.createStatement()
-                .executeQuery("SELECT * FROM hosts WHERE hostid = 'chacha'");
-            res2.next();
-            assertEquals("chacha", res2.getString("hostid"));
-            assertEquals("address", res2.getString("address"));
-            assertEquals(666, res2.getInt("port"));
-            assertArrayEquals("aaa".getBytes("utf-8"), res2.getBytes("hostkey"));
-            assertEquals(false, res2.getBoolean("isssl"));
-            assertEquals(false, res2.getBoolean("isclient"));
-            assertEquals(false, res2.getBoolean("isproxified"));
-            assertEquals(true, res2.getBoolean("adminrole"));
-            assertEquals(true, res2.getBoolean("isactive"));
-            assertEquals(0, res2.getInt("updatedinfo"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      ResultSet res2 = con.createStatement()
+                          .executeQuery(
+                              "SELECT * FROM hosts WHERE hostid = 'chacha'");
+      res2.next();
+      assertEquals("chacha", res2.getString("hostid"));
+      assertEquals("address", res2.getString("address"));
+      assertEquals(666, res2.getInt("port"));
+      assertArrayEquals("aaa".getBytes("utf-8"), res2.getBytes("hostkey"));
+      assertEquals(false, res2.getBoolean("isssl"));
+      assertEquals(false, res2.getBoolean("isclient"));
+      assertEquals(false, res2.getBoolean("isproxified"));
+      assertEquals(true, res2.getBoolean("adminrole"));
+      assertEquals(true, res2.getBoolean("isactive"));
+      assertEquals(0, res2.getInt("updatedinfo"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
-    @Test
-    public void testUpdate() {
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            dao.update(new Host("server2", "address", 666, "password".getBytes("utf-8"), false, false));
+  @Test
+  public void testUpdate() {
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      dao.update(
+          new Host("server2", "address", 666, "password".getBytes("utf-8"),
+                   false, false));
 
-            ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hosts WHERE hostid = 'server2'");
-            res.next();
-            assertEquals("server2", res.getString("hostid"));
-            assertEquals("address", res.getString("address"));
-            assertEquals(666, res.getInt("port"));
-            assertArrayEquals("password".getBytes("utf-8"), res.getBytes("hostkey"));
-            assertEquals(false, res.getBoolean("isssl"));
-            assertEquals(false, res.getBoolean("isclient"));
-            assertEquals(false, res.getBoolean("isproxified"));
-            assertEquals(true, res.getBoolean("adminrole"));
-            assertEquals(true, res.getBoolean("isactive"));
-            assertEquals(0, res.getInt("updatedinfo"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+      ResultSet res = con.createStatement()
+                         .executeQuery(
+                             "SELECT * FROM hosts WHERE hostid = 'server2'");
+      res.next();
+      assertEquals("server2", res.getString("hostid"));
+      assertEquals("address", res.getString("address"));
+      assertEquals(666, res.getInt("port"));
+      assertArrayEquals("password".getBytes("utf-8"), res.getBytes("hostkey"));
+      assertEquals(false, res.getBoolean("isssl"));
+      assertEquals(false, res.getBoolean("isclient"));
+      assertEquals(false, res.getBoolean("isproxified"));
+      assertEquals(true, res.getBoolean("adminrole"));
+      assertEquals(true, res.getBoolean("isactive"));
+      assertEquals(0, res.getInt("updatedinfo"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 
 
-    @Test
-    public void testFind() {
-        ArrayList<Filter> map = new ArrayList<Filter>();
-        map.add(new Filter(DBHostDAO.ADDRESS_FIELD, "=", "127.0.0.1"));
-        try {
-            HostDAO dao = new DBHostDAO(getConnection());
-            assertEquals(2, dao.find(map).size());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+  @Test
+  public void testFind() {
+    ArrayList<Filter> map = new ArrayList<Filter>();
+    map.add(new Filter(DBHostDAO.ADDRESS_FIELD, "=", "127.0.0.1"));
+    try {
+      HostDAO dao = new DBHostDAO(getConnection());
+      assertEquals(2, dao.find(map).size());
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
+  }
 }
 

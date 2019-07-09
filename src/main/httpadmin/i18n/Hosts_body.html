@@ -1,33 +1,41 @@
-
 <tr>
-	<form method="post" name="UPDATE" action="/Hosts.html">
-		<td width="13%" align="center"><input type="text" name="host"
-			size="20" value="XXXHOSTXXX" readonly></td>
-		<td width="13%" align="center"><input type="text" name="address"
-			size="20" value="XXXADDRXXX"></td>
-		<td width="13%" align="center"><input type="text" name="port"
-			size="20" value="XXXPORTXXX"></td>
-		<td width="1%" align="center"><input type="checkbox" name="ssl"
-			value="on" XXXSSLXXX></td>
-		<td width="13%" align="center"><input type="password"
-			name="hostkey" size="20" value="XXXKEYXXX"></td>
-		<td width="1%" align="center"><input type="checkbox" name="admin"
-			value="on" XXXADMXXX></td>
-		<td width="1%" align="center"><input type="checkbox"
-			name="isclient" value="on" XXXISCXXX></td>
-		<td width="1%" align="center"><input type="checkbox"
-			name="isactive" value="on" XXXISAXXX></td>
-		<td width="1%" align="center"><input type="checkbox"
-			name="isproxified" value="on" XXXISPXXX></td>
-		<td width="10%" align="center">XXXVERSIONXXX</td>
-		<td width="8%" align="center"><input type="submit" value="Update"
-			name="ACTION"></td>
-		<td width="8%" align="center"><input type="submit" value="Delete"
-			name="ACTION"></td>
-		<td width="8%" align="center"><input type="submit"
-			value="TestConn" name="ACTION"></td>
-		<td width="8%" align="center">XXXCONNXXX <input type="submit"
-			value="CloseConn" name="ACTION">
-		</td>
-	</form>
+  <form action="/Hosts.html" method="post" name="UPDATE">
+    <td align="center" width="13%"><input name="host" readonly
+                                          size="20" type="text"
+                                          value="XXXHOSTXXX">
+    </td>
+    <td align="center" width="13%"><input name="address" size="20"
+                                          type="text" value="XXXADDRXXX"></td>
+    <td align="center" width="13%"><input name="port" size="20"
+                                          type="text" value="XXXPORTXXX"></td>
+    <td align="center" width="1%"><input XXXSSLXXX name="ssl"
+                                         type="checkbox" value="on"></td>
+    <td align="center" width="13%"><input name="hostkey"
+                                          size="20" type="password"
+                                          value="XXXKEYXXX"></td>
+    <td align="center" width="1%"><input XXXADMXXX name="admin"
+                                         type="checkbox" value="on"></td>
+    <td align="center" width="1%"><input XXXISCXXX
+                                         name="isclient" type="checkbox"
+                                         value="on">
+    </td>
+    <td align="center" width="1%"><input XXXISAXXX
+                                         name="isactive" type="checkbox"
+                                         value="on">
+    </td>
+    <td align="center" width="1%"><input XXXISPXXX
+                                         name="isproxified" type="checkbox"
+                                         value="on"></td>
+    <td align="center" width="10%">XXXVERSIONXXX</td>
+    <td align="center" width="8%"><input name="ACTION" type="submit"
+                                         value="Update"></td>
+    <td align="center" width="8%"><input name="ACTION" type="submit"
+                                         value="Delete"></td>
+    <td align="center" width="8%"><input name="ACTION"
+                                         type="submit" value="TestConn"></td>
+    <td align="center" width="8%">XXXCONNXXX <input name="ACTION"
+                                                    type="submit"
+                                                    value="CloseConn">
+    </td>
+  </form>
 </tr>

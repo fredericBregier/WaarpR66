@@ -20,7 +20,7 @@
         <include>**/license/**</include>
         <include>**/lib/**</include>
         <include>**/src/**</include>
-        </includes>
+      </includes>
       <excludes>
         <exclude>**/target/**</exclude>
         <exclude>**/.*/**</exclude>

@@ -1,7 +1,7 @@
-/*
- *  This file is part of Waarp Project (named also Waarp or GG).
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
  *
- *  Copyright 2009, Waarp SAS, and individual contributors by the @author
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
  *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
  *  individual contributors.
  *
@@ -16,10 +16,10 @@
  *
  *  You should have received a copy of the GNU General Public License along with
  *  Waarp . If not, see <http://www.gnu.org/licenses/>.
- *
- */
+ ******************************************************************************/
 /**
- * This is the root package of the REST API version 2 code. It contains
- * the REST service initializer and all the RESTv2 API constants.
+ * This is the root package of the REST API version 2 code. It contains the REST
+ * service initializer and all the RESTv2
+ * API constants.
  */
 package org.waarp.openr66.protocol.http.restv2;

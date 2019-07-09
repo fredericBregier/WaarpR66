@@ -1,7 +1,7 @@
-/*
- *  This file is part of Waarp Project (named also Waarp or GG).
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
  *
- *  Copyright 2009, Waarp SAS, and individual contributors by the @author
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
  *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
  *  individual contributors.
  *
@@ -16,8 +16,7 @@
  *
  *  You should have received a copy of the GNU General Public License along with
  *  Waarp . If not, see <http://www.gnu.org/licenses/>.
- *
- */
+ ******************************************************************************/
 
 package org.waarp.openr66.protocol.http.restv2.dbhandlers;
 
@@ -45,166 +44,168 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.WILDCARD;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
+import static org.waarp.common.role.RoleDefault.ROLE.HOST;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the single host REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the
+ * single host REST entry point.
  */
 @Path(HOST_ID_HANDLER_URI)
 public class HostIdHandler extends AbstractRestDbHandler {
 
-    /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
-     */
-    private static final HttpHeaders OPTIONS_HEADERS;
+  /**
+   * The content of the 'Allow' header sent when an 'OPTIONS' request is made on
+   * the handler.
+   */
+  private static final HttpHeaders OPTIONS_HEADERS;
 
-    static {
-        OPTIONS_HEADERS = new DefaultHttpHeaders();
-        List<HttpMethod> allow = new ArrayList<HttpMethod>();
-        allow.add(HttpMethod.GET);
-        allow.add(HttpMethod.PUT);
-        allow.add(HttpMethod.DELETE);
-        allow.add(HttpMethod.OPTIONS);
-        OPTIONS_HEADERS.add(ALLOW, allow);
+  static {
+    OPTIONS_HEADERS = new DefaultHttpHeaders();
+    List<HttpMethod> allow = new ArrayList<HttpMethod>();
+    allow.add(HttpMethod.GET);
+    allow.add(HttpMethod.PUT);
+    allow.add(HttpMethod.DELETE);
+    allow.add(HttpMethod.OPTIONS);
+    OPTIONS_HEADERS.add(ALLOW, allow);
+  }
+
+  /**
+   * Initializes the handler with the given CRUD mask.
+   *
+   * @param crud the CRUD mask for this handler
+   */
+  public HostIdHandler(byte crud) {
+    super(crud);
+  }
+
+
+  /**
+   * Method called to retrieve a host entry from the database with the id in the
+   * request URI.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   * @param id the requested host's name
+   */
+  @GET
+  @Consumes(WILDCARD)
+  @RequiredRole(READONLY)
+  public void getHost(HttpRequest request, HttpResponder responder,
+                      @PathParam(URI_ID) String id) {
+
+    HostDAO hostDAO = null;
+    try {
+      hostDAO = DAO_FACTORY.getHostDAO();
+      Host host = hostDAO.select(id);
+      if (host == null) {
+        responder.sendStatus(NOT_FOUND);
+        return;
+      }
+      ObjectNode responseObject = HostConverter.hostToNode(host);
+      String responseText = JsonUtils.nodeToString(responseObject);
+      responder.sendJson(OK, responseText);
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (hostDAO != null) {
+        hostDAO.close();
+      }
     }
+  }
 
-    /**
-     * Initializes the handler with the given CRUD mask.
-     *
-     * @param crud the CRUD mask for this handler
-     */
-    public HostIdHandler(byte crud) {
-        super(crud);
+  /**
+   * Method called to update the host entry with the given id. The entry is
+   * replaced by the one in the request's
+   * body.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   * @param id the requested host's name
+   */
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @RequiredRole(HOST)
+  public void updateHost(HttpRequest request, HttpResponder responder,
+                         @PathParam(URI_ID) String id) {
+
+    HostDAO hostDAO = null;
+    try {
+      hostDAO = DAO_FACTORY.getHostDAO();
+      Host oldHost = hostDAO.select(id);
+
+      if (oldHost == null) {
+        responder.sendStatus(NOT_FOUND);
+        return;
+      }
+
+      ObjectNode requestObject = JsonUtils.deserializeRequest(request);
+      Host newHost = HostConverter.nodeToUpdatedHost(requestObject, oldHost);
+
+      hostDAO.update(newHost);
+
+      ObjectNode responseObject = HostConverter.hostToNode(newHost);
+      String responseText = JsonUtils.nodeToString(responseObject);
+      responder.sendJson(CREATED, responseText);
+
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (hostDAO != null) {
+        hostDAO.close();
+      }
     }
+  }
 
+  /**
+   * Method called to delete a host entry from the database.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   * @param id the requested host's name
+   */
+  @DELETE
+  @Consumes(WILDCARD)
+  @RequiredRole(HOST)
+  public void deleteHost(HttpRequest request, HttpResponder responder,
+                         @PathParam(URI_ID) String id) {
 
-    /**
-     * Method called to retrieve a host entry from the database with the id
-     * in the request URI.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
-     */
-    @GET
-    @Consumes(WILDCARD)
-    @RequiredRole(READONLY)
-    public void getHost(HttpRequest request, HttpResponder responder,
-                        @PathParam(URI_ID) String id) {
-
-        HostDAO hostDAO = null;
-        try {
-            hostDAO = DAO_FACTORY.getHostDAO();
-            Host host = hostDAO.select(id);
-            if (host == null) {
-                responder.sendStatus(NOT_FOUND);
-                return;
-            }
-            ObjectNode responseObject = HostConverter.hostToNode(host);
-            String responseText = JsonUtils.nodeToString(responseObject);
-            responder.sendJson(OK, responseText);
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (hostDAO != null) {
-                hostDAO.close();
-            }
-        }
+    HostDAO hostDAO = null;
+    try {
+      hostDAO = DAO_FACTORY.getHostDAO();
+      Host host = hostDAO.select(id);
+      if (host == null) {
+        responder.sendStatus(NOT_FOUND);
+      } else {
+        hostDAO.delete(host);
+        responder.sendStatus(NO_CONTENT);
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (hostDAO != null) {
+        hostDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to update the host entry with the given id. The entry is
-     * replaced by the one in the request's body.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
-     */
-    @PUT
-    @Consumes(APPLICATION_JSON)
-    @RequiredRole(HOST)
-    public void updateHost(HttpRequest request, HttpResponder responder,
-                           @PathParam(URI_ID) String id) {
-
-        HostDAO hostDAO = null;
-        try {
-            hostDAO = DAO_FACTORY.getHostDAO();
-            Host oldHost = hostDAO.select(id);
-
-            if (oldHost == null) {
-                responder.sendStatus(NOT_FOUND);
-                return;
-            }
-
-            ObjectNode requestObject = JsonUtils.deserializeRequest(request);
-            Host newHost = HostConverter.nodeToUpdatedHost(requestObject, oldHost);
-
-            hostDAO.update(newHost);
-
-            ObjectNode responseObject = HostConverter.hostToNode(newHost);
-            String responseText = JsonUtils.nodeToString(responseObject);
-            responder.sendJson(CREATED, responseText);
-
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (hostDAO != null) {
-                hostDAO.close();
-            }
-        }
-    }
-
-    /**
-     * Method called to delete a host entry from the database.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
-     */
-    @DELETE
-    @Consumes(WILDCARD)
-    @RequiredRole(HOST)
-    public void deleteHost(HttpRequest request, HttpResponder responder,
-                           @PathParam(URI_ID) String id) {
-
-        HostDAO hostDAO = null;
-        try {
-            hostDAO = DAO_FACTORY.getHostDAO();
-            Host host = hostDAO.select(id);
-            if (host == null) {
-                responder.sendStatus(NOT_FOUND);
-            } else {
-                hostDAO.delete(host);
-                responder.sendStatus(NO_CONTENT);
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (hostDAO != null) {
-                hostDAO.close();
-            }
-        }
-    }
-
-    /**
-     * Method called to get a list of all allowed HTTP methods on this entry point.
-     * The HTTP methods are sent as an array in the reply's headers.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
-     */
-    @OPTIONS
-    @Consumes(WILDCARD)
-    @RequiredRole(NOACCESS)
-    public void options(HttpRequest request, HttpResponder responder,
-                        @PathParam(URI_ID) String id) {
-        responder.sendStatus(OK, OPTIONS_HEADERS);
-    }
+  /**
+   * Method called to get a list of all allowed HTTP methods on this entry
+   * point. The HTTP methods are sent as an
+   * array in the reply's headers.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   * @param id the requested host's name
+   */
+  @OPTIONS
+  @Consumes(WILDCARD)
+  @RequiredRole(NOACCESS)
+  public void options(HttpRequest request, HttpResponder responder,
+                      @PathParam(URI_ID) String id) {
+    responder.sendStatus(OK, OPTIONS_HEADERS);
+  }
 }

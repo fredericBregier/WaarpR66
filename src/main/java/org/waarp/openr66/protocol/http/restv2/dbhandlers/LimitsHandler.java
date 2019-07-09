@@ -1,7 +1,7 @@
-/*
- *  This file is part of Waarp Project (named also Waarp or GG).
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
  *
- *  Copyright 2009, Waarp SAS, and individual contributors by the @author
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
  *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
  *  individual contributors.
  *
@@ -16,8 +16,7 @@
  *
  *  You should have received a copy of the GNU General Public License along with
  *  Waarp . If not, see <http://www.gnu.org/licenses/>.
- *
- */
+ ******************************************************************************/
 
 package org.waarp.openr66.protocol.http.restv2.dbhandlers;
 
@@ -46,208 +45,214 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.WILDCARD;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
-import static org.waarp.openr66.protocol.configuration.Configuration.configuration;
+import static org.waarp.openr66.protocol.configuration.Configuration.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ALREADY_EXISTING;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the bandwidth limits REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the
+ * bandwidth limits REST entry point.
  */
 @Path(LIMITS_HANDLER_URI)
 public class LimitsHandler extends AbstractRestDbHandler {
 
-    /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
-     */
-    private static final HttpHeaders OPTIONS_HEADERS;
+  /**
+   * The content of the 'Allow' header sent when an 'OPTIONS' request is made on
+   * the handler.
+   */
+  private static final HttpHeaders OPTIONS_HEADERS;
 
-    static {
-        OPTIONS_HEADERS = new DefaultHttpHeaders();
-        List<HttpMethod> allow = new ArrayList<HttpMethod>();
-        allow.add(HttpMethod.GET);
-        allow.add(HttpMethod.POST);
-        allow.add(HttpMethod.PUT);
-        allow.add(HttpMethod.DELETE);
-        allow.add(HttpMethod.OPTIONS);
-        OPTIONS_HEADERS.add(ALLOW, allow);
+  static {
+    OPTIONS_HEADERS = new DefaultHttpHeaders();
+    List<HttpMethod> allow = new ArrayList<HttpMethod>();
+    allow.add(HttpMethod.GET);
+    allow.add(HttpMethod.POST);
+    allow.add(HttpMethod.PUT);
+    allow.add(HttpMethod.DELETE);
+    allow.add(HttpMethod.OPTIONS);
+    OPTIONS_HEADERS.add(ALLOW, allow);
+  }
+
+  /**
+   * Initializes the handler with the given CRUD mask.
+   *
+   * @param crud the CRUD mask for this handler
+   */
+  public LimitsHandler(byte crud) {
+    super(crud);
+  }
+
+  /**
+   * Method called to obtain a description of the host's current bandwidth
+   * limits.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @GET
+  @Consumes(WILDCARD)
+  @RequiredRole(LIMIT)
+  public void getLimits(HttpRequest request, HttpResponder responder) {
+
+    LimitDAO limitDAO = null;
+    try {
+      limitDAO = DAO_FACTORY.getLimitDAO();
+      if (limitDAO.exist(SERVER_NAME)) {
+        Limit limits = limitDAO.select(SERVER_NAME);
+        ObjectNode responseObject = LimitsConverter.limitToNode(limits);
+        String responseText = JsonUtils.nodeToString(responseObject);
+
+        responder.sendJson(OK, responseText);
+      } else {
+        responder.sendStatus(NOT_FOUND);
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (limitDAO != null) {
+        limitDAO.close();
+      }
     }
+  }
 
-    /**
-     * Initializes the handler with the given CRUD mask.
-     *
-     * @param crud the CRUD mask for this handler
-     */
-    public LimitsHandler(byte crud) {
-        super(crud);
+  /**
+   * Method called to initiate the entry for this host in the bandwidth limits
+   * database. If the host already has
+   * limits set in its configuration, they will be replaced by these new ones.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @POST
+  @Consumes(APPLICATION_JSON)
+  @RequiredRole(READONLY)
+  public void initializeLimits(HttpRequest request, HttpResponder responder) {
+
+    LimitDAO limitDAO = null;
+    try {
+      limitDAO = DAO_FACTORY.getLimitDAO();
+
+      if (!limitDAO.exist(SERVER_NAME)) {
+        ObjectNode requestObject = JsonUtils.deserializeRequest(request);
+        Limit limits = LimitsConverter.nodeToNewLimit(requestObject);
+        limitDAO.insert(limits);
+
+        configuration.changeNetworkLimit(limits.getReadGlobalLimit(),
+                                         limits.getWriteGlobalLimit(),
+                                         limits.getReadSessionLimit(),
+                                         limits.getWriteSessionLimit(),
+                                         limits.getDelayLimit());
+
+        ObjectNode responseObject = LimitsConverter.limitToNode(limits);
+        String responseText = JsonUtils.nodeToString(responseObject);
+        responder.sendJson(CREATED, responseText);
+      } else {
+        throw new RestErrorException(ALREADY_EXISTING(SERVER_NAME));
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (limitDAO != null) {
+        limitDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to obtain a description of the host's current bandwidth
-     * limits.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @GET
-    @Consumes(WILDCARD)
-    @RequiredRole(LIMIT)
-    public void getLimits(HttpRequest request, HttpResponder responder) {
+  /**
+   * Method called to update this host's bandwidth limits in the database and
+   * configuration.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @RequiredRole(LIMIT)
+  public void updateLimits(HttpRequest request, HttpResponder responder) {
 
-        LimitDAO limitDAO = null;
-        try {
-            limitDAO = DAO_FACTORY.getLimitDAO();
-            if (limitDAO.exist(SERVER_NAME)) {
-                Limit limits = limitDAO.select(SERVER_NAME);
-                ObjectNode responseObject = LimitsConverter.limitToNode(limits);
-                String responseText = JsonUtils.nodeToString(responseObject);
+    LimitDAO limitDAO = null;
+    try {
+      limitDAO = DAO_FACTORY.getLimitDAO();
 
-                responder.sendJson(OK, responseText);
-            } else {
-                responder.sendStatus(NOT_FOUND);
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (limitDAO != null) {
-                limitDAO.close();
-            }
-        }
+      if (!limitDAO.exist(SERVER_NAME)) {
+        responder.sendStatus(NOT_FOUND);
+        return;
+      }
+
+      ObjectNode requestObject = JsonUtils.deserializeRequest(request);
+
+      Limit oldLimits = limitDAO.select(SERVER_NAME);
+      Limit newLimits =
+          LimitsConverter.nodeToUpdatedLimit(requestObject, oldLimits);
+
+      limitDAO.update(newLimits);
+
+      configuration.changeNetworkLimit(newLimits.getReadGlobalLimit(),
+                                       newLimits.getWriteGlobalLimit(),
+                                       newLimits.getReadSessionLimit(),
+                                       newLimits.getWriteSessionLimit(),
+                                       newLimits.getDelayLimit());
+
+      ObjectNode responseObject = LimitsConverter.limitToNode(newLimits);
+      String responseText = JsonUtils.nodeToString(responseObject);
+      responder.sendJson(CREATED, responseText);
+
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (limitDAO != null) {
+        limitDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to initiate the entry for this host in the bandwidth limits
-     * database. If the host already has limits set in its configuration,
-     * they will be replaced by these new ones.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @POST
-    @Consumes(APPLICATION_JSON)
-    @RequiredRole(READONLY)
-    public void initializeLimits(HttpRequest request, HttpResponder responder) {
+  /**
+   * Method called to remove any bandwidth limits in place on this host. Also
+   * removes any limits set in the
+   * configuration.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @DELETE
+  @Consumes(WILDCARD)
+  @RequiredRole(LIMIT)
+  public void deleteLimits(HttpRequest request, HttpResponder responder) {
+    LimitDAO limitDAO = null;
+    try {
+      limitDAO = DAO_FACTORY.getLimitDAO();
 
-        LimitDAO limitDAO = null;
-        try {
-            limitDAO = DAO_FACTORY.getLimitDAO();
-
-            if (!limitDAO.exist(SERVER_NAME)) {
-                ObjectNode requestObject = JsonUtils.deserializeRequest(request);
-                Limit limits = LimitsConverter.nodeToNewLimit(requestObject);
-                limitDAO.insert(limits);
-
-                configuration.changeNetworkLimit(limits.getReadGlobalLimit(),
-                        limits.getWriteGlobalLimit(), limits.getReadSessionLimit(),
-                        limits.getWriteSessionLimit(), limits.getDelayLimit());
-
-                ObjectNode responseObject = LimitsConverter.limitToNode(limits);
-                String responseText = JsonUtils.nodeToString(responseObject);
-                responder.sendJson(CREATED, responseText);
-            } else {
-                throw new RestErrorException(ALREADY_EXISTING(SERVER_NAME));
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (limitDAO != null) {
-                limitDAO.close();
-            }
-        }
+      if (limitDAO.exist(SERVER_NAME)) {
+        limitDAO.delete(limitDAO.select(SERVER_NAME));
+        configuration.changeNetworkLimit(0, 0, 0, 0, 0);
+        responder.sendStatus(NO_CONTENT);
+      } else {
+        responder.sendStatus(NOT_FOUND);
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (limitDAO != null) {
+        limitDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to update this host's bandwidth limits in the database
-     * and configuration.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @PUT
-    @Consumes(APPLICATION_JSON)
-    @RequiredRole(LIMIT)
-    public void updateLimits(HttpRequest request, HttpResponder responder) {
-
-        LimitDAO limitDAO = null;
-        try {
-            limitDAO = DAO_FACTORY.getLimitDAO();
-
-            if (!limitDAO.exist(SERVER_NAME)) {
-                responder.sendStatus(NOT_FOUND);
-                return;
-            }
-
-            ObjectNode requestObject = JsonUtils.deserializeRequest(request);
-
-            Limit oldLimits = limitDAO.select(SERVER_NAME);
-            Limit newLimits = LimitsConverter.nodeToUpdatedLimit(requestObject, oldLimits);
-
-            limitDAO.update(newLimits);
-
-            configuration.changeNetworkLimit(newLimits.getReadGlobalLimit(),
-                    newLimits.getWriteGlobalLimit(), newLimits.getReadSessionLimit(),
-                    newLimits.getWriteSessionLimit(), newLimits.getDelayLimit());
-
-            ObjectNode responseObject = LimitsConverter.limitToNode(newLimits);
-            String responseText = JsonUtils.nodeToString(responseObject);
-            responder.sendJson(CREATED, responseText);
-
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (limitDAO != null) {
-                limitDAO.close();
-            }
-        }
-    }
-
-    /**
-     * Method called to remove any bandwidth limits in place on this host.
-     * Also removes any limits set in the configuration.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @DELETE
-    @Consumes(WILDCARD)
-    @RequiredRole(LIMIT)
-    public void deleteLimits(HttpRequest request, HttpResponder responder) {
-        LimitDAO limitDAO = null;
-        try {
-            limitDAO = DAO_FACTORY.getLimitDAO();
-
-            if (limitDAO.exist(SERVER_NAME)) {
-                limitDAO.delete(limitDAO.select(SERVER_NAME));
-                configuration.changeNetworkLimit(0, 0, 0, 0, 0);
-                responder.sendStatus(NO_CONTENT);
-            } else {
-                responder.sendStatus(NOT_FOUND);
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (limitDAO != null) {
-                limitDAO.close();
-            }
-        }
-    }
-
-    /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @OPTIONS
-    @Consumes(WILDCARD)
-    @RequiredRole(NOACCESS)
-    public void options(HttpRequest request, HttpResponder responder) {
-        responder.sendStatus(OK, OPTIONS_HEADERS);
-    }
+  /**
+   * Method called to get a list of all allowed HTTP methods on this entry
+   * point. The HTTP methods are sent as an
+   * array in the reply's headers.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @OPTIONS
+  @Consumes(WILDCARD)
+  @RequiredRole(NOACCESS)
+  public void options(HttpRequest request, HttpResponder responder) {
+    responder.sendStatus(OK, OPTIONS_HEADERS);
+  }
 }

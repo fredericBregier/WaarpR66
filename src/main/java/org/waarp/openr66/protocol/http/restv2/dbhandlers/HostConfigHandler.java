@@ -1,7 +1,7 @@
-/*
- *  This file is part of Waarp Project (named also Waarp or GG).
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
  *
- *  Copyright 2009, Waarp SAS, and individual contributors by the @author
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
  *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
  *  individual contributors.
  *
@@ -16,8 +16,7 @@
  *
  *  You should have received a copy of the GNU General Public License along with
  *  Waarp . If not, see <http://www.gnu.org/licenses/>.
- *
- */
+ ******************************************************************************/
 
 package org.waarp.openr66.protocol.http.restv2.dbhandlers;
 
@@ -46,190 +45,194 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
+import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ALREADY_EXISTING;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the host configuration REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the
+ * host configuration REST entry point.
  */
 @Path(CONFIG_HANDLER_URI)
 public class HostConfigHandler extends AbstractRestDbHandler {
 
-    /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
-     */
-    private static final HttpHeaders OPTIONS_HEADERS;
+  /**
+   * The content of the 'Allow' header sent when an 'OPTIONS' request is made on
+   * the handler.
+   */
+  private static final HttpHeaders OPTIONS_HEADERS;
 
-    static {
-        OPTIONS_HEADERS = new DefaultHttpHeaders();
-        List<HttpMethod> allow = new ArrayList<HttpMethod>();
-        allow.add(HttpMethod.GET);
-        allow.add(HttpMethod.POST);
-        allow.add(HttpMethod.PUT);
-        allow.add(HttpMethod.DELETE);
-        allow.add(HttpMethod.OPTIONS);
-        OPTIONS_HEADERS.add(ALLOW, allow);
+  static {
+    OPTIONS_HEADERS = new DefaultHttpHeaders();
+    List<HttpMethod> allow = new ArrayList<HttpMethod>();
+    allow.add(HttpMethod.GET);
+    allow.add(HttpMethod.POST);
+    allow.add(HttpMethod.PUT);
+    allow.add(HttpMethod.DELETE);
+    allow.add(HttpMethod.OPTIONS);
+    OPTIONS_HEADERS.add(ALLOW, allow);
+  }
+
+  /**
+   * Initializes the handler with the given CRUD mask.
+   *
+   * @param crud the CRUD mask for this handler
+   */
+  public HostConfigHandler(byte crud) {
+    super(crud);
+  }
+
+  /**
+   * Method called to retrieve a host's configuration entry in the database.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @GET
+  @Consumes(WILDCARD)
+  @RequiredRole(READONLY)
+  public void getConfig(HttpRequest request, HttpResponder responder) {
+
+    BusinessDAO businessDAO = null;
+    try {
+      businessDAO = DAO_FACTORY.getBusinessDAO();
+      Business business = businessDAO.select(SERVER_NAME);
+      if (business != null) {
+        ObjectNode responseObject =
+            HostConfigConverter.businessToNode(business);
+        String responseText = JsonUtils.nodeToString(responseObject);
+        responder.sendJson(OK, responseText);
+      } else {
+        responder.sendStatus(NOT_FOUND);
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (businessDAO != null) {
+        businessDAO.close();
+      }
     }
+  }
 
-    /**
-     * Initializes the handler with the given CRUD mask.
-     *
-     * @param crud the CRUD mask for this handler
-     */
-    public HostConfigHandler(byte crud) {
-        super(crud);
+  /**
+   * Method called to initialize a host's configuration database entry if none
+   * already exists.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @POST
+  @Consumes(APPLICATION_FORM_URLENCODED)
+  @RequiredRole(CONFIGADMIN)
+  public void initializeConfig(HttpRequest request, HttpResponder responder) {
+
+    BusinessDAO businessDAO = null;
+    try {
+      businessDAO = DAO_FACTORY.getBusinessDAO();
+
+      if (!businessDAO.exist(SERVER_NAME)) {
+        ObjectNode requestObject = JsonUtils.deserializeRequest(request);
+        Business config = HostConfigConverter.nodeToNewBusiness(requestObject);
+        businessDAO.insert(config);
+
+        ObjectNode responseObject = HostConfigConverter.businessToNode(config);
+        String responseText = JsonUtils.nodeToString(responseObject);
+        responder.sendJson(CREATED, responseText);
+      } else {
+        throw new RestErrorException(ALREADY_EXISTING(SERVER_NAME));
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (businessDAO != null) {
+        businessDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to retrieve a host's configuration entry in the database.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @GET
-    @Consumes(WILDCARD)
-    @RequiredRole(READONLY)
-    public void getConfig(HttpRequest request, HttpResponder responder) {
+  /**
+   * Method called to update a host's configuration in the database if it
+   * exists.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @RequiredRole(CONFIGADMIN)
+  public void updateConfig(HttpRequest request, HttpResponder responder) {
 
-        BusinessDAO businessDAO = null;
-        try {
-            businessDAO = DAO_FACTORY.getBusinessDAO();
-            Business business = businessDAO.select(SERVER_NAME);
-            if (business != null) {
-                ObjectNode responseObject = HostConfigConverter.businessToNode(business);
-                String responseText = JsonUtils.nodeToString(responseObject);
-                responder.sendJson(OK, responseText);
-            } else {
-                responder.sendStatus(NOT_FOUND);
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (businessDAO != null) {
-                businessDAO.close();
-            }
-        }
+    BusinessDAO businessDAO = null;
+
+    try {
+      businessDAO = DAO_FACTORY.getBusinessDAO();
+
+      if (!businessDAO.exist(SERVER_NAME)) {
+        responder.sendStatus(NOT_FOUND);
+      }
+
+      ObjectNode requestObject = JsonUtils.deserializeRequest(request);
+      Business oldConfig = businessDAO.select(SERVER_NAME);
+      Business newConfig =
+          HostConfigConverter.nodeToUpdatedBusiness(requestObject, oldConfig);
+      businessDAO.update(newConfig);
+
+      ObjectNode responseObject = HostConfigConverter.businessToNode(newConfig);
+      String responseText = JsonUtils.nodeToString(responseObject);
+      responder.sendJson(CREATED, responseText);
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (businessDAO != null) {
+        businessDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to initialize a host's configuration database entry if none
-     * already exists.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @POST
-    @Consumes(APPLICATION_FORM_URLENCODED)
-    @RequiredRole(CONFIGADMIN)
-    public void initializeConfig(HttpRequest request, HttpResponder responder) {
+  /**
+   * Method called to delete a host's configuration entry in the database.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @DELETE
+  @Consumes(WILDCARD)
+  @RequiredRole(CONFIGADMIN)
+  public void deleteConfig(HttpRequest request, HttpResponder responder) {
 
-        BusinessDAO businessDAO = null;
-        try {
-            businessDAO = DAO_FACTORY.getBusinessDAO();
-
-            if (!businessDAO.exist(SERVER_NAME)) {
-                ObjectNode requestObject = JsonUtils.deserializeRequest(request);
-                Business config = HostConfigConverter.nodeToNewBusiness(requestObject);
-                businessDAO.insert(config);
-
-                ObjectNode responseObject = HostConfigConverter.businessToNode(config);
-                String responseText = JsonUtils.nodeToString(responseObject);
-                responder.sendJson(CREATED, responseText);
-            } else {
-                throw new RestErrorException(ALREADY_EXISTING(SERVER_NAME));
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (businessDAO != null) {
-                businessDAO.close();
-            }
-        }
+    BusinessDAO businessDAO = null;
+    try {
+      businessDAO = DAO_FACTORY.getBusinessDAO();
+      if (businessDAO.exist(SERVER_NAME)) {
+        businessDAO.delete(businessDAO.select(SERVER_NAME));
+        responder.sendStatus(NO_CONTENT);
+      } else {
+        responder.sendStatus(NOT_FOUND);
+      }
+    } catch (DAOException e) {
+      throw new InternalServerErrorException(e);
+    } finally {
+      if (businessDAO != null) {
+        businessDAO.close();
+      }
     }
+  }
 
-    /**
-     * Method called to update a host's configuration in the database if it exists.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @PUT
-    @Consumes(APPLICATION_JSON)
-    @RequiredRole(CONFIGADMIN)
-    public void updateConfig(HttpRequest request, HttpResponder responder) {
-
-        BusinessDAO businessDAO = null;
-
-        try {
-            businessDAO = DAO_FACTORY.getBusinessDAO();
-
-            if (!businessDAO.exist(SERVER_NAME)) {
-                responder.sendStatus(NOT_FOUND);
-            }
-
-            ObjectNode requestObject = JsonUtils.deserializeRequest(request);
-            Business oldConfig = businessDAO.select(SERVER_NAME);
-            Business newConfig = HostConfigConverter.nodeToUpdatedBusiness(requestObject, oldConfig);
-            businessDAO.update(newConfig);
-
-            ObjectNode responseObject = HostConfigConverter.businessToNode(newConfig);
-            String responseText = JsonUtils.nodeToString(responseObject);
-            responder.sendJson(CREATED, responseText);
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (businessDAO != null) {
-                businessDAO.close();
-            }
-        }
-    }
-
-    /**
-     * Method called to delete a host's configuration entry in the database.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @DELETE
-    @Consumes(WILDCARD)
-    @RequiredRole(CONFIGADMIN)
-    public void deleteConfig(HttpRequest request, HttpResponder responder) {
-
-        BusinessDAO businessDAO = null;
-        try {
-            businessDAO = DAO_FACTORY.getBusinessDAO();
-            if (businessDAO.exist(SERVER_NAME)) {
-                businessDAO.delete(businessDAO.select(SERVER_NAME));
-                responder.sendStatus(NO_CONTENT);
-            } else {
-                responder.sendStatus(NOT_FOUND);
-            }
-        } catch (DAOException e) {
-            throw new InternalServerErrorException(e);
-        } finally {
-            if (businessDAO != null) {
-                businessDAO.close();
-            }
-        }
-    }
-
-    /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
-     *
-     * @param request   the HttpRequest made on the resource
-     * @param responder the HttpResponder which sends the reply to the request
-     */
-    @OPTIONS
-    @Consumes(WILDCARD)
-    @RequiredRole(NOACCESS)
-    public void options(HttpRequest request, HttpResponder responder) {
-        responder.sendStatus(OK, OPTIONS_HEADERS);
-    }
+  /**
+   * Method called to get a list of all allowed HTTP methods on this entry
+   * point. The HTTP methods are sent as an
+   * array in the reply's headers.
+   *
+   * @param request the HttpRequest made on the resource
+   * @param responder the HttpResponder which sends the reply to the request
+   */
+  @OPTIONS
+  @Consumes(WILDCARD)
+  @RequiredRole(NOACCESS)
+  public void options(HttpRequest request, HttpResponder responder) {
+    responder.sendStatus(OK, OPTIONS_HEADERS);
+  }
 }
 

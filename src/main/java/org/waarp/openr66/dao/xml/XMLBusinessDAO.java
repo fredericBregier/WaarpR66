@@ -1,7 +1,26 @@
+/*******************************************************************************
+ * This file is part of Waarp Project (named also Waarp or GG).
+ *
+ *  Copyright (c) 2019, Waarp SAS, and individual contributors by the @author
+ *  tags. See the COPYRIGHT.txt in the distribution for a full listing of
+ *  individual contributors.
+ *
+ *  All Waarp Project is free software: you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or (at your
+ *  option) any later version.
+ *
+ *  Waarp is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ *  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with
+ *  Waarp . If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 package org.waarp.openr66.dao.xml;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.waarp.common.logging.WaarpLogger;
@@ -15,9 +34,12 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,144 +47,144 @@ import java.util.List;
 //TODO
 public class XMLBusinessDAO implements BusinessDAO {
 
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLBusinessDAO.class);
+  public static final String HOSTID_FIELD = "hostid";
+  private static final WaarpLogger logger =
+      WaarpLoggerFactory.getLogger(XMLBusinessDAO.class);
+  private static final String XML_SELECT = "/authent/entry[hostid=$hostid]";
+  private static final String XML_GET_ALL = "/authent/entry";
 
-    public static final String HOSTID_FIELD = "hostid";
+  private File file;
 
-    private static final String XML_SELECT = "/authent/entry[hostid=$hostid]";
-    private static final String XML_GET_ALL= "/authent/entry";
+  public XMLBusinessDAO(String filePath) throws DAOException {
+    this.file = new File(filePath);
+  }
 
-    private File file;
+  public void close() {
+  }
 
-    public XMLBusinessDAO(String filePath) throws DAOException {
-        this.file = new File(filePath);
+  public void delete(Business business) throws DAOException {
+    throw new DAOException("Operation not supported on XML DAO");
+  }
+
+  public void deleteAll() throws DAOException {
+    throw new DAOException("Operation not supported on XML DAO");
+  }
+
+  public List<Business> getAll() throws DAOException {
+    if (!file.exists()) {
+      throw new DAOException("File doesn't exist");
     }
-
-    public void close() {}
-
-    public void delete(Business business) throws DAOException {
-        throw new DAOException("Operation not supported on XML DAO");
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      Document document = dbf.newDocumentBuilder().parse(file);
+      // Setup XPath query
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      XPathExpression xpe = xPath.compile(XML_GET_ALL);
+      NodeList listNode = (NodeList) xpe.evaluate(document,
+                                                  XPathConstants.NODESET);
+      // Iterate through all found nodes
+      List<Business> res = new ArrayList<Business>(listNode.getLength());
+      for (int i = 0; i < listNode.getLength(); i++) {
+        Node node = listNode.item(i);
+        res.add(getFromNode(node));
+      }
+      return res;
+    } catch (SAXException e) {
+      throw new DAOException(e);
+    } catch (XPathExpressionException e) {
+      throw new DAOException(e);
+    } catch (ParserConfigurationException e) {
+      throw new DAOException(e);
+    } catch (IOException e) {
+      throw new DAOException(e);
     }
+  }
 
-    public void deleteAll() throws DAOException {
-        throw new DAOException("Operation not supported on XML DAO");
+  private Business getFromNode(Node parent) {
+    Business res = new Business();
+
+    NodeList children = parent.getChildNodes();
+    for (int j = 0; j < children.getLength(); j++) {
+      Node node = children.item(j);
+      if (node.getNodeName().equals(HOSTID_FIELD)) {
+        res.setHostid(node.getTextContent());
+      }
     }
+    return res;
+  }
 
-    public List<Business> getAll() throws DAOException {
-        if (!file.exists()) {
-            throw new DAOException("File doesn't exist");
-        }
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            Document document = dbf.newDocumentBuilder().parse(file);
-            // Setup XPath query
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            XPathExpression xpe = xPath.compile(XML_GET_ALL);
-            NodeList listNode = (NodeList) xpe.evaluate(document,
-                    XPathConstants.NODESET);
-            // Iterate through all found nodes
-            List<Business> res = new ArrayList<Business>(listNode.getLength());
-            for (int i = 0; i < listNode.getLength(); i++) {
-                Node node = listNode.item(i);
-                res.add(getFromNode(node));
-            }
-            return res;
-        } catch (SAXException e) {
-            throw new DAOException(e);
-        } catch (XPathExpressionException e) {
-            throw new DAOException(e);
-        } catch (ParserConfigurationException e) {
-            throw new DAOException(e);
-        } catch (IOException e) {
-            throw new DAOException(e);
-        }
+  public boolean exist(String hostid) throws DAOException {
+    if (!file.exists()) {
+      throw new DAOException("File doesn't exist");
     }
-
-    public boolean exist(String hostid) throws DAOException {
-        if (!file.exists()) {
-            throw new DAOException("File doesn't exist");
-        }
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            Document document = dbf.newDocumentBuilder().parse(file);
-            // Setup XPath variable
-            SimpleVariableResolver resolver = new SimpleVariableResolver();
-            resolver.addVariable(new QName(null, "hostid"), hostid);
-            // Setup XPath query
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            xPath.setXPathVariableResolver(resolver);
-            XPathExpression xpe = xPath.compile(XML_SELECT);
-            // Query will return "" if nothing is found
-            return(!"".equals(xpe.evaluate(document)));
-        } catch (SAXException e) {
-            throw new DAOException(e);
-        } catch (XPathExpressionException e) {
-            throw new DAOException(e);
-        } catch (ParserConfigurationException e) {
-            throw new DAOException(e);
-        } catch (IOException e) {
-            throw new DAOException(e);
-        }
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      Document document = dbf.newDocumentBuilder().parse(file);
+      // Setup XPath variable
+      SimpleVariableResolver resolver = new SimpleVariableResolver();
+      resolver.addVariable(new QName(null, "hostid"), hostid);
+      // Setup XPath query
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      xPath.setXPathVariableResolver(resolver);
+      XPathExpression xpe = xPath.compile(XML_SELECT);
+      // Query will return "" if nothing is found
+      return (!"".equals(xpe.evaluate(document)));
+    } catch (SAXException e) {
+      throw new DAOException(e);
+    } catch (XPathExpressionException e) {
+      throw new DAOException(e);
+    } catch (ParserConfigurationException e) {
+      throw new DAOException(e);
+    } catch (IOException e) {
+      throw new DAOException(e);
     }
+  }
 
-    public List<Business> find(List<Filter> fitlers) throws DAOException {
-        throw new DAOException("Operation not supported on XML DAO");
+  public List<Business> find(List<Filter> fitlers) throws DAOException {
+    throw new DAOException("Operation not supported on XML DAO");
+  }
+
+  public void insert(Business business) throws DAOException {
+    throw new DAOException("Operation not supported on XML DAO");
+  }
+
+  public Business select(String hostid) throws DAOException {
+    if (!file.exists()) {
+      throw new DAOException("File doesn't exist");
     }
-
-    public void insert(Business business) throws DAOException {
-        throw new DAOException("Operation not supported on XML DAO");
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      Document document = dbf.newDocumentBuilder().parse(file);
+      // Setup XPath variable
+      SimpleVariableResolver resolver = new SimpleVariableResolver();
+      resolver.addVariable(new QName(null, "hostid"), hostid);
+      // Setup XPath query
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      xPath.setXPathVariableResolver(resolver);
+      XPathExpression xpe = xPath.compile(XML_SELECT);
+      // Retrieve node and instantiate object
+      Node node = (Node) xpe.evaluate(document, XPathConstants.NODE);
+      if (node != null) {
+        return getFromNode(node);
+      }
+      return null;
+    } catch (SAXException e) {
+      throw new DAOException(e);
+    } catch (XPathExpressionException e) {
+      throw new DAOException(e);
+    } catch (ParserConfigurationException e) {
+      throw new DAOException(e);
+    } catch (IOException e) {
+      throw new DAOException(e);
     }
+  }
 
-    public Business select(String hostid) throws DAOException {
-        if (!file.exists()) {
-            throw new DAOException("File doesn't exist");
-        }
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            Document document = dbf.newDocumentBuilder().parse(file);
-            // Setup XPath variable
-            SimpleVariableResolver resolver = new SimpleVariableResolver();
-            resolver.addVariable(new QName(null, "hostid"), hostid);
-            // Setup XPath query
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            xPath.setXPathVariableResolver(resolver);
-            XPathExpression xpe = xPath.compile(XML_SELECT);
-            // Retrieve node and instantiate object
-            Node node = (Node) xpe.evaluate(document, XPathConstants.NODE);
-            if (node != null) {
-                return getFromNode(node);
-            }
-            return null;
-        } catch (SAXException e) {
-            throw new DAOException(e);
-        } catch (XPathExpressionException e) {
-            throw new DAOException(e);
-        } catch (ParserConfigurationException e) {
-            throw new DAOException(e);
-        } catch (IOException e) {
-            throw new DAOException(e);
-        }
-    }
+  public void update(Business business) throws DAOException {
+    throw new DAOException("Operation not supported on XML DAO");
+  }
 
-    public void update(Business business) throws DAOException {
-        throw new DAOException("Operation not supported on XML DAO");
-    }
-
-    private Business getFromNode(Node parent) {
-        Business res = new Business();
-
-        NodeList children = parent.getChildNodes();
-        for (int j = 0; j < children.getLength(); j++) {
-            Node node = children.item(j);
-            if (node.getNodeName().equals(HOSTID_FIELD)) {
-                res.setHostid(node.getTextContent());
-            }
-        }
-        return res;
-    }
-
-    private Node getNode(Document doc, Business business) {
-        Node res = doc.createElement("entry");
-        return res;
-    }
+  private Node getNode(Document doc, Business business) {
+    Node res = doc.createElement("entry");
+    return res;
+  }
 }
