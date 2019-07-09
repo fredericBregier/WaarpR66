@@ -1,25 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.gateway.kernel.exec;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.command.exception.Reply421Exception;
@@ -28,9 +23,13 @@ import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.utility.WaarpThreadFactory;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author "Frederic Bregier"
- * 
+ *
  */
 public class JavaExecutor extends AbstractExecutor {
     /**
@@ -67,7 +66,7 @@ public class JavaExecutor extends AbstractExecutor {
             throw new Reply421Exception("Pre Exec command is not executable");
         }
         runnable.setArgs(true, useLocalExec,
-                (int) this.delay, args);
+                         (int) this.delay, args);
         logger.debug(className + " " + runnable.getClass().getName());
         int status = -1;
         if (delay <= 0) {
@@ -88,13 +87,14 @@ public class JavaExecutor extends AbstractExecutor {
                         status = runnable.getFinalStatus();
                     }
                 } else {
-                    while (!executorService.awaitTermination(30, TimeUnit.SECONDS))
+                    while (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
                         ;
+                    }
                     status = runnable.getFinalStatus();
                 }
             } catch (InterruptedException e) {
                 logger.error("Status: " + e.getMessage() + "\n\t Exec in error with " +
-                        runnable);
+                             runnable);
                 throw new Reply421Exception("Pre Exec command is not correctly executed");
             }
         }
@@ -106,7 +106,7 @@ public class JavaExecutor extends AbstractExecutor {
             futureCompletion.setSuccess();
         } else {
             logger.error("Status: " + status + " Exec in error with " +
-                    runnable);
+                         runnable);
             throw new Reply421Exception("Pre command executed in error");
         }
     }

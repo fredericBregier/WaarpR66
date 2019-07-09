@@ -21,16 +21,17 @@ public class Business {
      * Empty constructor for compatibility issues
      */
     @Deprecated
-    public Business() {}
+    public Business() {
+    }
 
-    public Business(String hostid, String business, String roles, 
-            String aliases, String others, UpdatedInfo updatedInfo) {
+    public Business(String hostid, String business, String roles,
+                    String aliases, String others, UpdatedInfo updatedInfo) {
         this(hostid, business, roles, aliases, others);
         this.updatedInfo = updatedInfo;
     }
 
-    public Business(String hostid, String business, String roles, 
-            String aliases, String others) {
+    public Business(String hostid, String business, String roles,
+                    String aliases, String others) {
         this.hostid = hostid;
         this.business = business;
         this.roles = roles;

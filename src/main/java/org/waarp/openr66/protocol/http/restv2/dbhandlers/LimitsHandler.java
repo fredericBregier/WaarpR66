@@ -46,24 +46,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.WILDCARD;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
-import static org.waarp.openr66.protocol.configuration.Configuration.configuration;
+import static org.waarp.openr66.protocol.configuration.Configuration.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ALREADY_EXISTING;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the bandwidth limits REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the bandwidth limits REST entry point.
  */
 @Path(LIMITS_HANDLER_URI)
 public class LimitsHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final HttpHeaders OPTIONS_HEADERS;
 
@@ -88,10 +85,9 @@ public class LimitsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to obtain a description of the host's current bandwidth
-     * limits.
+     * Method called to obtain a description of the host's current bandwidth limits.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @GET
@@ -121,11 +117,10 @@ public class LimitsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to initiate the entry for this host in the bandwidth limits
-     * database. If the host already has limits set in its configuration,
-     * they will be replaced by these new ones.
+     * Method called to initiate the entry for this host in the bandwidth limits database. If the host already has
+     * limits set in its configuration, they will be replaced by these new ones.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @POST
@@ -143,8 +138,8 @@ public class LimitsHandler extends AbstractRestDbHandler {
                 limitDAO.insert(limits);
 
                 configuration.changeNetworkLimit(limits.getReadGlobalLimit(),
-                        limits.getWriteGlobalLimit(), limits.getReadSessionLimit(),
-                        limits.getWriteSessionLimit(), limits.getDelayLimit());
+                                                 limits.getWriteGlobalLimit(), limits.getReadSessionLimit(),
+                                                 limits.getWriteSessionLimit(), limits.getDelayLimit());
 
                 ObjectNode responseObject = LimitsConverter.limitToNode(limits);
                 String responseText = JsonUtils.nodeToString(responseObject);
@@ -162,10 +157,9 @@ public class LimitsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to update this host's bandwidth limits in the database
-     * and configuration.
+     * Method called to update this host's bandwidth limits in the database and configuration.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @PUT
@@ -190,8 +184,8 @@ public class LimitsHandler extends AbstractRestDbHandler {
             limitDAO.update(newLimits);
 
             configuration.changeNetworkLimit(newLimits.getReadGlobalLimit(),
-                    newLimits.getWriteGlobalLimit(), newLimits.getReadSessionLimit(),
-                    newLimits.getWriteSessionLimit(), newLimits.getDelayLimit());
+                                             newLimits.getWriteGlobalLimit(), newLimits.getReadSessionLimit(),
+                                             newLimits.getWriteSessionLimit(), newLimits.getDelayLimit());
 
             ObjectNode responseObject = LimitsConverter.limitToNode(newLimits);
             String responseText = JsonUtils.nodeToString(responseObject);
@@ -207,10 +201,10 @@ public class LimitsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to remove any bandwidth limits in place on this host.
-     * Also removes any limits set in the configuration.
+     * Method called to remove any bandwidth limits in place on this host. Also removes any limits set in the
+     * configuration.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @DELETE
@@ -238,10 +232,10 @@ public class LimitsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @OPTIONS

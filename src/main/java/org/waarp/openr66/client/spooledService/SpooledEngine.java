@@ -1,29 +1,20 @@
 /**
-   This file is part of Waarp Project.
-
-   Copyright 2009, Frederic Bregier, and individual contributors by the @author
-   tags. See the COPYRIGHT.txt in the distribution for a full listing of
-   individual contributors.
-
-   All Waarp Project is free software: you can redistribute it and/or 
-   modify it under the terms of the GNU General Public License as published 
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Waarp is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Waarp .  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Waarp Project.
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with Waarp .  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.client.spooledService;
-
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.waarp.common.future.WaarpFuture;
 import org.waarp.common.logging.WaarpLogger;
@@ -37,20 +28,24 @@ import org.waarp.openr66.protocol.configuration.R66SystemProperties;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Engine used to start and stop the SpooledDirectory service
- * 
+ *
  * @author Frederic Bregier
  *
  */
 public class SpooledEngine extends EngineAbstract {
+    static final WaarpFuture closeFuture = new WaarpFuture(true);
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(SpooledEngine.class);
-
-    static final WaarpFuture closeFuture = new WaarpFuture(true);
 
     @Override
     public void run() {
@@ -108,17 +103,18 @@ public class SpooledEngine extends EngineAbstract {
         }
         Configuration.configuration.setTIMEOUTCON(Configuration.configuration.getTIMEOUTCON() / 10);
         try {
-            while (!SpooledDirectoryTransfer.executorService.awaitTermination(Configuration.configuration.getTIMEOUTCON(),
-                    TimeUnit.MILLISECONDS)) {
+            while (!SpooledDirectoryTransfer.executorService
+                    .awaitTermination(Configuration.configuration.getTIMEOUTCON(),
+                                      TimeUnit.MILLISECONDS)) {
                 Thread.sleep(Configuration.configuration.getTIMEOUTCON());
             }
         } catch (InterruptedException e) {
         }
         for (SpooledDirectoryTransfer spooledDirectoryTransfer : SpooledDirectoryTransfer.list) {
             logger.warn(Messages.getString("SpooledDirectoryTransfer.58") + spooledDirectoryTransfer.name + ": "
-                    + spooledDirectoryTransfer.getSent()
-                    + " success, " + spooledDirectoryTransfer.getError()
-                    + Messages.getString("SpooledDirectoryTransfer.60")); //$NON-NLS-1$
+                        + spooledDirectoryTransfer.getSent()
+                        + " success, " + spooledDirectoryTransfer.getError()
+                        + Messages.getString("SpooledDirectoryTransfer.60")); //$NON-NLS-1$
         }
         SpooledDirectoryTransfer.list.clear();
         logger.info("Shutdown network");

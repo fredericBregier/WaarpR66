@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -34,9 +33,9 @@ import org.waarp.openr66.database.data.DbTaskRunner;
  * <br>
  * For instance "SIZE LT 10000000 SIZE GT 1000 DFCHECK" will test that the current file size is less than 10 MB (base 10),
  * and greater than 1000 bytes, and that the working and received directories have enough space to receive the file.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class FileCheckTask extends AbstractTask {
     /**
@@ -45,14 +44,6 @@ public class FileCheckTask extends AbstractTask {
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(FileCheckTask.class);
 
-    private static enum FC_COMMAND {
-        SIZE, DFCHECK
-    };
-
-    private static enum FC_ARGSSIZE {
-        LT, GT, LTE, GTE, EQ
-    };
-
     /**
      * @param argRule
      * @param delay
@@ -60,9 +51,11 @@ public class FileCheckTask extends AbstractTask {
      * @param session
      */
     public FileCheckTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                         R66Session session) {
         super(TaskType.CHKFILE, delay, argRule, argTransfer, session);
     }
+
+    ;
 
     @Override
     public void run() {
@@ -70,7 +63,7 @@ public class FileCheckTask extends AbstractTask {
         if (runner == null) {
             // no information so in error
             logger.error("No Runner task so cannot check file: " +
-                    session.toString());
+                         session.toString());
             futureCompletion.setFailure(new OpenR66RunnerException("No Runner task so cannot check File"));
             return;
         }
@@ -78,7 +71,7 @@ public class FileCheckTask extends AbstractTask {
         if (supposelength <= 0) {
             // no information but could be not an error so ignore
             logger.warn("No file size known: " +
-                    session.toString());
+                        session.toString());
             futureCompletion.setSuccess();
             return;
         }
@@ -100,30 +93,30 @@ public class FileCheckTask extends AbstractTask {
                         current++;
                         boolean result = true;
                         switch (arg) {
-                            case EQ:
-                                result = supposelength == tocompare;
-                                break;
-                            case GT:
-                                result = supposelength > tocompare;
-                                break;
-                            case GTE:
-                                result = supposelength >= tocompare;
-                                break;
-                            case LT:
-                                result = supposelength < tocompare;
-                                break;
-                            case LTE:
-                                result = supposelength <= tocompare;
-                                break;
-                            default:
-                                result = true; // ??
-                                break;
+                        case EQ:
+                            result = supposelength == tocompare;
+                            break;
+                        case GT:
+                            result = supposelength > tocompare;
+                            break;
+                        case GTE:
+                            result = supposelength >= tocompare;
+                            break;
+                        case LT:
+                            result = supposelength < tocompare;
+                            break;
+                        case LTE:
+                            result = supposelength <= tocompare;
+                            break;
+                        default:
+                            result = true; // ??
+                            break;
                         }
                         logger.debug("DEBUG: " + supposelength + " " + arg.name() + " " + tocompare);
                         if (result == false) {
                             // error so stop
                             logger.error("File length is incompatible with specified SIZE comparizon: " +
-                                    supposelength + " NOT " + arg.name() + " " + tocompare);
+                                         supposelength + " NOT " + arg.name() + " " + tocompare);
                             futureCompletion.setResult(new R66Result(session, false, ErrorCode.SizeNotAllowed, runner));
                             futureCompletion.setFailure(new OpenR66RunnerException("File size incompatible"));
                             return;
@@ -138,7 +131,7 @@ public class FileCheckTask extends AbstractTask {
                 if (freesize > 0 && supposelength > freesize) {
                     // error so stop
                     logger.error("File length is incompatible with available space in Working directory: " +
-                            supposelength + " > " + freesize);
+                                 supposelength + " > " + freesize);
                     futureCompletion.setResult(new R66Result(session, false, ErrorCode.SizeNotAllowed, runner));
                     futureCompletion.setFailure(new OpenR66RunnerException(
                             "File size incompatible with Working directory"));
@@ -149,7 +142,7 @@ public class FileCheckTask extends AbstractTask {
                 if (freesize > 0 && supposelength > freesize) {
                     // error so stop
                     logger.error("File length is incompatible with available space in Recv directory: " +
-                            supposelength + " > " + freesize);
+                                 supposelength + " > " + freesize);
                     futureCompletion.setResult(new R66Result(session, false, ErrorCode.SizeNotAllowed, runner));
                     futureCompletion
                             .setFailure(new OpenR66RunnerException("File size incompatible with Recv directory"));
@@ -164,6 +157,16 @@ public class FileCheckTask extends AbstractTask {
         logger.debug("DEBUG: End of check " + supposelength);
         futureCompletion.setSuccess();
         return;
+    }
+
+    ;
+
+    private static enum FC_COMMAND {
+        SIZE, DFCHECK
+    }
+
+    private static enum FC_ARGSSIZE {
+        LT, GT, LTE, GTE, EQ
     }
 
 }

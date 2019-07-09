@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.networkhandler;
-
-import java.net.BindException;
-import java.net.SocketAddress;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -26,7 +22,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.ReadTimeoutException;
-
 import org.waarp.common.crypto.ssl.WaarpSslUtility;
 import org.waarp.common.database.DbSession;
 import org.waarp.common.database.exception.WaarpDatabaseNoConnectionException;
@@ -52,9 +47,12 @@ import org.waarp.openr66.protocol.utils.ChannelCloseTimer;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
 
+import java.net.BindException;
+import java.net.SocketAddress;
+
 /**
  * Network Server Handler (Requester side)
- * 
+ *
  * @author frederic bregier
  */
 public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPacket> {
@@ -63,7 +61,18 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(NetworkServerHandler.class);
-
+    /**
+     * Does this Handler is for SSL
+     */
+    protected boolean isSSL = false;
+    /**
+     * Is this Handler a server side
+     */
+    protected boolean isServer = false;
+    /**
+     * Is this network connection being refused (black listed)
+     */
+    protected volatile boolean isBlackListed = false;
     /**
      * The associated Remote Address
      */
@@ -78,28 +87,38 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
      */
     private DbSession dbSession;
     /**
-     * Does this Handler is for SSL
-     */
-    protected boolean isSSL = false;
-    /**
-     * Is this Handler a server side
-     */
-    protected boolean isServer = false;
-    /**
      * To handle the keep alive
      */
     private volatile int keepAlivedSent = 0;
-    /**
-     * Is this network connection being refused (black listed)
-     */
-    protected volatile boolean isBlackListed = false;
 
     /**
-     * 
+     *
      * @param isServer
      */
     public NetworkServerHandler(boolean isServer) {
         this.isServer = isServer;
+    }
+
+    /**
+     * Write error back to remote client
+     *
+     * @param channel
+     * @param remoteId
+     * @param localId
+     * @param error
+     */
+    public static void writeError(Channel channel, Integer remoteId, Integer localId, AbstractLocalPacket error) {
+        NetworkPacket networkPacket = null;
+        try {
+            networkPacket = new NetworkPacket(localId, remoteId, error, null);
+        } catch (OpenR66ProtocolPacketException e) {
+        }
+        try {
+            if (channel.isActive()) {
+                channel.writeAndFlush(networkPacket).await(Configuration.WAITFORNETOP);
+            }
+        } catch (InterruptedException e) {
+        }
     }
 
     @Override
@@ -107,8 +126,8 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
         if (networkChannelReference != null) {
             if (networkChannelReference.nbLocalChannels() > 0) {
                 logger.info("Network Channel Closed: {} LocalChannels Left: {}",
-                        ctx.channel().id(),
-                        networkChannelReference.nbLocalChannels());
+                            ctx.channel().id(),
+                            networkChannelReference.nbLocalChannels());
                 // Give an extra time if necessary to let the local channel being closed
                 try {
                     Thread.sleep(Configuration.RETRYINMS * 2);
@@ -124,7 +143,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
         }
         // Now force the close of the database after a wait
         if (dbSession != null && DbConstant.admin != null && DbConstant.admin.getSession() != null
-                && !dbSession.equals(DbConstant.admin.getSession())) {
+            && !dbSession.equals(DbConstant.admin.getSession())) {
             dbSession.forceDisconnect();
             dbSession = null;
         }
@@ -150,7 +169,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
             this.networkChannelReference = NetworkTransaction.addNetworkChannel(netChannel);
         } catch (OpenR66ProtocolRemoteShutdownException e2) {
             logger.warn("Connection refused since Partner is in Shutdown from " + remoteAddress.toString() + " : {}",
-                    e2.getMessage());
+                        e2.getMessage());
             isBlackListed = true;
             // close immediately the connection
             WaarpSslUtility.closingSslChannel(netChannel);
@@ -176,11 +195,12 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (Configuration.configuration.isShutdown())
+        if (Configuration.configuration.isShutdown()) {
             return;
+        }
         if (evt instanceof IdleStateEvent) {
             if (this.networkChannelReference != null
-                    && this.networkChannelReference.checkLastTime(Configuration.configuration.getTIMEOUTCON() * 2) <= 0) {
+                && this.networkChannelReference.checkLastTime(Configuration.configuration.getTIMEOUTCON() * 2) <= 0) {
                 keepAlivedSent = 0;
                 return;
             }
@@ -203,7 +223,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                 KeepAlivePacket keepAlivePacket = new KeepAlivePacket();
                 NetworkPacket response =
                         new NetworkPacket(ChannelUtils.NOCHANNEL,
-                                ChannelUtils.NOCHANNEL, keepAlivePacket, null);
+                                          ChannelUtils.NOCHANNEL, keepAlivePacket, null);
                 logger.info("Write KAlive");
                 ctx.channel().writeAndFlush(response);
             }
@@ -235,7 +255,8 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
             if (packet.getLocalId() == ChannelUtils.NOCHANNEL) {
                 int nb = this.networkChannelReference.nbLocalChannels();
                 if (nb > 0) {
-                    logger.warn("Temptative of connection failed but still some connection are there so not closing the server channel immediately: "
+                    logger.warn(
+                            "Temptative of connection failed but still some connection are there so not closing the server channel immediately: "
                             + nb);
                     NetworkTransaction.shuttingDownNetworkChannel(networkChannelReference);
                     return;
@@ -243,10 +264,10 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                 // No way to know what is wrong: close all connections with
                 // remote host
                 logger.error("Will close NETWORK channel, Cannot continue connection with remote Host: "
-                        +
-                        packet.toString() +
-                        " : " +
-                        channel.remoteAddress() + " : " + nb);
+                             +
+                             packet.toString() +
+                             " : " +
+                             channel.remoteAddress() + " : " + nb);
                 WaarpSslUtility.closingSslChannel(channel);
                 packet.clear();
                 return;
@@ -263,7 +284,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                     keepAlivePacket.validate();
                     NetworkPacket response =
                             new NetworkPacket(ChannelUtils.NOCHANNEL,
-                                    ChannelUtils.NOCHANNEL, keepAlivePacket, null);
+                                              ChannelUtils.NOCHANNEL, keepAlivePacket, null);
                     logger.info("Answer KAlive");
                     ctx.channel().writeAndFlush(response);
                 } else {
@@ -279,7 +300,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
         LocalChannelReference localChannelReference = null;
         if (packet.getLocalId() == ChannelUtils.NOCHANNEL) {
             logger.debug("NetworkRecv Create: {} {}", packet,
-                    channel.id());
+                         channel.id());
             NetworkTransaction.createConnectionFromNetworkChannelStartup(
                     this.networkChannelReference, packet, isSSL);
             return;
@@ -289,15 +310,15 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                 try {
                     localChannelReference = Configuration.configuration
                             .getLocalTransaction().getClient(packet.getRemoteId(),
-                                    packet.getLocalId());
+                                                             packet.getLocalId());
                 } catch (OpenR66ProtocolSystemException e1) {
                     // do not send anything since the packet is external
                     try {
                         logger.debug("Cannot get LocalChannel while an end of request comes: {}",
-                                LocalPacketCodec.decodeNetworkPacket(packet.getBuffer()));
+                                     LocalPacketCodec.decodeNetworkPacket(packet.getBuffer()));
                     } catch (OpenR66ProtocolPacketException e2) {
                         logger.debug("Cannot get LocalChannel while an end of request comes: {}",
-                                packet.toString());
+                                     packet.toString());
                     }
                     packet.clear();
                     return;
@@ -308,15 +329,15 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                 try {
                     localChannelReference = Configuration.configuration
                             .getLocalTransaction().getClient(packet.getRemoteId(),
-                                    packet.getLocalId());
+                                                             packet.getLocalId());
                 } catch (OpenR66ProtocolSystemException e1) {
                     // do not send anything since the packet is external
                     try {
                         logger.debug("Cannot get LocalChannel while an external error comes: {}",
-                                LocalPacketCodec.decodeNetworkPacket(packet.getBuffer()));
+                                     LocalPacketCodec.decodeNetworkPacket(packet.getBuffer()));
                     } catch (OpenR66ProtocolPacketException e2) {
                         logger.debug("Cannot get LocalChannel while an external error comes: {}",
-                                packet.toString());
+                                     packet.toString());
                     }
                     packet.clear();
                     return;
@@ -326,13 +347,13 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                 try {
                     localChannelReference = Configuration.configuration
                             .getLocalTransaction().getClient(packet.getRemoteId(),
-                                    packet.getLocalId());
+                                                             packet.getLocalId());
                 } catch (OpenR66ProtocolSystemException e1) {
                     if (remoteAddress == null) {
                         remoteAddress = channel.remoteAddress();
                     }
                     if (NetworkTransaction.isShuttingdownNetworkChannel(remoteAddress)
-                            || R66ShutdownHook.isShutdownStarting()) {
+                        || R66ShutdownHook.isShutdownStarting()) {
                         // ignore
                         packet.clear();
                         return;
@@ -344,8 +365,8 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
         }
         // check if not already in shutdown or closed
         if (NetworkTransaction.isShuttingdownNetworkChannel(remoteAddress)
-                || R66ShutdownHook.isShutdownStarting() ||
-                ! localChannelReference.getLocalChannel().isActive()) {
+            || R66ShutdownHook.isShutdownStarting() ||
+            !localChannelReference.getLocalChannel().isActive()) {
             logger.debug("Cannot use LocalChannel since already in shutdown: " + packet);
             // ignore
             packet.clear();
@@ -360,7 +381,8 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
         Channel channel = ctx.channel();
         if (isBlackListed) {
             logger.info("While partner is blacklisted, Network Channel Exception: {}", channel.id(), cause.getClass()
-                    .getName() + " : " + cause);
+                                                                                                          .getName() +
+                                                                                                     " : " + cause);
             // ignore
             return;
         }
@@ -369,7 +391,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
             ReadTimeoutException exception = (ReadTimeoutException) cause;
             // No read for too long
             logger.error("ReadTimeout so Will close NETWORK channel {}", exception.getClass().getName() + " : "
-                    + exception.getMessage());
+                                                                         + exception.getMessage());
             ChannelCloseTimer.closeFutureChannel(channel);
             return;
         }
@@ -393,7 +415,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
                 return;
             } else if (exception instanceof OpenR66ProtocolNoConnectionException) {
                 logger.debug("Connection impossible with NETWORK channel {}",
-                        exception.getClass().getName() + " : " + exception.getMessage());
+                             exception.getClass().getName() + " : " + exception.getMessage());
                 channel.close();
                 return;
             } else {
@@ -404,35 +426,13 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
             final ConnectionErrorPacket errorPacket = new ConnectionErrorPacket(
                     exception.getClass().getName() + " : " + exception.getMessage(), null);
             writeError(channel, ChannelUtils.NOCHANNEL,
-                    ChannelUtils.NOCHANNEL, errorPacket);
+                       ChannelUtils.NOCHANNEL, errorPacket);
             logger.debug("Will close NETWORK channel: {}",
-                    exception.getClass().getName() + " : " + exception.getMessage());
+                         exception.getClass().getName() + " : " + exception.getMessage());
             ChannelCloseTimer.closeFutureChannel(channel);
         } else {
             // Nothing to do
             return;
-        }
-    }
-
-    /**
-     * Write error back to remote client
-     * 
-     * @param channel
-     * @param remoteId
-     * @param localId
-     * @param error
-     */
-    public static void writeError(Channel channel, Integer remoteId, Integer localId, AbstractLocalPacket error) {
-        NetworkPacket networkPacket = null;
-        try {
-            networkPacket = new NetworkPacket(localId, remoteId, error, null);
-        } catch (OpenR66ProtocolPacketException e) {
-        }
-        try {
-            if (channel.isActive()) {
-                channel.writeAndFlush(networkPacket).await(Configuration.WAITFORNETOP);
-            }
-        } catch (InterruptedException e) {
         }
     }
 
@@ -444,7 +444,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
     }
 
     /**
-     * 
+     *
      * @return True if this Handler is for SSL
      */
     public boolean isSsl() {

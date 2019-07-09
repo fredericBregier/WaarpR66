@@ -1,12 +1,12 @@
 /*
  * Copyright 2009 Red Hat, Inc.
- * 
+ *
  * Red Hat licenses this file to you under the Apache License, version 2.0 (the
  * "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,12 +15,10 @@
  */
 package org.waarp.openr66.protocol.http.rest.test;
 
-import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpMethod;
-
 import org.waarp.common.crypto.ssl.WaarpSslUtility;
 import org.waarp.common.json.JsonHandler;
 import org.waarp.gateway.kernel.exception.HttpInvalidAuthenticationException;
@@ -41,22 +39,22 @@ import org.waarp.openr66.protocol.localhandler.packet.json.RestartTransferJsonPa
 import org.waarp.openr66.protocol.localhandler.packet.json.StopOrCancelJsonPacket;
 import org.waarp.openr66.protocol.localhandler.packet.json.TransferRequestJsonPacket;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Test Rest client response handler
- * 
- * Note that for testing, result is only the last "json" command, and therefore future is only
- * validated once all items are passed in a chain.
- * In normal condition, each step should produce: setting the RestArgument to the RestFuture and
+ * <p>
+ * Note that for testing, result is only the last "json" command, and therefore future is only validated once all items
+ * are passed in a chain. In normal condition, each step should produce: setting the RestArgument to the RestFuture and
  * validating (error or ok) to RestFuture.
- * 
+ *
  * @author Frederic Bregier
  */
 public class HttpTestResponseHandler extends HttpRestR66ClientResponseHandler {
     /**
      * @param channel
+     *
      * @throws HttpInvalidAuthenticationException
      */
 
@@ -159,119 +157,122 @@ public class HttpTestResponseHandler extends HttpRestR66ClientResponseHandler {
         HttpTestRestR66Client.count.incrementAndGet();
         boolean newMessage = false;
         switch (act) {
-            case CreateTransfer: {
-                // Continue with GetTransferInformation
-                TransferRequestJsonPacket recv;
-                try {
-                    recv = (TransferRequestJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra
-                            .getResults().get(0)));
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return newMessage;
-                }
-                InformationJsonPacket node = new InformationJsonPacket(recv.getSpecialId(), false, recv.getRequested());
-                HttpTestRestR66Client.action(channel, HttpMethod.GET, RESTHANDLERS.Control.uri, node);
-                newMessage = true;
-                break;
+        case CreateTransfer: {
+            // Continue with GetTransferInformation
+            TransferRequestJsonPacket recv;
+            try {
+                recv = (TransferRequestJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra
+                                                                                                                 .getResults()
+                                                                                                                 .get(0)));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return newMessage;
             }
-            case ExecuteBusiness:
-                // End
-                break;
-            case ExportConfig:
-                // no Import in automatic test
-                break;
-            case GetBandwidth:
-                // End
-                break;
-            case GetInformation:
-                // End
-                break;
-            case GetLog:
-                // End
-                break;
-            case GetTransferInformation: {
-                // Continue with Stop in StopOrCancelTransfer
-                ObjectNode answer = (ObjectNode) ra.getResults().get(0);
-                StopOrCancelJsonPacket node = new StopOrCancelJsonPacket();
-                node.setRequestUserPacket();
-                node.setStop();
-                node.setRequested(answer.path(DbTaskRunner.Columns.REQUESTED.name()).asText());
-                node.setRequester(answer.path(DbTaskRunner.Columns.REQUESTER.name()).asText());
-                node.setSpecialid(answer.path(DbTaskRunner.Columns.SPECIALID.name()).asLong());
-                HttpTestRestR66Client.action(channel, HttpMethod.PUT, RESTHANDLERS.Control.uri, node);
-                newMessage = true;
-                break;
+            InformationJsonPacket node = new InformationJsonPacket(recv.getSpecialId(), false, recv.getRequested());
+            HttpTestRestR66Client.action(channel, HttpMethod.GET, RESTHANDLERS.Control.uri, node);
+            newMessage = true;
+            break;
+        }
+        case ExecuteBusiness:
+            // End
+            break;
+        case ExportConfig:
+            // no Import in automatic test
+            break;
+        case GetBandwidth:
+            // End
+            break;
+        case GetInformation:
+            // End
+            break;
+        case GetLog:
+            // End
+            break;
+        case GetTransferInformation: {
+            // Continue with Stop in StopOrCancelTransfer
+            ObjectNode answer = (ObjectNode) ra.getResults().get(0);
+            StopOrCancelJsonPacket node = new StopOrCancelJsonPacket();
+            node.setRequestUserPacket();
+            node.setStop();
+            node.setRequested(answer.path(DbTaskRunner.Columns.REQUESTED.name()).asText());
+            node.setRequester(answer.path(DbTaskRunner.Columns.REQUESTER.name()).asText());
+            node.setSpecialid(answer.path(DbTaskRunner.Columns.SPECIALID.name()).asLong());
+            HttpTestRestR66Client.action(channel, HttpMethod.PUT, RESTHANDLERS.Control.uri, node);
+            newMessage = true;
+            break;
+        }
+        case ImportConfig:
+            // End
+            break;
+        case OPTIONS:
+            break;
+        case RestartTransfer: {
+            // Continue with delete transfer
+            RestartTransferJsonPacket recv;
+            try {
+                recv = (RestartTransferJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra
+                                                                                                                 .getResults()
+                                                                                                                 .get(0)));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return newMessage;
             }
-            case ImportConfig:
-                // End
-                break;
-            case OPTIONS:
-                break;
-            case RestartTransfer: {
-                // Continue with delete transfer
-                RestartTransferJsonPacket recv;
-                try {
-                    recv = (RestartTransferJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra
-                            .getResults().get(0)));
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return newMessage;
-                }
-                try {
-                    HttpTestRestR66Client.deleteData(channel, recv.getRequested(), recv.getRequester(),
-                            recv.getSpecialid());
-                } catch (HttpInvalidAuthenticationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                newMessage = true;
-                break;
+            try {
+                HttpTestRestR66Client.deleteData(channel, recv.getRequested(), recv.getRequester(),
+                                                 recv.getSpecialid());
+            } catch (HttpInvalidAuthenticationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-            case SetBandwidth: {
-                // Continue with GetBandwidth
-                BandwidthJsonPacket recv;
-                try {
-                    recv = (BandwidthJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra.getResults()
-                            .get(0)));
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return newMessage;
-                }
-                recv.setSetter(false);
-                HttpTestRestR66Client.action(channel, HttpMethod.GET, RESTHANDLERS.Bandwidth.uri, recv);
-                newMessage = true;
-                break;
+            newMessage = true;
+            break;
+        }
+        case SetBandwidth: {
+            // Continue with GetBandwidth
+            BandwidthJsonPacket recv;
+            try {
+                recv = (BandwidthJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra.getResults()
+                                                                                                     .get(0)));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return newMessage;
             }
-            case ShutdownOrBlock:
-                // End
-                break;
-            case StopOrCancelTransfer: {
-                // Continue with RestartTransfer
-                StopOrCancelJsonPacket recv;
-                try {
-                    recv = (StopOrCancelJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra
-                            .getResults().get(0)));
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return newMessage;
-                }
-                RestartTransferJsonPacket node = new RestartTransferJsonPacket();
-                node.setRequestUserPacket();
-                node.setRequested(recv.getRequested());
-                node.setRequester(recv.getRequester());
-                node.setSpecialid(recv.getSpecialid());
-                HttpTestRestR66Client.action(channel, HttpMethod.PUT, RESTHANDLERS.Control.uri, node);
-                newMessage = true;
-                break;
+            recv.setSetter(false);
+            HttpTestRestR66Client.action(channel, HttpMethod.GET, RESTHANDLERS.Bandwidth.uri, recv);
+            newMessage = true;
+            break;
+        }
+        case ShutdownOrBlock:
+            // End
+            break;
+        case StopOrCancelTransfer: {
+            // Continue with RestartTransfer
+            StopOrCancelJsonPacket recv;
+            try {
+                recv = (StopOrCancelJsonPacket) JsonPacket.createFromBuffer(JsonHandler.writeAsString(ra
+                                                                                                              .getResults()
+                                                                                                              .get(0)));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return newMessage;
             }
-            case GetStatus:
-                break;
-            default:
-                break;
+            RestartTransferJsonPacket node = new RestartTransferJsonPacket();
+            node.setRequestUserPacket();
+            node.setRequested(recv.getRequested());
+            node.setRequester(recv.getRequester());
+            node.setSpecialid(recv.getSpecialid());
+            HttpTestRestR66Client.action(channel, HttpMethod.PUT, RESTHANDLERS.Control.uri, node);
+            newMessage = true;
+            break;
+        }
+        case GetStatus:
+            break;
+        default:
+            break;
 
         }
         if (!newMessage) {

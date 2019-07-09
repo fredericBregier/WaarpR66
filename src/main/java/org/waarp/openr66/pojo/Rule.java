@@ -12,21 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.ROOT;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XARCHIVEPATH;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XHOSTID;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XHOSTIDS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XIDRULE;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XMODE;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XRECVPATH;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XRERRORTASKS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XRPOSTTASKS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XRPRETASKS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XSENDPATH;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XSERRORTASKS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XSPOSTTASKS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XSPRETASKS;
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XWORKPATH;
+import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.*;
 
 /**
  * Rule data object
@@ -91,6 +77,51 @@ public class Rule {
         sErrorTasks = new ArrayList<RuleTask>();
     }
 
+    public Rule(String name, int mode, List<String> hostids, String recvPath,
+                String sendPath, String archivePath, String workPath,
+                List<RuleTask> rPre, List<RuleTask> rPost, List<RuleTask> rError,
+                List<RuleTask> sPre, List<RuleTask> sPost, List<RuleTask> sError,
+                UpdatedInfo updatedInfo) {
+        this(name, mode, hostids, recvPath, sendPath, archivePath, workPath,
+             rPre, rPost, rError, sPre, sPost, sError);
+        this.updatedInfo = updatedInfo;
+    }
+
+    public Rule(String name, int mode, List<String> hostids, String recvPath,
+                String sendPath, String archivePath, String workPath,
+                List<RuleTask> rPre, List<RuleTask> rPost, List<RuleTask> rError,
+                List<RuleTask> sPre, List<RuleTask> sPost, List<RuleTask> sError) {
+        this.name = name;
+        this.mode = mode;
+        this.hostids = hostids;
+        this.recvPath = recvPath;
+        this.sendPath = sendPath;
+        this.archivePath = archivePath;
+        this.workPath = workPath;
+        rPreTasks = rPre;
+        rPostTasks = rPost;
+        rErrorTasks = rError;
+        sPreTasks = sPre;
+        sPostTasks = sPost;
+        sErrorTasks = sError;
+    }
+
+    public Rule(String name, int mode, List<String> hostids, String recvPath,
+                String sendPath, String archivePath, String workPath) {
+        this(name, mode, hostids, recvPath, sendPath, archivePath, workPath,
+             new ArrayList<RuleTask>(), new ArrayList<RuleTask>(),
+             new ArrayList<RuleTask>(), new ArrayList<RuleTask>(),
+             new ArrayList<RuleTask>(), new ArrayList<RuleTask>());
+    }
+
+    public Rule(String name, int mode, List<String> hostids) {
+        this(name, mode, hostids, "", "", "", "");
+    }
+
+    public Rule(String name, int mode) {
+        this(name, mode, new ArrayList<String>());
+    }
+
     @XmlElementDecl(name = XRPRETASKS)
     @XmlElement(name = XRPRETASKS)
     public Tasks get_rPreTasks() {
@@ -125,52 +156,6 @@ public class Rule {
     @XmlElement(name = XSERRORTASKS)
     public Tasks get_sErrorTasks() {
         return new Tasks(this.sErrorTasks);
-    }
-
-
-    public Rule(String name, int mode, List<String> hostids, String recvPath,
-            String sendPath, String archivePath, String workPath,
-            List<RuleTask> rPre, List<RuleTask> rPost, List<RuleTask> rError,
-            List<RuleTask> sPre, List<RuleTask> sPost, List<RuleTask> sError,
-            UpdatedInfo updatedInfo) {
-        this(name, mode, hostids, recvPath, sendPath, archivePath, workPath,
-                rPre, rPost, rError, sPre, sPost, sError);
-        this.updatedInfo = updatedInfo;
-    }
-
-    public Rule(String name, int mode, List<String> hostids, String recvPath,
-            String sendPath, String archivePath, String workPath,
-            List<RuleTask> rPre, List<RuleTask> rPost, List<RuleTask> rError,
-            List<RuleTask> sPre, List<RuleTask> sPost, List<RuleTask> sError) {
-        this.name = name;
-        this.mode = mode;
-        this.hostids = hostids;
-        this.recvPath = recvPath;
-        this.sendPath = sendPath;
-        this.archivePath = archivePath;
-        this.workPath = workPath;
-        rPreTasks = rPre;
-        rPostTasks = rPost;
-        rErrorTasks = rError;
-        sPreTasks = sPre;
-        sPostTasks = sPost;
-        sErrorTasks = sError;
-    }
-
-    public Rule(String name, int mode, List<String> hostids, String recvPath,
-            String sendPath, String archivePath, String workPath) {
-        this(name, mode, hostids, recvPath, sendPath, archivePath, workPath,
-                new ArrayList<RuleTask>(), new ArrayList<RuleTask>(),
-                new ArrayList<RuleTask>(), new ArrayList<RuleTask>(),
-                new ArrayList<RuleTask>(), new ArrayList<RuleTask>());
-    }
-
-    public Rule(String name, int mode, List<String> hostids) {
-        this(name, mode, hostids, "", "", "", "");
-    }
-
-    public Rule(String name, int mode) {
-        this(name, mode, new ArrayList<String>());
     }
 
     public boolean isAuthorized(String hostid) {

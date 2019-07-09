@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -22,9 +21,9 @@ import org.waarp.openr66.protocol.configuration.Messages;
 /**
  * This enum class keeps all code that will be returned into the result and store (char
  * representation) into the runner.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public enum ErrorCode {
     /**
@@ -102,68 +101,68 @@ public enum ErrorCode {
     /**
      * Code stands for a request of stopping transfer
      */
-    StoppedTransfer('H'), 
+    StoppedTransfer('H'),
     /**
      * Code stands for a request of canceling transfer
      */
-    CanceledTransfer('K'), 
+    CanceledTransfer('K'),
     /**
      * Warning in execution
      */
-    Warning('W'), 
+    Warning('W'),
     /**
      * Code stands for unknown type of error
      */
-    Unknown('-'), 
+    Unknown('-'),
     /**
      * Code stands for a request that is already remotely finished
      */
-    QueryAlreadyFinished('Q'), 
+    QueryAlreadyFinished('Q'),
     /**
      * Code stands for request that is still running
      */
-    QueryStillRunning('s'), 
+    QueryStillRunning('s'),
     /**
      * Code stands for not known host
      */
-    NotKnownHost('N'), 
+    NotKnownHost('N'),
     /**
      * Code stands for self requested host starting request is invalid
      */
-    LoopSelfRequestedHost('L'), 
+    LoopSelfRequestedHost('L'),
     /**
      * Code stands for request should exist but is not found on remote host
      */
-    QueryRemotelyUnknown('u'), 
+    QueryRemotelyUnknown('u'),
     /**
      * Code stands for File not found error
      */
-    FileNotFound('f'), 
+    FileNotFound('f'),
     /**
      * Code stands for Command not found error
      */
-    CommandNotFound('c'), 
+    CommandNotFound('c'),
     /**
      * Code stands for a request in PassThroughMode and required action is incompatible with this
      * mode
      */
-    PassThroughMode('p'), 
+    PassThroughMode('p'),
     /**
      * Code stands for running step
      */
-    Running('z'), 
+    Running('z'),
     /**
      * Code stands for Incorrect command
      */
-    IncorrectCommand('n'), 
+    IncorrectCommand('n'),
     /**
      * Code stands for File not allowed
      */
-    FileNotAllowed('a'), 
+    FileNotAllowed('a'),
     /**
      * Code stands for Size not allowed
      */
-    SizeNotAllowed('d'); 
+    SizeNotAllowed('d');
 
     /**
      * Code could be used to switch case operations
@@ -174,15 +173,9 @@ public enum ErrorCode {
         this.code = code;
     }
 
-    public String getCode() {
-        return String.valueOf(code);
-    }
-
-    public String getMesg() { return Messages.getString("ErrorCode." + code); }
-
     /**
      * Code is either the 1 char code or the exact name in Enum
-     * 
+     *
      * @param code
      * @return the ErrorCode according to the code
      */
@@ -191,126 +184,134 @@ public enum ErrorCode {
             return Unknown;
         }
         switch (code.charAt(0)) {
-            case 'i':
-                return InitOk;
-            case 'B':
-                return PreProcessingOk;
-            case 'P':
-                return PostProcessingOk;
-            case 'X':
-                return TransferOk;
-            case 'O':
-                return CompleteOk;
-            case 'C':
-                return ConnectionImpossible;
-            case 'A':
-                return BadAuthent;
-            case 'E':
-                return ExternalOp;
-            case 'T':
-                return TransferError;
-            case 'M':
-                return MD5Error;
-            case 'D':
-                return Disconnection;
-            case 'r':
-                return RemoteShutdown;
-            case 'F':
-                return FinalOp;
-            case 'U':
-                return Unimplemented;
-            case 'S':
-                return Shutdown;
-            case 'R':
-                return RemoteError;
-            case 'I':
-                return Internal;
-            case 'H':
-                return StoppedTransfer;
-            case 'K':
-                return CanceledTransfer;
-            case 'W':
-                return Warning;
-            case '-':
+        case 'i':
+            return InitOk;
+        case 'B':
+            return PreProcessingOk;
+        case 'P':
+            return PostProcessingOk;
+        case 'X':
+            return TransferOk;
+        case 'O':
+            return CompleteOk;
+        case 'C':
+            return ConnectionImpossible;
+        case 'A':
+            return BadAuthent;
+        case 'E':
+            return ExternalOp;
+        case 'T':
+            return TransferError;
+        case 'M':
+            return MD5Error;
+        case 'D':
+            return Disconnection;
+        case 'r':
+            return RemoteShutdown;
+        case 'F':
+            return FinalOp;
+        case 'U':
+            return Unimplemented;
+        case 'S':
+            return Shutdown;
+        case 'R':
+            return RemoteError;
+        case 'I':
+            return Internal;
+        case 'H':
+            return StoppedTransfer;
+        case 'K':
+            return CanceledTransfer;
+        case 'W':
+            return Warning;
+        case '-':
+            return Unknown;
+        case 'Q':
+            return QueryAlreadyFinished;
+        case 's':
+            return QueryStillRunning;
+        case 'N':
+            return NotKnownHost;
+        case 'L':
+            return LoopSelfRequestedHost;
+        case 'u':
+            return QueryRemotelyUnknown;
+        case 'f':
+            return FileNotFound;
+        case 'z':
+            return Running;
+        case 'c':
+            return CommandNotFound;
+        case 'p':
+            return PassThroughMode;
+        case 'l':
+            return ServerOverloaded;
+        case 'n':
+            return IncorrectCommand;
+        case 'a':
+            return FileNotAllowed;
+        case 'd':
+            return SizeNotAllowed;
+        default:
+            ErrorCode ecode = Unknown;
+            try {
+                ecode = ErrorCode.valueOf(code.trim());
+            } catch (IllegalArgumentException e) {
                 return Unknown;
-            case 'Q':
-                return QueryAlreadyFinished;
-            case 's':
-                return QueryStillRunning;
-            case 'N':
-                return NotKnownHost;
-            case 'L':
-                return LoopSelfRequestedHost;
-            case 'u':
-                return QueryRemotelyUnknown;
-            case 'f':
-                return FileNotFound;
-            case 'z':
-                return Running;
-            case 'c':
-                return CommandNotFound;
-            case 'p':
-                return PassThroughMode;
-            case 'l':
-                return ServerOverloaded;
-            case 'n':
-                return IncorrectCommand;
-            case 'a':
-                return FileNotAllowed;
-            case 'd':
-                return SizeNotAllowed;
-            default:
-                ErrorCode ecode = Unknown;
-                try {
-                    ecode = ErrorCode.valueOf(code.trim());
-                } catch (IllegalArgumentException e) {
-                    return Unknown;
-                }
-                return ecode;
+            }
+            return ecode;
         }
     }
 
     public static boolean isErrorCode(ErrorCode code) {
         switch (code) {
-            case BadAuthent:
-            case CanceledTransfer:
-            case CommandNotFound:
-            case ConnectionImpossible:
-            case Disconnection:
-            case ExternalOp:
-            case FileNotFound:
-            case FinalOp:
-            case Internal:
-            case LoopSelfRequestedHost:
-            case MD5Error:
-            case NotKnownHost:
-            case PassThroughMode:
-            case QueryAlreadyFinished:
-            case QueryRemotelyUnknown:
-            case QueryStillRunning:
-            case RemoteError:
-            case RemoteShutdown:
-            case ServerOverloaded:
-            case Shutdown:
-            case StoppedTransfer:
-            case TransferError:
-            case Unimplemented:
-            case IncorrectCommand:
-            case FileNotAllowed:
-            case SizeNotAllowed:
-                return true;
-            case CompleteOk:
-            case InitOk:
-            case PostProcessingOk:
-            case PreProcessingOk:
-            case Running:
-            case TransferOk:
-            case Unknown:
-            case Warning:
-                return false;
-            default:
-                break;
+        case BadAuthent:
+        case CanceledTransfer:
+        case CommandNotFound:
+        case ConnectionImpossible:
+        case Disconnection:
+        case ExternalOp:
+        case FileNotFound:
+        case FinalOp:
+        case Internal:
+        case LoopSelfRequestedHost:
+        case MD5Error:
+        case NotKnownHost:
+        case PassThroughMode:
+        case QueryAlreadyFinished:
+        case QueryRemotelyUnknown:
+        case QueryStillRunning:
+        case RemoteError:
+        case RemoteShutdown:
+        case ServerOverloaded:
+        case Shutdown:
+        case StoppedTransfer:
+        case TransferError:
+        case Unimplemented:
+        case IncorrectCommand:
+        case FileNotAllowed:
+        case SizeNotAllowed:
+            return true;
+        case CompleteOk:
+        case InitOk:
+        case PostProcessingOk:
+        case PreProcessingOk:
+        case Running:
+        case TransferOk:
+        case Unknown:
+        case Warning:
+            return false;
+        default:
+            break;
         }
         return true;
+    }
+
+    public String getCode() {
+        return String.valueOf(code);
+    }
+
+    public String getMesg() {
+        return Messages.getString("ErrorCode." + code);
     }
 }

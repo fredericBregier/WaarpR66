@@ -20,8 +20,8 @@
 
 package org.waarp.openr66.protocol.http.restv2.utils;
 
-import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 import org.waarp.openr66.protocol.http.restv2.errors.RestErrorException;
+import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.xml.bind.JAXBContext;
@@ -43,18 +43,21 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import static com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.INDENT_NUMBER;
-import static javax.xml.transform.OutputKeys.INDENT;
-import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
+import static com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.*;
+import static javax.xml.transform.OutputKeys.*;
 
 
-/** A series of utility methods for serializing and deserializing XML. */
+/**
+ * A series of utility methods for serializing and deserializing XML.
+ */
 public final class XmlUtils {
 
-    /** Prevents the default constructor from being called. */
+    /**
+     * Prevents the default constructor from being called.
+     */
     private XmlUtils() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
 
@@ -64,7 +67,9 @@ public final class XmlUtils {
      * Converts a serializable Java object into XML format as a String.
      *
      * @param object the object to convert to XML
-     * @return       the object's representation in XML
+     *
+     * @return the object's representation in XML
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static String objectToXml(XmlSerializable object) {
@@ -84,9 +89,11 @@ public final class XmlUtils {
     /**
      * Converts an XML String into a serializable Java object.
      *
-     * @param xml  the string to convert into an object
+     * @param xml the string to convert into an object
      * @param clazz the class of the serializable object
-     * @return     the deserialized Java object
+     *
+     * @return the deserialized Java object
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static <T extends XmlSerializable> T xmlToObject(String xml,
@@ -106,8 +113,9 @@ public final class XmlUtils {
     /**
      * Saves an XML String to a file at the given location.
      *
-     * @param xml      the XML String
+     * @param xml the XML String
      * @param filePath the path where to save the XML file
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static void saveXML(String xml, String filePath) {
@@ -126,7 +134,9 @@ public final class XmlUtils {
      * Loads an XML file into a String.
      *
      * @param filePath the path of the XML file to load
-     * @return         the content of the XML file
+     *
+     * @return the content of the XML file
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static String loadXML(String filePath) {
@@ -148,8 +158,9 @@ public final class XmlUtils {
     /**
      * Saves a serializable Java object to an XML file at the given location.
      *
-     * @param object    the object to save as XML
-     * @param filePath  the path where to save the XML file
+     * @param object the object to save as XML
+     * @param filePath the path where to save the XML file
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static void saveObject(XmlSerializable object, String filePath) {
@@ -162,8 +173,10 @@ public final class XmlUtils {
      * Loads the given XML file into a corresponding serializable Java object.
      *
      * @param filePath path of the file to load
-     * @param clazz    class of the target Java object
-     * @return         the deserialized XML object
+     * @param clazz class of the target Java object
+     *
+     * @return the deserialized XML object
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static <T extends XmlSerializable> T loadObject(String filePath,
@@ -178,8 +191,10 @@ public final class XmlUtils {
     /**
      * Formats an unformatted XML String into a human readable one.
      *
-     * @param input   The unformatted XML String.
-     * @return      The XML String in human readable format.
+     * @param input The unformatted XML String.
+     *
+     * @return The XML String in human readable format.
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     private static String pretty(String input) {

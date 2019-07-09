@@ -1,23 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
-
-import java.io.File;
 
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -29,6 +26,8 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.database.data.DbTaskRunner;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
+
+import java.io.File;
 
 /**
  * Transcode the current file from one Charset to another Charset as specified<br>
@@ -47,11 +46,11 @@ import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
  * <br>
  * It could also be used as a test of transcode outside R66:<br>
  * java -cp WaarpCommon-1.2.7.jar org.waarp.common.transcode.CharsetsUtil -from fromFilename fromCharset -to toFilename toCharset<br>
- * 
+ *
  * The current file is not touched and is not marked as moved.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TranscodeTask extends AbstractTask {
     /**
@@ -67,7 +66,7 @@ public class TranscodeTask extends AbstractTask {
      * @param session
      */
     public TranscodeTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                         R66Session session) {
         super(TaskType.TRANSCODE, delay, argRule, argTransfer, session);
     }
 
@@ -112,7 +111,7 @@ public class TranscodeTask extends AbstractTask {
         }
         if (dos2unix && unix2dos) {
             R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                    runner);
+                                             runner);
             futureCompletion.setResult(result);
             logger.warn("Dos2Unix and Unix2Dos cannot be used simultaneously in Transcode: " + runner.toShortString());
             futureCompletion.setFailure(new OpenR66ProtocolSystemException(
@@ -122,7 +121,7 @@ public class TranscodeTask extends AbstractTask {
         if (fromCharset == null || toCharset == null) {
             if (!(dos2unix || unix2dos)) {
                 R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                        runner);
+                                                 runner);
                 futureCompletion.setResult(result);
                 logger.warn("Not enough argument in Transcode: " + runner.toShortString());
                 futureCompletion.setFailure(new OpenR66ProtocolSystemException(
@@ -135,10 +134,10 @@ public class TranscodeTask extends AbstractTask {
                     futureCompletion.setSuccess();
                 } else {
                     R66Result result = new R66Result(session, false, ErrorCode.Internal,
-                            runner);
+                                                     runner);
                     futureCompletion.setResult(result);
                     logger.error("Cannot Transcode " +
-                            argRule + ":" + argTransfer + " and " + session);
+                                 argRule + ":" + argTransfer + " and " + session);
                     futureCompletion.setFailure(new OpenR66ProtocolSystemException(
                             "Cannot Transcode file"));
                 }
@@ -155,8 +154,8 @@ public class TranscodeTask extends AbstractTask {
             finalname = from.getAbsolutePath() + ".transcode";
         }
         success = CharsetsUtil.transcode(from.getAbsolutePath(), fromCharset,
-                finalname, toCharset,
-                Configuration.BUFFERSIZEDEFAULT);
+                                         finalname, toCharset,
+                                         Configuration.BUFFERSIZEDEFAULT);
         if (success && (dos2unix || unix2dos)) {
             // now convert it
             // only 1 of Dos2Unix/Unix2Dos
@@ -167,7 +166,7 @@ public class TranscodeTask extends AbstractTask {
             } else {
                 // only warning
                 logger.warn("Cannot Unix/Dos Transcode " + to + " : " +
-                        argRule + ":" + argTransfer + " and " + session);
+                            argRule + ":" + argTransfer + " and " + session);
                 futureCompletion.setSuccess();
             }
             return;
@@ -176,7 +175,7 @@ public class TranscodeTask extends AbstractTask {
             futureCompletion.setSuccess();
         } else {
             logger.error("Cannot Transcode from " + fromCharset + " to " + toCharset + " with " +
-                    argRule + ":" + argTransfer + " and " + session);
+                         argRule + ":" + argTransfer + " and " + session);
             futureCompletion.setFailure(new OpenR66ProtocolSystemException(
                     "Cannot Transcode file"));
         }

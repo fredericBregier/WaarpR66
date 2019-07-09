@@ -1,9 +1,9 @@
 package org.waarp.openr66.dao;
 
-import java.util.List;
-
 import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.pojo.Transfer;
+
+import java.util.List;
 
 /**
  * Interface to interact with Transfer objects in the persistance layer
@@ -18,10 +18,10 @@ public interface TransferDAO {
     List<Transfer> getAll() throws DAOException;
 
     /**
-     * Retrieve all Transfer objects to the given filters
-     * in a List from the persistance layer
+     * Retrieve all Transfer objects to the given filters in a List from the persistance layer
      *
      * @param filters List of filter
+     *
      * @throws DAOException If data access error occurs
      */
     List<Transfer> find(List<Filter> filters) throws DAOException;
@@ -46,18 +46,20 @@ public interface TransferDAO {
      * Retrieve the Transfer object with the specified Special ID from the persistance layer
      *
      * @param id special ID of the Transfer object requested
+     *
      * @throws DAOException If a data access error occurs
      */
     Transfer select(long id, String requester, String requested, String owner)
             throws DAOException;
 
     /**
-     * Verify if a Transfer object with the specified Special ID exists in
-     * the persistance layer
+     * Verify if a Transfer object with the specified Special ID exists in the persistance layer
      *
      * @param id special ID of the Transfer object verified
-     * @return true if a Transfer object with the specified Special ID exist; false
-     * if no Transfer object correspond to the specified Special ID.
+     *
+     * @return true if a Transfer object with the specified Special ID exist; false if no Transfer object correspond to
+     * the specified Special ID.
+     *
      * @throws DAOException If a data access error occurs
      */
     boolean exist(long id, String requester, String requested, String owner)
@@ -67,6 +69,7 @@ public interface TransferDAO {
      * Insert the specified Transfer object in the persistance layer
      *
      * @param transfer Transfer object to insert
+     *
      * @throws DAOException If a data access error occurs
      */
     void insert(Transfer transfer) throws DAOException;
@@ -75,6 +78,7 @@ public interface TransferDAO {
      * Update the specified Transfer object in the persistance layer
      *
      * @param transfer Transfer object to update
+     *
      * @throws DAOException If a data access error occurs
      */
     void update(Transfer transfer) throws DAOException;
@@ -83,6 +87,7 @@ public interface TransferDAO {
      * Remove the specified Transfer object from the persistance layer
      *
      * @param transfer Transfer object to insert
+     *
      * @throws DAOException If a data access error occurs
      */
     void delete(Transfer transfer) throws DAOException;

@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -33,22 +32,22 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * class for direct Business Request call
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class BusinessRequest extends AbstractBusinessRequest {
-    /**
-     * Internal Logger
-     */
-    private static WaarpLogger logger;
     /**
      * Default class
      */
     public static final String DEFAULT_CLASS = "org.waarp.openr66.context.task.ExecBusinessTask";
+    /**
+     * Internal Logger
+     */
+    private static WaarpLogger logger;
 
     public BusinessRequest(NetworkTransaction networkTransaction,
-            R66Future future, String remoteHost, BusinessRequestPacket packet) {
+                           R66Future future, String remoteHost, BusinessRequestPacket packet) {
         super(BusinessRequest.class, future, remoteHost, networkTransaction, packet);
     }
 
@@ -61,7 +60,7 @@ public class BusinessRequest extends AbstractBusinessRequest {
         if (args.length < 5) {
             logger
                     .error(Messages.getString("BusinessRequest.1") + //$NON-NLS-1$
-                            _INFO_ARGS);
+                           _INFO_ARGS);
             return;
         }
         classname = DEFAULT_CLASS;
@@ -94,7 +93,8 @@ public class BusinessRequest extends AbstractBusinessRequest {
         if (future.isSuccess()) {
             outputFormat.setValue(FIELDS.status.name(), 0);
             outputFormat.setValue(FIELDS.statusTxt.name(),
-                    Messages.getString("BusinessRequest.6") + Messages.getString("RequestInformation.Success")); //$NON-NLS-1$
+                                  Messages.getString("BusinessRequest.6") +
+                                  Messages.getString("RequestInformation.Success")); //$NON-NLS-1$
             outputFormat.setValue(FIELDS.remote.name(), rhost);
             outputFormat.setValue("delay", delay);
             logger.info(outputFormat.loggerOut());
@@ -104,7 +104,8 @@ public class BusinessRequest extends AbstractBusinessRequest {
         } else {
             outputFormat.setValue(FIELDS.status.name(), 2);
             outputFormat.setValue(FIELDS.statusTxt.name(),
-                    Messages.getString("BusinessRequest.6") + Messages.getString("RequestInformation.Failure")); //$NON-NLS-1$
+                                  Messages.getString("BusinessRequest.6") +
+                                  Messages.getString("RequestInformation.Failure")); //$NON-NLS-1$
             outputFormat.setValue(FIELDS.remote.name(), rhost);
             outputFormat.setValue("delay", delay);
             logger.error(outputFormat.loggerOut(), future.getCause());

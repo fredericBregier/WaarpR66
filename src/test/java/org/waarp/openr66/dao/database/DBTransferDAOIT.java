@@ -9,7 +9,6 @@ import org.waarp.openr66.dao.TransferDAO;
 import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.pojo.Transfer;
 import org.waarp.openr66.pojo.UpdatedInfo;
-import org.waarp.openr66.protocol.configuration.Configuration;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,16 +19,18 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public abstract class DBTransferDAOIT {
 
     private Connection con;
 
     public abstract TransferDAO getDAO(Connection con) throws DAOException;
+
     public abstract Connection getConnection() throws SQLException;
+
     public abstract void initDB() throws SQLException;
+
     public abstract void cleanDB() throws SQLException;
 
     public void runScript(String script) {
@@ -68,7 +69,7 @@ public abstract class DBTransferDAOIT {
         dao.deleteAll();
 
         ResultSet res = con.createStatement()
-            .executeQuery("SELECT * FROM runner");
+                           .executeQuery("SELECT * FROM runner");
         assertEquals(false, res.next());
     }
 
@@ -76,12 +77,12 @@ public abstract class DBTransferDAOIT {
     public void testDelete() throws Exception {
         TransferDAO dao = getDAO(getConnection());
         dao.delete(new Transfer(0l, "", 1, "", "", "", false, 0, false,
-                "server1", "server1", "server2", "",
-                Transfer.TASKSTEP.NOTASK, Transfer.TASKSTEP.NOTASK, 0,
-                ErrorCode.Unknown, ErrorCode.Unknown, 0, null, null));
+                                "server1", "server1", "server2", "",
+                                Transfer.TASKSTEP.NOTASK, Transfer.TASKSTEP.NOTASK, 0,
+                                ErrorCode.Unknown, ErrorCode.Unknown, 0, null, null));
 
         ResultSet res = con.createStatement()
-            .executeQuery("SELECT * FROM runner where specialid = 0");
+                           .executeQuery("SELECT * FROM runner where specialid = 0");
         assertEquals(false, res.next());
     }
 
@@ -112,7 +113,7 @@ public abstract class DBTransferDAOIT {
     public void testInsert() throws Exception {
         TransferDAO dao = getDAO(getConnection());
         Transfer transfer = new Transfer("server2", "rule", 1, false,
-                "file", "info", 3);
+                                         "file", "info", 3);
         // Requester and requested are setup manualy
         transfer.setRequester("dummy");
         transfer.setOwnerRequest("dummy");
@@ -121,12 +122,12 @@ public abstract class DBTransferDAOIT {
         dao.insert(transfer);
 
         ResultSet res = con.createStatement()
-            .executeQuery("SELECT COUNT(1) as count FROM runner");
+                           .executeQuery("SELECT COUNT(1) as count FROM runner");
         res.next();
         assertEquals(5, res.getInt("count"));
 
         ResultSet res2 = con.createStatement()
-            .executeQuery("SELECT * FROM runner WHERE idrule = 'rule'");
+                            .executeQuery("SELECT * FROM runner WHERE idrule = 'rule'");
         res2.next();
         assertEquals("rule", res2.getString("idrule"));
         assertEquals(1, res2.getInt("modetrans"));
@@ -142,16 +143,16 @@ public abstract class DBTransferDAOIT {
         TransferDAO dao = getDAO(getConnection());
 
         dao.update(new Transfer(0l, "rule", 13, "test", "testOrig",
-                "testInfo", true, 42, true, "server1", "server1",
-                "server2", "transferInfo", Transfer.TASKSTEP.ERRORTASK,
-                Transfer.TASKSTEP.TRANSFERTASK, 27, ErrorCode.CompleteOk,
-                ErrorCode.Unknown, 64, new Timestamp(192l),
-                new Timestamp(1511l), UpdatedInfo.TOSUBMIT));
+                                "testInfo", true, 42, true, "server1", "server1",
+                                "server2", "transferInfo", Transfer.TASKSTEP.ERRORTASK,
+                                Transfer.TASKSTEP.TRANSFERTASK, 27, ErrorCode.CompleteOk,
+                                ErrorCode.Unknown, 64, new Timestamp(192l),
+                                new Timestamp(1511l), UpdatedInfo.TOSUBMIT));
 
         ResultSet res = con.createStatement()
-            .executeQuery("SELECT * FROM runner WHERE specialid=0 and " +
-                    "ownerreq='server1' and requester='server1' and " +
-                    "requested='server2'");
+                           .executeQuery("SELECT * FROM runner WHERE specialid=0 and " +
+                                         "ownerreq='server1' and requester='server1' and " +
+                                         "requested='server2'");
         if (!res.next()) {
             fail("Result not found");
         }
@@ -183,7 +184,7 @@ public abstract class DBTransferDAOIT {
     public void testFind() throws Exception {
         ArrayList<Filter> map = new ArrayList<Filter>();
         map.add(new Filter(DBTransferDAO.ID_RULE_FIELD, "=", "default"));
-        map.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,"=", "server1"));
+        map.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD, "=", "server1"));
 
         TransferDAO dao = getDAO(getConnection());
         assertEquals(3, dao.find(map).size());

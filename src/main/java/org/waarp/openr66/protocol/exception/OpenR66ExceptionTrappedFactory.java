@@ -1,31 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.exception;
-
-import java.io.IOException;
-import java.net.BindException;
-import java.net.ConnectException;
-import java.nio.channels.CancelledKeyException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.NotYetConnectedException;
-import java.util.concurrent.RejectedExecutionException;
-
-import javax.net.ssl.SSLException;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -34,9 +23,18 @@ import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
 
+import javax.net.ssl.SSLException;
+import java.io.IOException;
+import java.net.BindException;
+import java.net.ConnectException;
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.NotYetConnectedException;
+import java.util.concurrent.RejectedExecutionException;
+
 /**
  * Class that filter exceptions
- * 
+ *
  * @author frederic bregier
  */
 public class OpenR66ExceptionTrappedFactory {
@@ -64,7 +62,7 @@ public class OpenR66ExceptionTrappedFactory {
         } else if (e1 instanceof ChannelException) {
             final ChannelException e2 = (ChannelException) e1;
             logger.info("Connection (example: timeout) impossible since {} with Channel {}",
-                    e2.getMessage(), channel);
+                        e2.getMessage(), channel);
             return new OpenR66ProtocolNetworkException(
                     "Connection (example: timeout) impossible", e2);
         } else if (e1 instanceof CancelledKeyException) {
@@ -133,7 +131,7 @@ public class OpenR66ExceptionTrappedFactory {
             final NullPointerException e2 = (NullPointerException) e1;
             logger.error("Null pointer Exception", e2);
             return new OpenR66ProtocolSystemException("Null Pointer Exception",
-                    e2);
+                                                      e2);
         } else if (e1 instanceof SSLException) {
             final SSLException e2 = (SSLException) e1;
             logger.debug("Connection aborted since SSL Error {} with Channel {}", e2
@@ -145,10 +143,10 @@ public class OpenR66ExceptionTrappedFactory {
                     .getMessage(), channel);
             if (channel.isActive()) {
                 return new OpenR66ProtocolSystemException("Connection aborted due to "
-                        + e2.getMessage(), e2);
+                                                          + e2.getMessage(), e2);
             } else {
                 return new OpenR66ProtocolBusinessNoWriteBackException("Connection aborted due to "
-                        + e2.getMessage(), e2);
+                                                                       + e2.getMessage(), e2);
             }
         } else if (e1 instanceof RejectedExecutionException) {
             final RejectedExecutionException e2 = (RejectedExecutionException) e1;
@@ -171,7 +169,7 @@ public class OpenR66ExceptionTrappedFactory {
             return e2;
         } else {
             logger.error("Unexpected exception from Outband" +
-                    " Ref Channel: " + channel.toString(), e1);
+                         " Ref Channel: " + channel.toString(), e1);
         }
         if (Configuration.configuration.getR66Mib() != null) {
             Configuration.configuration.getR66Mib().notifyWarning(

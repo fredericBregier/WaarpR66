@@ -1,37 +1,25 @@
 /**
-   This file is part of Waarp Project.
-
-   Copyright 2009, Frederic Bregier, and individual contributors by the @author
-   tags. See the COPYRIGHT.txt in the distribution for a full listing of
-   individual contributors.
-
-   All Waarp Project is free software: you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Waarp is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Waarp .  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Waarp Project.
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with Waarp .  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.localhandler;
-
-import static org.waarp.openr66.context.R66FiniteDualStates.*;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-
 import org.waarp.common.command.exception.Reply421Exception;
 import org.waarp.common.command.exception.Reply530Exception;
 import org.waarp.common.database.exception.WaarpDatabaseException;
@@ -67,6 +55,13 @@ import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.ChannelCloseTimer;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66Future;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
+
+import static org.waarp.openr66.context.R66FiniteDualStates.*;
 
 /**
  * Class to implement actions related to general connection handler: channelClosed, startup, authentication, and error.
@@ -110,6 +105,7 @@ public abstract class ConnectionActions {
             session.getBusinessObject().checkAtError(session);
         }
     }
+
     /**
      * @return the session
      */
@@ -147,13 +143,13 @@ public abstract class ConnectionActions {
         DbTaskRunner runner = session.getRunner();
         try {
             logger.debug("Local Server Channel Closed: {} {}",
-                    (localChannelReference != null ? localChannelReference
-                            : "no LocalChannelReference"), (runner != null ?
+                         (localChannelReference != null? localChannelReference
+                                 : "no LocalChannelReference"), (runner != null?
                             runner.toShortString() : "no runner"));
             // clean session objects like files
             boolean mustFinalize = true;
             if (localChannelReference != null &&
-                    localChannelReference.getFutureRequest().isDone()) {
+                localChannelReference.getFutureRequest().isDone()) {
                 // already done
                 mustFinalize = false;
             } else {
@@ -195,10 +191,10 @@ public abstract class ConnectionActions {
                     R66Result result = transfer.getResult();
                     if (transfer.isDone() && transfer.isSuccess()) {
                         logger.info("TRANSFER REQUESTED RESULT:     SUCCESS     " +
-                                (result != null ? result.toString() : "no result"));
+                                    (result != null? result.toString() : "no result"));
                     } else {
                         logger.error("TRANSFER REQUESTED RESULT:     FAILURE     " +
-                                (result != null ? result.toString() : "no result"));
+                                     (result != null? result.toString() : "no result"));
                     }
                 }
             }
@@ -212,15 +208,15 @@ public abstract class ConnectionActions {
                     logger.debug("End Use Connection");
                 }
                 NetworkTransaction.checkClosingNetworkChannel(localChannelReference.getNetworkChannelObject(),
-                        localChannelReference);
+                                                              localChannelReference);
                 session.setStatus(52);
             } else {
                 logger.debug("Local Server Channel Closed but no LocalChannelReference: " +
-                        e.channel().id());
+                             e.channel().id());
             }
             // Now if runner is not yet finished, finish it by force
             if (mustFinalize && localChannelReference != null
-                    && (!localChannelReference.getFutureRequest().isDone())) {
+                && (!localChannelReference.getFutureRequest().isDone())) {
                 R66Result finalValue = new R66Result(
                         new OpenR66ProtocolSystemException(
                                 Messages.getString("LocalServerHandler.11")), //$NON-NLS-1$
@@ -276,7 +272,8 @@ public abstract class ConnectionActions {
             logger.error(Messages.getString("LocalServerHandler.1")); //$NON-NLS-1$
             if (channel.isActive()) {
                 ErrorPacket error = new ErrorPacket("Cannot startup connection",
-                        ErrorCode.ConnectionImpossible.getCode(), ErrorPacket.FORWARDCLOSECODE);
+                                                    ErrorCode.ConnectionImpossible.getCode(),
+                                                    ErrorPacket.FORWARDCLOSECODE);
                 channel.writeAndFlush(error).addListener(ChannelFutureListener.CLOSE);
                 // Cannot do writeBack(error, true);
                 session.setStatus(40);
@@ -288,7 +285,8 @@ public abstract class ConnectionActions {
                 session.getBusinessObject().checkAtConnection(session);
             } catch (OpenR66RunnerErrorException e) {
                 ErrorPacket error = new ErrorPacket("Connection refused by business logic",
-                        ErrorCode.ConnectionImpossible.getCode(), ErrorPacket.FORWARDCLOSECODE);
+                                                    ErrorCode.ConnectionImpossible.getCode(),
+                                                    ErrorPacket.FORWARDCLOSECODE);
                 channel.writeAndFlush(error).addListener(ChannelFutureListener.CLOSE);
                 session.setStatus(40);
                 return;
@@ -312,16 +310,16 @@ public abstract class ConnectionActions {
     private final void refusedConnection(Channel channel, AuthentPacket packet, Exception e1)
             throws OpenR66ProtocolPacketException {
         logger.error(Messages.getString("LocalServerHandler.6") + //$NON-NLS-1$
-                localChannelReference.getNetworkChannel().remoteAddress() +
-                " : " + packet.getHostId());
+                     localChannelReference.getNetworkChannel().remoteAddress() +
+                     " : " + packet.getHostId());
         logger.debug(Messages.getString("LocalServerHandler.6") + //$NON-NLS-1$
-                localChannelReference.getNetworkChannel().remoteAddress() +
-                " : " + packet.getHostId(), e1);
+                     localChannelReference.getNetworkChannel().remoteAddress() +
+                     " : " + packet.getHostId(), e1);
         if (Configuration.configuration.getR66Mib() != null) {
             Configuration.configuration.getR66Mib().notifyError(
                     "Connection not allowed from " +
-                            localChannelReference.getNetworkChannel().remoteAddress()
-                            + " since " + e1.getMessage(), packet.getHostId());
+                    localChannelReference.getNetworkChannel().remoteAddress()
+                    + " since " + e1.getMessage(), packet.getHostId());
         }
 
         DbHostAuth auth = null;
@@ -336,21 +334,21 @@ public abstract class ConnectionActions {
         R66Result result = new R66Result(
                 new OpenR66ProtocolSystemException(
                         Messages.getString("LocalServerHandler.6") + //$NON-NLS-1$
-                                localChannelReference.getNetworkChannel().remoteAddress(),
+                        localChannelReference.getNetworkChannel().remoteAddress(),
                         e1), session, true,
                 ErrorCode.BadAuthent, null);
         localChannelReference.invalidateRequest(result);
         session.newState(ERROR);
         ErrorPacket error = new ErrorPacket(e1.getMessage(),
-                ErrorCode.BadAuthent.getCode(),
-                ErrorPacket.FORWARDCLOSECODE);
+                                            ErrorCode.BadAuthent.getCode(),
+                                            ErrorPacket.FORWARDCLOSECODE);
         ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
         localChannelReference.validateConnection(false, result);
         Channel networkchannel = localChannelReference.getNetworkChannel();
         boolean valid = NetworkTransaction.shuttingDownNetworkChannelBlackList(localChannelReference
-                .getNetworkChannelObject());
+                                                                                       .getNetworkChannelObject());
         logger.warn("Closing and blacklisting NetworkChannelReference since LocalChannel is not authenticated: "
-                + valid);
+                    + valid);
         ChannelCloseTimer.closeFutureChannel(channel);
         ChannelCloseTimer.closeFutureChannel(networkchannel);
         businessError();
@@ -383,8 +381,8 @@ public abstract class ConnectionActions {
                     ErrorCode.ConnectionImpossible, null);
             localChannelReference.invalidateRequest(result);
             ErrorPacket error = new ErrorPacket("Service unavailable",
-                    ErrorCode.ConnectionImpossible.getCode(),
-                    ErrorPacket.FORWARDCLOSECODE);
+                                                ErrorCode.ConnectionImpossible.getCode(),
+                                                ErrorPacket.FORWARDCLOSECODE);
             ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
             localChannelReference.validateConnection(false, result);
             ChannelCloseTimer.closeFutureChannel(channel);
@@ -404,12 +402,12 @@ public abstract class ConnectionActions {
             logger.error("Service unavailable: " + packet.getHostId(), e1);
             R66Result result = new R66Result(
                     new OpenR66ProtocolSystemException("Service unavailable",
-                            e1), session, true,
+                                                       e1), session, true,
                     ErrorCode.ConnectionImpossible, null);
             localChannelReference.invalidateRequest(result);
             ErrorPacket error = new ErrorPacket("Service unavailable",
-                    ErrorCode.ConnectionImpossible.getCode(),
-                    ErrorPacket.FORWARDCLOSECODE);
+                                                ErrorCode.ConnectionImpossible.getCode(),
+                                                ErrorPacket.FORWARDCLOSECODE);
             ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
             localChannelReference.validateConnection(false, result);
             ChannelCloseTimer.closeFutureChannel(channel);
@@ -421,7 +419,7 @@ public abstract class ConnectionActions {
         // Now if configuration say to do so: check remote ip address
         if (Configuration.configuration.isCheckRemoteAddress() && !localChannelReference.getPartner().isProxified()) {
             DbHostAuth host = R66Auth.getServerAuth(localChannelReference.getDbSession(),
-                    packet.getHostId());
+                                                    packet.getHostId());
             boolean toTest = false;
             if (!host.isProxified()) {
                 if (host.isClient()) {
@@ -459,10 +457,10 @@ public abstract class ConnectionActions {
                     if (!found) {
                         // error
                         refusedConnection(channel, packet,
-                                new OpenR66ProtocolNotAuthenticatedException(
-                                        "Server IP not authenticated: " +
-                                                inetAddress[0].toString() + " compare to "
-                                                + socketAddress.getAddress().toString()));
+                                          new OpenR66ProtocolNotAuthenticatedException(
+                                                  "Server IP not authenticated: " +
+                                                  inetAddress[0].toString() + " compare to "
+                                                  + socketAddress.getAddress().toString()));
                         session.setStatus(104);
                         return;
                     }
@@ -474,7 +472,7 @@ public abstract class ConnectionActions {
                 session.getBusinessObject().checkAtAuthentication(session);
             } catch (OpenR66RunnerErrorException e) {
                 refusedConnection(channel, packet,
-                        new OpenR66ProtocolNotAuthenticatedException(e.getMessage()));
+                                  new OpenR66ProtocolNotAuthenticatedException(e.getMessage()));
                 session.setStatus(104);
                 return;
             }
@@ -483,8 +481,8 @@ public abstract class ConnectionActions {
         session.newState(AUTHENTD);
         localChannelReference.validateConnection(true, result);
         logger.debug("Local Server Channel Validated: {} ",
-                (localChannelReference != null ? localChannelReference
-                        : "no LocalChannelReference"));
+                     (localChannelReference != null? localChannelReference
+                             : "no LocalChannelReference"));
         session.setStatus(44);
         NetworkTransaction.addClient(localChannelReference.getNetworkChannelObject(), packet.getHostId());
         if (packet.isToValidate()) {
@@ -493,7 +491,8 @@ public abstract class ConnectionActions {
             ChannelUtils.writeAbstractLocalPacket(localChannelReference, packet, false);
             session.setStatus(98);
         }
-        logger.debug("Partner: {} from {}", localChannelReference.getPartner(), Configuration.configuration.getVersions());
+        logger.debug("Partner: {} from {}", localChannelReference.getPartner(),
+                     Configuration.configuration.getVersions());
     }
 
     /**
@@ -520,29 +519,6 @@ public abstract class ConnectionActions {
     }
 
     /**
-     * Class to finalize a runner when the future is over
-     *
-     * @author Frederic Bregier
-     *
-     */
-    private static final class RunnerChannelFutureListener implements ChannelFutureListener {
-        private LocalChannelReference localChannelReference;
-        private R66Result result;
-
-        public RunnerChannelFutureListener(LocalChannelReference localChannelReference,
-                R66Result result) {
-            this.localChannelReference = localChannelReference;
-            this.result = result;
-        }
-
-        public void operationComplete(ChannelFuture future) throws Exception {
-            localChannelReference.invalidateRequest(result);
-            ChannelCloseTimer.closeFutureChannel(localChannelReference.getLocalChannel());
-        }
-
-    }
-
-    /**
      * Receive a remote error
      *
      * @param channel
@@ -553,7 +529,7 @@ public abstract class ConnectionActions {
      */
     public void errorMesg(Channel channel, ErrorPacket packet)
             throws OpenR66RunnerErrorException, OpenR66ProtocolSystemException,
-            OpenR66ProtocolBusinessException {
+                   OpenR66ProtocolBusinessException {
         // do something according to the error
         if (session.getLocalChannelReference().getFutureRequest().isDone()) {
             // already canceled or successful
@@ -576,7 +552,7 @@ public abstract class ConnectionActions {
                 runner.stopOrCancelRunner(code);
             }
             R66Result result = new R66Result(exception, session,
-                    true, code, runner);
+                                             true, code, runner);
             // now try to inform other
             session.setFinalizeTransfer(false, result);
             try {
@@ -601,7 +577,7 @@ public abstract class ConnectionActions {
                 runner.stopOrCancelRunner(code);
             }
             R66Result result = new R66Result(exception, session,
-                    true, code, runner);
+                                             true, code, runner);
             // now try to inform other
             session.setFinalizeTransfer(false, result);
             try {
@@ -646,7 +622,7 @@ public abstract class ConnectionActions {
                     new OpenR66ProtocolBusinessNoWriteBackException(packet.toString());
         }
         session.setFinalizeTransfer(false, new R66Result(exception, session,
-                true, code, session.getRunner()));
+                                                         true, code, session.getRunner()));
         throw exception;
     }
 
@@ -661,6 +637,29 @@ public abstract class ConnectionActions {
     public final void tryFinalizeRequest(R66Result errorValue)
             throws OpenR66RunnerErrorException, OpenR66ProtocolSystemException {
         session.tryFinalizeRequest(errorValue);
+    }
+
+    /**
+     * Class to finalize a runner when the future is over
+     *
+     * @author Frederic Bregier
+     *
+     */
+    private static final class RunnerChannelFutureListener implements ChannelFutureListener {
+        private LocalChannelReference localChannelReference;
+        private R66Result result;
+
+        public RunnerChannelFutureListener(LocalChannelReference localChannelReference,
+                                           R66Result result) {
+            this.localChannelReference = localChannelReference;
+            this.result = result;
+        }
+
+        public void operationComplete(ChannelFuture future) throws Exception {
+            localChannelReference.invalidateRequest(result);
+            ChannelCloseTimer.closeFutureChannel(localChannelReference.getLocalChannel());
+        }
+
     }
 
 }

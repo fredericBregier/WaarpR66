@@ -1,34 +1,33 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.localhandler.packet;
-
-import java.nio.charset.Charset;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolPacketException;
 import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
+import java.nio.charset.Charset;
+
 /**
  * End of Request class
- * 
+ *
  * header = Error.code middle = way end = might be empty
- * 
+ *
  * @author frederic bregier
  */
 public class EndRequestPacket extends AbstractLocalPacket {
@@ -41,34 +40,6 @@ public class EndRequestPacket extends AbstractLocalPacket {
     private byte way;
 
     private String optional;
-
-    /**
-     * @param headerLength
-     * @param middleLength
-     * @param endLength
-     * @param buf
-     * @return the new EndTransferPacket from buffer
-     * @throws OpenR66ProtocolPacketException
-     */
-    public static EndRequestPacket createFromBuffer(int headerLength,
-            int middleLength, int endLength, ByteBuf buf)
-            throws OpenR66ProtocolPacketException {
-        if (headerLength - 1 != 4) {
-            throw new OpenR66ProtocolPacketException("Not enough data");
-        }
-        if (middleLength != 1) {
-            throw new OpenR66ProtocolPacketException("Not enough data");
-        }
-        final int bheader = buf.readInt();
-        byte valid = buf.readByte();
-        String optional;
-        if (endLength > 0) {
-            optional = buf.toString(buf.readerIndex(), endLength, Charset.defaultCharset());
-            buf.skipBytes(endLength);
-            return new EndRequestPacket(bheader, valid, optional);
-        }
-        return new EndRequestPacket(bheader, valid);
-    }
 
     /**
      * @param code
@@ -98,6 +69,34 @@ public class EndRequestPacket extends AbstractLocalPacket {
         way = ASKVALIDATE;
     }
 
+    /**
+     * @param headerLength
+     * @param middleLength
+     * @param endLength
+     * @param buf
+     * @return the new EndTransferPacket from buffer
+     * @throws OpenR66ProtocolPacketException
+     */
+    public static EndRequestPacket createFromBuffer(int headerLength,
+                                                    int middleLength, int endLength, ByteBuf buf)
+            throws OpenR66ProtocolPacketException {
+        if (headerLength - 1 != 4) {
+            throw new OpenR66ProtocolPacketException("Not enough data");
+        }
+        if (middleLength != 1) {
+            throw new OpenR66ProtocolPacketException("Not enough data");
+        }
+        final int bheader = buf.readInt();
+        byte valid = buf.readByte();
+        String optional;
+        if (endLength > 0) {
+            optional = buf.toString(buf.readerIndex(), endLength, Charset.defaultCharset());
+            buf.skipBytes(endLength);
+            return new EndRequestPacket(bheader, valid, optional);
+        }
+        return new EndRequestPacket(bheader, valid);
+    }
+
     @Override
     public void createEnd(LocalChannelReference lcr) {
         if (optional == null) {
@@ -116,7 +115,8 @@ public class EndRequestPacket extends AbstractLocalPacket {
     @Override
     public void createMiddle(LocalChannelReference lcr) {
         byte[] newbytes = {
-                way };
+                way
+        };
         middle = Unpooled.wrappedBuffer(newbytes);
     }
 
@@ -127,7 +127,7 @@ public class EndRequestPacket extends AbstractLocalPacket {
 
     @Override
     public String toString() {
-        return "EndRequestPacket: " + code + " " + way + (optional != null ? " " + optional : "");
+        return "EndRequestPacket: " + code + " " + way + (optional != null? " " + optional : "");
     }
 
     /**

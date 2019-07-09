@@ -64,28 +64,33 @@ import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
  */
 public final class RestServiceInitializer {
 
-    /** The logger for all unexpected errors during the service initialization. */
+    /**
+     * The list of all {@link AbstractRestDbHandler} used by the API.
+     */
+    public static final Collection<AbstractRestDbHandler> handlers =
+            new ArrayList<AbstractRestDbHandler>();
+    /**
+     * The logger for all unexpected errors during the service initialization.
+     */
     private static final WaarpLogger logger =
             WaarpLoggerFactory.getLogger(RestServiceInitializer.class);
-
-    /** This is the {@link NettyHttpService} in charge of handling the RESTv2 API. */
+    /**
+     * This is the {@link NettyHttpService} in charge of handling the RESTv2 API.
+     */
     private static NettyHttpService restService;
 
-    /** This is a static class that should never be instantiated with a constructor. */
+    /**
+     * This is a static class that should never be instantiated with a constructor.
+     */
     private RestServiceInitializer() {
         throw new UnsupportedOperationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                                " cannot be instantiated.");
     }
 
-    /** The list of all {@link AbstractRestDbHandler} used by the API. */
-    public static final Collection<AbstractRestDbHandler> handlers  =
-            new ArrayList<AbstractRestDbHandler>();
-
     /**
-     * Fills the list of {@link AbstractRestDbHandler} with all handlers
-     * activated in the API configuration.
+     * Fills the list of {@link AbstractRestDbHandler} with all handlers activated in the API configuration.
      *
-     * @param config    The REST API configuration object.
+     * @param config The REST API configuration object.
      */
     private static void initHandlers(RestConfiguration config) {
         byte hostsCRUD = config.RESTHANDLERS_CRUD[DbHostAuth.ordinal()];
@@ -125,8 +130,8 @@ public final class RestServiceInitializer {
     }
 
     /**
-     * Builds and returns a {@link CorsConfig} to be used by the {@link CorsHandler}
-     * to allow the REST API to support CORS.
+     * Builds and returns a {@link CorsConfig} to be used by the {@link CorsHandler} to allow the REST API to support
+     * CORS.
      *
      * @return The configuration used for dealing with CORS requests.
      */
@@ -135,7 +140,7 @@ public final class RestServiceInitializer {
 
         builder.exposeHeaders(ALLOW, "transferURI", "hostURI", "ruleURI");
         builder.allowedRequestHeaders(AUTHORIZATION, AUTH_USER, AUTH_TIMESTAMP,
-                AUTH_SIGNATURE, CONTENT_TYPE);
+                                      AUTH_SIGNATURE, CONTENT_TYPE);
         builder.allowedRequestMethods(GET, POST, PUT, DELETE, OPTIONS);
         builder.maxAge(600);
         return builder.build();
@@ -144,46 +149,46 @@ public final class RestServiceInitializer {
     /**
      * Initializes the RESTv2 service with the given {@link RestConfiguration}.
      *
-     * @param config    The REST API configuration object.
+     * @param config The REST API configuration object.
      */
     public static void initRestService(final RestConfiguration config) {
         initHandlers(config);
 
         NettyHttpService.Builder restServiceBuilder =
                 NettyHttpService.builder("R66_RESTv2")
-                .setPort(config.REST_PORT)
-                .setHost(config.REST_ADDRESS)
-                .setHttpHandlers(handlers)
-                .setHandlerHooks(Collections.singleton(new RestHandlerHook(
-                        config.REST_AUTHENTICATED, config.hmacSha256,
-                        config.REST_TIME_LIMIT)))
-                .setExceptionHandler(new RestExceptionHandler())
-                .setExecThreadKeepAliveSeconds(-1L)
-                .setChannelPipelineModifier(new ChannelPipelineModifier() {
-                    @Override
-                    public void modify(ChannelPipeline channelPipeline) {
-                        channelPipeline.addBefore("router", "aggregator",
-                                new HttpObjectAggregator(Integer.MAX_VALUE));
-                        channelPipeline.addBefore("router", RestVersionHandler.HANDLER_NAME,
-                                new RestVersionHandler(config));
-                        channelPipeline.addBefore(RestVersionHandler.HANDLER_NAME, "cors",
-                                new CorsHandler(corsConfig()));
-                        if (config.REST_AUTHENTICATED && config.REST_SIGNATURE) {
-                            channelPipeline.addAfter("router", "signature",
-                                    new RestSignatureHandler(config.hmacSha256));
-                        }
+                                .setPort(config.REST_PORT)
+                                .setHost(config.REST_ADDRESS)
+                                .setHttpHandlers(handlers)
+                                .setHandlerHooks(Collections.singleton(new RestHandlerHook(
+                                        config.REST_AUTHENTICATED, config.hmacSha256,
+                                        config.REST_TIME_LIMIT)))
+                                .setExceptionHandler(new RestExceptionHandler())
+                                .setExecThreadKeepAliveSeconds(-1L)
+                                .setChannelPipelineModifier(new ChannelPipelineModifier() {
+                                    @Override
+                                    public void modify(ChannelPipeline channelPipeline) {
+                                        channelPipeline.addBefore("router", "aggregator",
+                                                                  new HttpObjectAggregator(Integer.MAX_VALUE));
+                                        channelPipeline.addBefore("router", RestVersionHandler.HANDLER_NAME,
+                                                                  new RestVersionHandler(config));
+                                        channelPipeline.addBefore(RestVersionHandler.HANDLER_NAME, "cors",
+                                                                  new CorsHandler(corsConfig()));
+                                        if (config.REST_AUTHENTICATED && config.REST_SIGNATURE) {
+                                            channelPipeline.addAfter("router", "signature",
+                                                                     new RestSignatureHandler(config.hmacSha256));
+                                        }
 
-                        //Removes the HTTP compressor which causes problems
-                        //on systems running java6 or earlier
-                        double JRE_version = Double.parseDouble(
-                                System.getProperty("java.specification.version"));
-                        if (JRE_version <= 1.6) {
-                            logger.info("Removed REST HTTP compressor due to incompatibility " +
-                                    "with the Java Runtime version");
-                            channelPipeline.remove("compressor");
-                        }
-                    }
-                });
+                                        //Removes the HTTP compressor which causes problems
+                                        //on systems running java6 or earlier
+                                        double JRE_version = Double.parseDouble(
+                                                System.getProperty("java.specification.version"));
+                                        if (JRE_version <= 1.6) {
+                                            logger.info("Removed REST HTTP compressor due to incompatibility " +
+                                                        "with the Java Runtime version");
+                                            channelPipeline.remove("compressor");
+                                        }
+                                    }
+                                });
 
         if (config.REST_SSL) {
             WaarpSecureKeyStore keyStore =
@@ -197,8 +202,8 @@ public final class RestServiceInitializer {
 
             restServiceBuilder.enableSSL(
                     SSLConfig.builder(new File(keyStoreFilename), keyStorePass)
-                            .setCertificatePassword(certificatePassword)
-                            .build()
+                             .setCertificatePassword(certificatePassword)
+                             .build()
             );
         }
 

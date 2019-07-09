@@ -1,27 +1,24 @@
 /**
-   This file is part of Waarp Project.
-
-   Copyright 2009, Frederic Bregier, and individual contributors by the @author
-   tags. See the COPYRIGHT.txt in the distribution for a full listing of
-   individual contributors.
-
-   All Waarp Project is free software: you can redistribute it and/or 
-   modify it under the terms of the GNU General Public License as published 
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Waarp is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Waarp .  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Waarp Project.
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with Waarp .  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.http.rest.handler;
 
-import java.sql.Timestamp;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.data.DbValue;
@@ -36,48 +33,24 @@ import org.waarp.gateway.kernel.exception.HttpInvalidAuthenticationException;
 import org.waarp.gateway.kernel.exception.HttpNotFoundRequestException;
 import org.waarp.gateway.kernel.rest.DataModelRestMethodHandler;
 import org.waarp.gateway.kernel.rest.HttpRestHandler;
-import org.waarp.gateway.kernel.rest.RestArgument;
 import org.waarp.gateway.kernel.rest.HttpRestHandler.METHOD;
+import org.waarp.gateway.kernel.rest.RestArgument;
 import org.waarp.gateway.kernel.rest.RestConfiguration;
 import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.database.data.DbTaskRunner;
 import org.waarp.openr66.database.data.DbTaskRunner.Columns;
 import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.sql.Timestamp;
 
 /**
  * DbTaskRunner Rest handler
- * 
+ *
  * @author "Frederic Bregier"
  *
  */
 public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler<DbTaskRunner> {
     public static final String BASEURI = "transfers";
-
-    public static enum FILTER_ARGS {
-        LIMIT("number"),
-        ORDERBYID("boolean"),
-        STARTID("transfer id"),
-        STOPID("transfer id"),
-        IDRULE("rule name"),
-        PARTNER("partner (requester or requested) name"),
-        PENDING("boolean"),
-        INTRANSFER("boolean"),
-        INERROR("boolean"),
-        DONE("boolean"),
-        ALLSTATUS("boolean"),
-        STARTTRANS("Date in ISO 8601 format or ms"),
-        STOPTRANS("Date in ISO 8601 format or ms");
-
-        public String type;
-
-        FILTER_ARGS(String type) {
-            this.type = type;
-        }
-    }
 
     /**
      * @param config
@@ -88,8 +61,9 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
     }
 
     protected DbTaskRunner getItem(HttpRestHandler handler, RestArgument arguments,
-            RestArgument result, Object body) throws HttpIncorrectRequestException,
-            HttpInvalidAuthenticationException, HttpNotFoundRequestException {
+                                   RestArgument result, Object body) throws HttpIncorrectRequestException,
+                                                                            HttpInvalidAuthenticationException,
+                                                                            HttpNotFoundRequestException {
         ObjectNode arg = arguments.getUriArgs().deepCopy();
         arg.setAll(arguments.getBody());
         try {
@@ -102,9 +76,9 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
                 id = node.asLong();
             }
             return new DbTaskRunner(id,
-                    arg.path(DbTaskRunner.Columns.REQUESTER.name()).asText(),
-                    arg.path(DbTaskRunner.Columns.REQUESTED.name()).asText(),
-                    arg.path(DbTaskRunner.Columns.OWNERREQ.name()).asText());
+                                    arg.path(DbTaskRunner.Columns.REQUESTER.name()).asText(),
+                                    arg.path(DbTaskRunner.Columns.REQUESTED.name()).asText(),
+                                    arg.path(DbTaskRunner.Columns.OWNERREQ.name()).asText());
         } catch (WaarpDatabaseException e) {
             throw new HttpNotFoundRequestException("Issue while reading from database " + arg, e);
         }
@@ -112,8 +86,8 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
 
     @Override
     protected DbTaskRunner createItem(HttpRestHandler handler, RestArgument arguments,
-            RestArgument result, Object body) throws HttpIncorrectRequestException,
-            HttpInvalidAuthenticationException {
+                                      RestArgument result, Object body) throws HttpIncorrectRequestException,
+                                                                               HttpInvalidAuthenticationException {
         ObjectNode arg = arguments.getUriArgs().deepCopy();
         arg.setAll(arguments.getBody());
         try {
@@ -125,7 +99,7 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
 
     @Override
     protected DbPreparedStatement getPreparedStatement(HttpRestHandler handler,
-            RestArgument arguments, RestArgument result, Object body)
+                                                       RestArgument arguments, RestArgument result, Object body)
             throws HttpIncorrectRequestException, HttpInvalidAuthenticationException {
         ObjectNode arg = arguments.getUriArgs().deepCopy();
         arg.setAll(arguments.getBody());
@@ -186,8 +160,9 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
         }
         try {
             return DbTaskRunner.getFilterPrepareStatement(handler.getDbSession(),
-                    limit, orderBySpecialId, startid, stopid, start, stop, rule, req,
-                    pending, transfer, error, done, all, owner);
+                                                          limit, orderBySpecialId, startid, stopid, start, stop, rule,
+                                                          req,
+                                                          pending, transfer, error, done, all, owner);
         } catch (WaarpDatabaseNoConnectionException e) {
             throw new HttpIncorrectRequestException("Issue while reading from database", e);
         } catch (WaarpDatabaseSqlException e) {
@@ -226,7 +201,7 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
             node3.put(DbTaskRunner.Columns.REQUESTED.name(), "Partner as requested as VARCHAR");
             node3.put(DbTaskRunner.Columns.OWNERREQ.name(), "Owner of this request (optional) as VARCHAR");
             node2 = RestArgument.fillDetailedAllow(METHOD.GET, this.path + "/id", COMMAND_TYPE.GET.name(),
-                    node3, node1);
+                                                   node3, node1);
             node.add(node2);
 
             node3 = JsonHandler.createObjectNode();
@@ -235,7 +210,7 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
             }
             node3.put(DbTaskRunner.Columns.OWNERREQ.name(), "Owner of this request (optional) as VARCHAR");
             node2 = RestArgument.fillDetailedAllow(METHOD.GET, this.path, COMMAND_TYPE.MULTIGET.name(),
-                    node3, JsonHandler.createArrayNode().add(node1));
+                                                   node3, JsonHandler.createArrayNode().add(node1));
             node.add(node2);
         }
         if (this.methods.contains(METHOD.PUT)) {
@@ -251,7 +226,7 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
                 node3.put(dbValue.getColumn(), dbValue.getType());
             }
             node2 = RestArgument.fillDetailedAllow(METHOD.PUT, this.path + "/id", COMMAND_TYPE.UPDATE.name(),
-                    node3, node1);
+                                                   node3, node1);
             node.add(node2);
         }
         if (this.methods.contains(METHOD.DELETE)) {
@@ -261,7 +236,7 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
             node3.put(DbTaskRunner.Columns.REQUESTED.name(), "Partner as requested as VARCHAR");
             node3.put(DbTaskRunner.Columns.OWNERREQ.name(), "Owner of this request (optional) as VARCHAR");
             node2 = RestArgument.fillDetailedAllow(METHOD.DELETE, this.path + "/id", COMMAND_TYPE.DELETE.name(),
-                    node3, node1);
+                                                   node3, node1);
             node.add(node2);
         }
         if (this.methods.contains(METHOD.POST)) {
@@ -270,7 +245,7 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
                 node3.put(dbValue.getColumn(), dbValue.getType());
             }
             node2 = RestArgument.fillDetailedAllow(METHOD.POST, this.path, COMMAND_TYPE.CREATE.name(),
-                    node3, node1);
+                                                   node3, node1);
             node.add(node2);
         }
         node2 = RestArgument.fillDetailedAllow(METHOD.OPTIONS, this.path, COMMAND_TYPE.OPTIONS.name(), null, null);
@@ -286,11 +261,33 @@ public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler
 
     @Override
     protected void checkAuthorization(HttpRestHandler handler, RestArgument arguments,
-            RestArgument result, METHOD method) throws HttpForbiddenRequestException {
+                                      RestArgument result, METHOD method) throws HttpForbiddenRequestException {
         HttpRestR66Handler r66handler = (HttpRestR66Handler) handler;
         R66Session session = r66handler.getServerHandler().getSession();
         if (!session.getAuth().isValidRole(ROLE.SYSTEM)) {
             throw new HttpForbiddenRequestException("Partner must have System role");
+        }
+    }
+
+    public static enum FILTER_ARGS {
+        LIMIT("number"),
+        ORDERBYID("boolean"),
+        STARTID("transfer id"),
+        STOPID("transfer id"),
+        IDRULE("rule name"),
+        PARTNER("partner (requester or requested) name"),
+        PENDING("boolean"),
+        INTRANSFER("boolean"),
+        INERROR("boolean"),
+        DONE("boolean"),
+        ALLSTATUS("boolean"),
+        STARTTRANS("Date in ISO 8601 format or ms"),
+        STOPTRANS("Date in ISO 8601 format or ms");
+
+        public String type;
+
+        FILTER_ARGS(String type) {
+            this.type = type;
         }
     }
 

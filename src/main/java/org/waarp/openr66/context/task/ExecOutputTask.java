@@ -1,26 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -38,30 +32,35 @@ import org.waarp.openr66.context.task.exception.OpenR66RunnerErrorException;
 import org.waarp.openr66.context.task.localexec.LocalExecClient;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
 /**
  * Execute an external command and Use the output if an error occurs.<br>
- * 
+ *
  * The output is ignored if the command has a correct status.<br>
  * In case of error, if the output finishes with <tt>NEWFINALNAME:xxx</tt> then this part is removed from the output
  * and the xxx is used as the last valid name for the file (meaning the file was moved or renamed even in case of error)<br>
  * <br>
- * 
+ *
  * waitForValidation (#NOWAIT#) must not be set since it will prevent to have the feedback in case
  * of error. So it is ignored.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class ExecOutputTask extends AbstractExecTask {
+    /**
+     * In the final line output, the filename must prefixed by the following field
+     */
+    public static final String DELIMITER = "NEWFINALNAME:";
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(ExecOutputTask.class);
-    /**
-     * In the final line output, the filename must prefixed by the following field
-     */
-    public static final String DELIMITER = "NEWFINALNAME:";
 
     /**
      * @param argRule
@@ -70,7 +69,7 @@ public class ExecOutputTask extends AbstractExecTask {
      * @param session
      */
     public ExecOutputTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                          R66Session session) {
         super(TaskType.EXECOUTPUT, delay, argRule, argTransfer, session);
     }
 
@@ -84,7 +83,7 @@ public class ExecOutputTask extends AbstractExecTask {
          * code. No change is made to the file.
          */
         logger.info("ExecOutput with " + argRule + ":" + argTransfer + " and {}",
-                session);
+                    session);
         String finalname = applyTransferSubstitutions(argRule);
         //
         // Force the WaitForValidation
@@ -117,7 +116,7 @@ public class ExecOutputTask extends AbstractExecTask {
             } catch (IOException e) {
             }
             logger.error("Exception: " + e1.getMessage() +
-                    " Exec in error with " + commandLine.toString(), e1);
+                         " Exec in error with " + commandLine.toString(), e1);
             futureCompletion.setFailure(e1);
             return;
         }
@@ -125,7 +124,8 @@ public class ExecOutputTask extends AbstractExecTask {
                 outputStream, null);
         defaultExecutor.setStreamHandler(pumpStreamHandler);
         int[] correctValues = {
-                0, 1 };
+                0, 1
+        };
         defaultExecutor.setExitValues(correctValues);
         ExecuteWatchdog watchdog = null;
         if (delay > 0) {
@@ -150,12 +150,12 @@ public class ExecOutputTask extends AbstractExecTask {
                     status = defaultExecutor.execute(commandLine);
                 } catch (ExecuteException e1) {
                     finalizeFromError(outputStream,
-                            pumpStreamHandler,
-                            inputStream,
-                            allLineReader,
-                            thread,
-                            status,
-                            commandLine);
+                                      pumpStreamHandler,
+                                      inputStream,
+                                      allLineReader,
+                                      thread,
+                                      status,
+                                      commandLine);
                     return;
                 } catch (IOException e1) {
                     try {
@@ -176,18 +176,18 @@ public class ExecOutputTask extends AbstractExecTask {
                     } catch (IOException e2) {
                     }
                     logger.error("IOException: " + e.getMessage() +
-                            " . Exec in error with " + commandLine.toString());
+                                 " . Exec in error with " + commandLine.toString());
                     futureCompletion.setFailure(e);
                     return;
                 }
             } else {
                 finalizeFromError(outputStream,
-                        pumpStreamHandler,
-                        inputStream,
-                        allLineReader,
-                        thread,
-                        status,
-                        commandLine);
+                                  pumpStreamHandler,
+                                  inputStream,
+                                  allLineReader,
+                                  thread,
+                                  status,
+                                  commandLine);
                 return;
             }
         } catch (IOException e) {
@@ -205,7 +205,7 @@ public class ExecOutputTask extends AbstractExecTask {
             } catch (IOException e2) {
             }
             logger.error("IOException: " + e.getMessage() +
-                    " . Exec in error with " + commandLine.toString());
+                         " . Exec in error with " + commandLine.toString());
             futureCompletion.setFailure(e);
             return;
         }
@@ -236,7 +236,7 @@ public class ExecOutputTask extends AbstractExecTask {
         }
         String newname = null;
         if (defaultExecutor.isFailure(status) && watchdog != null &&
-                watchdog.killedProcess()) {
+            watchdog.killedProcess()) {
             // kill by the watchdoc (time out)
             status = -1;
             newname = "TimeOut";
@@ -254,13 +254,13 @@ public class ExecOutputTask extends AbstractExecTask {
             futureCompletion.setResult(result);
             futureCompletion.setSuccess();
             logger.info("Exec OK with {} returns {}", commandLine,
-                    newname);
+                        newname);
         } else if (status == 1) {
             R66Result result = new R66Result(session, true, ErrorCode.Warning, this.session.getRunner());
             result.setOther(newName);
             futureCompletion.setResult(result);
             logger.warn("Exec in warning with " + commandLine +
-                    " returns " + newname);
+                        " returns " + newname);
             session.getRunner().setErrorExecutionStatus(ErrorCode.Warning);
             futureCompletion.setSuccess();
         } else {
@@ -270,7 +270,7 @@ public class ExecOutputTask extends AbstractExecTask {
                 newname = newname.substring(0, pos);
                 if (newfilename.indexOf(' ') > 0) {
                     logger.warn("Exec returns a multiple string in final line: " +
-                            newfilename);
+                                newfilename);
                     // XXX FIXME: should not split String[] args = newfilename.split(" ");
                     // newfilename = args[args.length - 1];
                 }
@@ -285,23 +285,23 @@ public class ExecOutputTask extends AbstractExecTask {
                 } catch (CommandAbstractException e) {
                     logger
                             .warn("Exec in warning with " + commandLine,
-                                    e);
+                                  e);
                 }
                 session.getRunner().setFileMoved(newfilename, true);
             }
             logger.error("Status: " + status + " Exec in error with " +
-                    commandLine + " returns " + newname);
+                         commandLine + " returns " + newname);
             OpenR66RunnerErrorException exc =
                     new OpenR66RunnerErrorException("<STATUS>" + status + "</STATUS><ERROR>"
-                            + newname + "</ERROR>");
+                                                    + newname + "</ERROR>");
             futureCompletion.setFailure(exc);
         }
     }
 
     private void finalizeFromError(PipedOutputStream outputStream,
-            PumpStreamHandler pumpStreamHandler,
-            PipedInputStream inputStream, AllLineReader allLineReader, Thread thread,
-            int status, CommandLine commandLine) {
+                                   PumpStreamHandler pumpStreamHandler,
+                                   PipedInputStream inputStream, AllLineReader allLineReader, Thread thread,
+                                   int status, CommandLine commandLine) {
         try {
             Thread.sleep(Configuration.RETRYINMS);
         } catch (InterruptedException e) {
@@ -337,10 +337,10 @@ public class ExecOutputTask extends AbstractExecTask {
         }
         String result = allLineReader.getLastLine().toString();
         logger.error("Status: " + status + " Exec in error with " +
-                commandLine + " returns " + result);
+                     commandLine + " returns " + result);
         OpenR66RunnerErrorException exc =
                 new OpenR66RunnerErrorException("<STATUS>" + status + "</STATUS><ERROR>" + result
-                        + "</ERROR>");
+                                                + "</ERROR>");
         futureCompletion.setFailure(exc);
     }
 }

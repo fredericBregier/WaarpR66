@@ -1,23 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.database.model;
-
-import java.sql.SQLException;
 
 import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.DbRequest;
@@ -36,6 +33,8 @@ import org.waarp.openr66.database.data.DbTaskRunner;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.configuration.PartnerConfiguration;
 import org.waarp.openr66.protocol.utils.R66Versions;
+
+import java.sql.SQLException;
 
 /**
  * Oracle Database Model implementation
@@ -71,14 +70,14 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
                 .values();
         for (int i = 0; i < mcolumns.length - 1; i++) {
             action += mcolumns[i].name() +
-                    DBType.getType(DbMultipleMonitor.dbTypes[i]) + notNull +
-                    ", ";
+                      DBType.getType(DbMultipleMonitor.dbTypes[i]) + notNull +
+                      ", ";
         }
         action += mcolumns[mcolumns.length - 1].name() +
-                DBType.getType(DbMultipleMonitor.dbTypes[mcolumns.length - 1]) +
-                notNull + ",";
+                  DBType.getType(DbMultipleMonitor.dbTypes[mcolumns.length - 1]) +
+                  notNull + ",";
         action += constraint + " multimonit_pk " + primaryKey + "("
-                + mcolumns[mcolumns.length - 1].name() + "))";
+                  + mcolumns[mcolumns.length - 1].name() + "))";
         System.out.println(action);
         DbRequest request = new DbRequest(session);
         try {
@@ -108,14 +107,14 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
                 .values();
         for (int i = 0; i < ccolumns.length - 1; i++) {
             action += ccolumns[i].name() +
-                    DBType.getType(DbConfiguration.dbTypes[i]) + notNull +
-                    ", ";
+                      DBType.getType(DbConfiguration.dbTypes[i]) + notNull +
+                      ", ";
         }
         action += ccolumns[ccolumns.length - 1].name() +
-                DBType.getType(DbConfiguration.dbTypes[ccolumns.length - 1]) +
-                notNull + ",";
+                  DBType.getType(DbConfiguration.dbTypes[ccolumns.length - 1]) +
+                  notNull + ",";
         action += constraint + " conf_pk " + primaryKey + "("
-                + ccolumns[ccolumns.length - 1].name() + "))";
+                  + ccolumns[ccolumns.length - 1].name() + "))";
         System.out.println(action);
         request = new DbRequest(session);
         try {
@@ -135,14 +134,14 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
                 .values();
         for (int i = 0; i < chcolumns.length - 1; i++) {
             action += chcolumns[i].name() +
-                    DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
-                    ", ";
+                      DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
+                      ", ";
         }
         action += chcolumns[chcolumns.length - 1].name() +
-                DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
-                notNull + ",";
+                  DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
+                  notNull + ",";
         action += constraint + " hostconf_pk " + primaryKey + "("
-                + chcolumns[chcolumns.length - 1].name() + "))";
+                  + chcolumns[chcolumns.length - 1].name() + "))";
         System.out.println(action);
         request = new DbRequest(session);
         try {
@@ -161,13 +160,13 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         DbHostAuth.Columns[] hcolumns = DbHostAuth.Columns.values();
         for (int i = 0; i < hcolumns.length - 1; i++) {
             action += hcolumns[i].name() +
-                    DBType.getType(DbHostAuth.dbTypes[i]) + notNull + ", ";
+                      DBType.getType(DbHostAuth.dbTypes[i]) + notNull + ", ";
         }
         action += hcolumns[hcolumns.length - 1].name() +
-                DBType.getType(DbHostAuth.dbTypes[hcolumns.length - 1]) +
-                notNull + ",";
+                  DBType.getType(DbHostAuth.dbTypes[hcolumns.length - 1]) +
+                  notNull + ",";
         action += constraint + " host_pk " + primaryKey + "("
-                + hcolumns[hcolumns.length - 1].name() + "))";
+                  + hcolumns[hcolumns.length - 1].name() + "))";
         System.out.println(action);
         try {
             request.query(action);
@@ -185,13 +184,13 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         DbRule.Columns[] rcolumns = DbRule.Columns.values();
         for (int i = 0; i < rcolumns.length - 1; i++) {
             action += rcolumns[i].name() +
-                    DBType.getType(DbRule.dbTypes[i]) + ", ";
+                      DBType.getType(DbRule.dbTypes[i]) + ", ";
         }
         action += rcolumns[rcolumns.length - 1].name() +
-                DBType.getType(DbRule.dbTypes[rcolumns.length - 1]) +
-                notNull + ",";
+                  DBType.getType(DbRule.dbTypes[rcolumns.length - 1]) +
+                  notNull + ",";
         action += constraint + " rule_pk " + primaryKey + "("
-                + rcolumns[rcolumns.length - 1].name() + "))";
+                  + rcolumns[rcolumns.length - 1].name() + "))";
         System.out.println(action);
         try {
             request.query(action);
@@ -209,7 +208,7 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         DbTaskRunner.Columns[] acolumns = DbTaskRunner.Columns.values();
         for (int i = 0; i < acolumns.length; i++) {
             action += acolumns[i].name() +
-                    DBType.getType(DbTaskRunner.dbTypes[i]) + notNull + ", ";
+                      DBType.getType(DbTaskRunner.dbTypes[i]) + notNull + ", ";
         }
         // Several columns for primary key
         action += constraint + " runner_pk " + primaryKey + "(";
@@ -249,8 +248,8 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
 
         // cptrunner
         action = "CREATE SEQUENCE " + DbTaskRunner.fieldseq +
-                " MINVALUE " + (DbConstant.ILLEGALVALUE + 1) +
-                " START WITH " + (DbConstant.ILLEGALVALUE + 1);
+                 " MINVALUE " + (DbConstant.ILLEGALVALUE + 1) +
+                 " START WITH " + (DbConstant.ILLEGALVALUE + 1);
         System.out.println(action);
         try {
             request.query(action);
@@ -264,7 +263,7 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         }
 
         DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-            R66Versions.V2_4_25.getVersion());
+                                            R66Versions.V2_4_25.getVersion());
     }
 
     @Override
@@ -272,8 +271,8 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
             throws WaarpDatabaseNoConnectionException {
         String action = "DROP SEQUENCE " + DbTaskRunner.fieldseq;
         String action2 = "CREATE SEQUENCE " + DbTaskRunner.fieldseq +
-                " MINVALUE " + (DbConstant.ILLEGALVALUE + 1) +
-                " START WITH " + (newvalue);
+                         " MINVALUE " + (DbConstant.ILLEGALVALUE + 1) +
+                         " START WITH " + (newvalue);
         DbRequest request = new DbRequest(session);
         try {
             request.query(action);
@@ -294,7 +293,7 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
     @Override
     public long nextSequence(DbSession dbSession)
             throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException, WaarpDatabaseNoDataException {
+                   WaarpDatabaseSqlException, WaarpDatabaseNoDataException {
         long result = DbConstant.ILLEGALVALUE;
         String action = "SELECT " + DbTaskRunner.fieldseq + ".NEXTVAL FROM DUAL";
         DbPreparedStatement preparedStatement = new DbPreparedStatement(
@@ -333,14 +332,14 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
                     .values();
             for (int i = 0; i < chcolumns.length - 1; i++) {
                 action += chcolumns[i].name() +
-                        DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
-                        ", ";
+                          DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
+                          ", ";
             }
             action += chcolumns[chcolumns.length - 1].name() +
-                    DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
-                    notNull + ",";
+                      DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
+                      notNull + ",";
             action += constraint + " hostconf_pk " + primaryKey + "("
-                    + chcolumns[chcolumns.length - 1].name() + "))";
+                      + chcolumns[chcolumns.length - 1].name() + "))";
             System.out.println(action);
             DbRequest request = new DbRequest(session);
             try {
@@ -355,9 +354,9 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         if (PartnerConfiguration.isVersion2GEQVersion1(version, R66Versions.V2_4_17.getVersion())) {
             System.out.println(version + " to " + R66Versions.V2_4_17.getVersion() + "? " + true);
             String command = "ALTER TABLE " + DbTaskRunner.table + " ADD ( " +
-                    DbTaskRunner.Columns.TRANSFERINFO.name() + " " +
-                    DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.TRANSFERINFO.ordinal()]) +
-                    " DEFAULT '{}' NOT NULL ) ";
+                             DbTaskRunner.Columns.TRANSFERINFO.name() + " " +
+                             DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.TRANSFERINFO.ordinal()]) +
+                             " DEFAULT '{}' NOT NULL ) ";
             DbRequest request = new DbRequest(session);
             try {
                 request.query(command);
@@ -371,9 +370,9 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         if (PartnerConfiguration.isVersion2GEQVersion1(version, R66Versions.V2_4_23.getVersion())) {
             System.out.println(version + " to " + R66Versions.V2_4_23.getVersion() + "? " + true);
             String command = "ALTER TABLE " + DbHostAuth.table + " ADD ( " +
-                    DbHostAuth.Columns.ISACTIVE.name() + " " +
-                    DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISACTIVE.ordinal()]) +
-                    " DEFAULT " + true + " NOT NULL ) ";
+                             DbHostAuth.Columns.ISACTIVE.name() + " " +
+                             DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISACTIVE.ordinal()]) +
+                             " DEFAULT " + true + " NOT NULL ) ";
             DbRequest request = new DbRequest(session);
             try {
                 request.query(command);
@@ -384,9 +383,9 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
                 request.close();
             }
             command = "ALTER TABLE " + DbHostAuth.table + " ADD ( " +
-                    DbHostAuth.Columns.ISPROXIFIED.name() + " " +
-                    DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISPROXIFIED.ordinal()]) +
-                    " DEFAULT " + false + " NOT NULL ) ";
+                      DbHostAuth.Columns.ISPROXIFIED.name() + " " +
+                      DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISPROXIFIED.ordinal()]) +
+                      " DEFAULT " + false + " NOT NULL ) ";
             request = new DbRequest(session);
             try {
                 request.query(command);
@@ -400,12 +399,12 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
         if (PartnerConfiguration.isVersion2GTVersion1(version, R66Versions.V2_4_25.getVersion())) {
             System.out.println(version + " to " + R66Versions.V2_4_25.getVersion() + "? " + true);
             String command = "ALTER TABLE " + DbTaskRunner.table + " MODIFY ( " +
-                    DbTaskRunner.Columns.FILENAME.name() + " " +
-                    DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.FILENAME.ordinal()]) +
-                    " NOT NULL, " +
-                    DbTaskRunner.Columns.ORIGINALNAME.name() + " " +
-                    DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.ORIGINALNAME.ordinal()]) +
-                    " NOT NULL )";
+                             DbTaskRunner.Columns.FILENAME.name() + " " +
+                             DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.FILENAME.ordinal()]) +
+                             " NOT NULL, " +
+                             DbTaskRunner.Columns.ORIGINALNAME.name() + " " +
+                             DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.ORIGINALNAME.ordinal()]) +
+                             " NOT NULL )";
             DbRequest request = new DbRequest(session);
             try {
                 System.out.println("Command: " + command);
@@ -418,7 +417,7 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
             }
         }
         DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                R66Versions.V2_4_25.getVersion());
+                                            R66Versions.V2_4_25.getVersion());
         return true;
     }
 
@@ -430,12 +429,13 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
             try {
                 request = new DbRequest(session);
                 request.select("select " + DbHostConfiguration.Columns.HOSTID.name() + " from "
-                        + DbHostConfiguration.table +
-                        " where " + DbHostConfiguration.Columns.HOSTID + " = '" + Configuration.configuration.getHOST_ID()
-                        + "'");
+                               + DbHostConfiguration.table +
+                               " where " + DbHostConfiguration.Columns.HOSTID + " = '" +
+                               Configuration.configuration.getHOST_ID()
+                               + "'");
                 request.close();
                 DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                        R66Versions.V2_4_13.getVersion());
+                                                    R66Versions.V2_4_13.getVersion());
             } catch (WaarpDatabaseSqlException e) {
                 return !upgradeDb(session, version);
             } finally {
@@ -449,10 +449,10 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
             try {
                 request = new DbRequest(session);
                 request.select("select " + DbTaskRunner.Columns.TRANSFERINFO.name() + " from " + DbTaskRunner.table +
-                        " where " + DbTaskRunner.Columns.SPECIALID + " = " + DbConstant.ILLEGALVALUE);
+                               " where " + DbTaskRunner.Columns.SPECIALID + " = " + DbConstant.ILLEGALVALUE);
                 request.close();
                 DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                        R66Versions.V2_4_17.getVersion());
+                                                    R66Versions.V2_4_17.getVersion());
             } catch (WaarpDatabaseSqlException e) {
                 return !upgradeDb(session, version);
             } finally {
@@ -466,10 +466,10 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
             try {
                 request = new DbRequest(session);
                 request.select("select " + DbHostAuth.Columns.ISACTIVE.name() + " from " + DbHostAuth.table +
-                        " where " + DbHostAuth.Columns.PORT + " = " + 0);
+                               " where " + DbHostAuth.Columns.PORT + " = " + 0);
                 request.close();
                 DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                        R66Versions.V2_4_23.getVersion());
+                                                    R66Versions.V2_4_23.getVersion());
             } catch (WaarpDatabaseSqlException e) {
                 return !upgradeDb(session, version);
             } finally {
@@ -483,7 +483,7 @@ public class DbModelOracle extends org.waarp.common.database.model.DbModelOracle
             try {
                 if (upgradeDb(session, version)) {
                     DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                            R66Versions.V2_4_25.getVersion());
+                                                        R66Versions.V2_4_25.getVersion());
                 } else {
                     return true;
                 }

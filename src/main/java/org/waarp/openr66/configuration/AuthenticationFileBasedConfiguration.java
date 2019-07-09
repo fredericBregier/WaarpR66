@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -33,7 +32,6 @@ import org.waarp.common.xml.XmlHash;
 import org.waarp.common.xml.XmlType;
 import org.waarp.common.xml.XmlUtil;
 import org.waarp.common.xml.XmlValue;
-import org.waarp.openr66.database.DbConstant;
 import org.waarp.openr66.database.data.DbHostAuth;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
@@ -45,17 +43,11 @@ import java.util.List;
 
 /**
  * Authentication from File support
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class AuthenticationFileBasedConfiguration {
-    /**
-     * Internal Logger
-     */
-    private static final WaarpLogger logger = WaarpLoggerFactory
-            .getLogger(AuthenticationFileBasedConfiguration.class);
-
     /**
      * Authentication Fields
      */
@@ -68,31 +60,26 @@ public class AuthenticationFileBasedConfiguration {
      * Authentication Fields
      */
     public static final String XML_AUTHENTIFICATION_BASED = "/"
-            +
-            XML_AUTHENTIFICATION_ROOT
-            + "/"
-            + XML_AUTHENTIFICATION_ENTRY;
-
+                                                            +
+                                                            XML_AUTHENTIFICATION_ROOT
+                                                            + "/"
+                                                            + XML_AUTHENTIFICATION_ENTRY;
     /**
      * Authentication Fields
      */
     public static final String XML_AUTHENTIFICATION_HOSTID = "hostid";
-
     /**
      * Authentication Fields
      */
     public static final String XML_AUTHENTIFICATION_KEYFILE = "keyfile";
-
     /**
      * Authentication Fields
      */
     public static final String XML_AUTHENTIFICATION_KEY = "key";
-
     /**
      * Authentication Fields
      */
     public static final String XML_AUTHENTIFICATION_ADMIN = "admin";
-
     /**
      * Authentication Fields
      */
@@ -117,10 +104,14 @@ public class AuthenticationFileBasedConfiguration {
      * Authentication Fields
      */
     public static final String XML_AUTHENTIFICATION_ISPROXIFIED = "isproxified";
-
+    /**
+     * Internal Logger
+     */
+    private static final WaarpLogger logger = WaarpLoggerFactory
+            .getLogger(AuthenticationFileBasedConfiguration.class);
     /**
      * Structure of the Configuration file
-     * 
+     *
      */
     private static final XmlDecl[] configAuthenticationDecls = {
             // identity
@@ -149,7 +140,7 @@ public class AuthenticationFileBasedConfiguration {
 
     /**
      * Load Authentication from File
-     * 
+     *
      * @param filename
      * @return True if OK
      */
@@ -160,12 +151,12 @@ public class AuthenticationFileBasedConfiguration {
             document = new SAXReader().read(filename);
         } catch (DocumentException e) {
             logger.error("Unable to read the XML Authentication file: " +
-                    filename, e);
+                         filename, e);
             return false;
         }
         if (document == null) {
             logger.error("Unable to read the XML Authentication file: " +
-                    filename);
+                         filename);
             return false;
         }
         XmlValue[] values = XmlUtil.read(document, authentElements);
@@ -278,7 +269,7 @@ public class AuthenticationFileBasedConfiguration {
 
     /**
      * Construct a new Element with value
-     * 
+     *
      * @param name
      * @param value
      * @return the new Element
@@ -291,7 +282,7 @@ public class AuthenticationFileBasedConfiguration {
 
     /**
      * Write all authentication to a file with filename
-     * 
+     *
      * @param filename
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseNoConnectionException
@@ -299,7 +290,7 @@ public class AuthenticationFileBasedConfiguration {
      */
     public static void writeXML(Configuration config, String filename)
             throws OpenR66ProtocolSystemException, WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                   WaarpDatabaseSqlException {
         Document document = DocumentHelper.createDocument();
         Element root = document.addElement(XML_AUTHENTIFICATION_ROOT);
         DbHostAuth[] hosts = DbHostAuth.getAllHosts();

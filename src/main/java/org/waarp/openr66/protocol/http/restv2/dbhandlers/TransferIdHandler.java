@@ -50,15 +50,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.WILDCARD;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
-import static org.waarp.openr66.pojo.UpdatedInfo.TOSUBMIT;
+import static org.waarp.openr66.pojo.UpdatedInfo.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on the
- * single transfer REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the single transfer REST entry point.
  */
 @Path(TRANSFER_ID_HANDLER_URI)
 public class TransferIdHandler extends AbstractRestDbHandler {
@@ -73,18 +72,16 @@ public class TransferIdHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to obtain the information on the transfer whose id was
-     * given in the request's URI. The requested transfer is sent back in
-     * JSON format, unless an unexpected error prevents it or if the request
-     * id does not exist.
+     * Method called to obtain the information on the transfer whose id was given in the request's URI. The requested
+     * transfer is sent back in JSON format, unless an unexpected error prevents it or if the request id does not
+     * exist.
      * <p>
-     * **NOTE:** The {@code uri} parameter refers to the concatenation of
-     * the transfer's id, and the name of the host to which the transfer was
-     * requested, separated by an underscore character.
+     * **NOTE:** The {@code uri} parameter refers to the concatenation of the transfer's id, and the name of the host to
+     * which the transfer was requested, separated by an underscore character.
      *
-     * @param request   the HttpRequest made to the resource
+     * @param request the HttpRequest made to the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param uri       the transfer's unique identifier
+     * @param uri the transfer's unique identifier
      */
     @GET
     @Consumes(WILDCARD)
@@ -129,13 +126,12 @@ public class TransferIdHandler extends AbstractRestDbHandler {
     /**
      * Method called to restart a paused transfer.
      * <p>
-     * **NOTE:** The {@code uri} parameter refers to the concatenation of
-     * the transfer's id, and the name of the host to which the transfer was
-     * requested, separated by an underscore character.
+     * **NOTE:** The {@code uri} parameter refers to the concatenation of the transfer's id, and the name of the host to
+     * which the transfer was requested, separated by an underscore character.
      *
-     * @param request   the HttpRequest made to the resource
+     * @param request the HttpRequest made to the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param uri       the transfer's unique identifier
+     * @param uri the transfer's unique identifier
      */
     @Path(TransferCommandsURI.RESTART_URI)
     @PUT
@@ -189,13 +185,12 @@ public class TransferIdHandler extends AbstractRestDbHandler {
     /**
      * Method called to pause a staged or running transfer.
      * <p>
-     * **NOTE:** The {@code uri} parameter refers to the concatenation of
-     * the transfer's id, and the name of the host to which the transfer was
-     * requested, separated by an underscore character.
+     * **NOTE:** The {@code uri} parameter refers to the concatenation of the transfer's id, and the name of the host to
+     * which the transfer was requested, separated by an underscore character.
      *
-     * @param request   the HttpRequest made to the resource
+     * @param request the HttpRequest made to the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param uri       the transfer's unique identifier
+     * @param uri the transfer's unique identifier
      */
     @Path(TransferCommandsURI.STOP_URI)
     @PUT
@@ -246,13 +241,12 @@ public class TransferIdHandler extends AbstractRestDbHandler {
     /**
      * Method called to cancel a staged or running transfer.
      * <p>
-     * **NOTE:** The {@code uri} parameter refers to the concatenation of
-     * the transfer's id, and the name of the host to which the transfer was
-     * requested, separated by an underscore character.
+     * **NOTE:** The {@code uri} parameter refers to the concatenation of the transfer's id, and the name of the host to
+     * which the transfer was requested, separated by an underscore character.
      *
-     * @param request   the HttpRequest made to the resource
+     * @param request the HttpRequest made to the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param uri       the transfer's unique identifier
+     * @param uri the transfer's unique identifier
      */
     @Path(TransferCommandsURI.CANCEL_URI)
     @PUT
@@ -302,16 +296,15 @@ public class TransferIdHandler extends AbstractRestDbHandler {
 
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      * <p>
-     * **NOTE:** The {@code uri} parameter refers to the concatenation of
-     * the transfer's id, and the name of the host to which the transfer was
-     * requested, separated by an underscore character.
+     * **NOTE:** The {@code uri} parameter refers to the concatenation of the transfer's id, and the name of the host to
+     * which the transfer was requested, separated by an underscore character.
      *
-     * @param request   the HttpRequest made to the resource
+     * @param request the HttpRequest made to the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param uri       the transfer's unique identifier
+     * @param uri the transfer's unique identifier
      */
     @OPTIONS
     @Consumes(WILDCARD)

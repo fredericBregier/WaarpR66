@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.utils;
-
-import java.sql.Timestamp;
-import java.util.Map;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.database.DbPreparedStatement;
@@ -46,6 +42,9 @@ import org.waarp.openr66.protocol.configuration.Messages;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
 import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 import org.waarp.openr66.protocol.localhandler.packet.ErrorPacket;
+
+import java.sql.Timestamp;
+import java.util.Map;
 
 /**
  * Utility class for transfers
@@ -91,10 +90,10 @@ public class TransferUtils {
                     finalResult.setOther(Messages.getString("TransferUtils.1")); //$NON-NLS-1$
                 } else {
                     if (taskRunner.isSelfRequested() &&
-                            (taskRunner.getGloballaststep() < TASKSTEP.POSTTASK.ordinal())) {
+                        (taskRunner.getGloballaststep() < TASKSTEP.POSTTASK.ordinal())) {
                         // send a VALID packet with VALID code to the requester except if client
                         DbHostAuth host = R66Auth.getServerAuth(DbConstant.admin.getSession(),
-                                taskRunner.getRequester());
+                                                                taskRunner.getRequester());
                         if (host == null || host.isClient()) {
                             // cannot be relaunch from there
                             finalResult.setCode(ErrorCode.ConnectionImpossible);
@@ -102,45 +101,46 @@ public class TransferUtils {
                             logger.warn(Messages.getString("TransferUtils.3")); //$NON-NLS-1$
                         } else {
                             R66Future result = new R66Future(true);
-                            logger.info(Messages.getString("TransferUtils.4") + taskRunner.toShortString()); //$NON-NLS-1$
+                            logger.info(
+                                    Messages.getString("TransferUtils.4") + taskRunner.toShortString()); //$NON-NLS-1$
                             RequestTransfer requestTransfer =
                                     new RequestTransfer(result, taskRunner.getSpecialId(),
-                                            taskRunner.getRequested(), taskRunner.getRequester(),
-                                            false, false, true,
-                                            Configuration.configuration.getInternalRunner().
-                                                    getNetworkTransaction());
+                                                        taskRunner.getRequested(), taskRunner.getRequester(),
+                                                        false, false, true,
+                                                        Configuration.configuration.getInternalRunner().
+                                                                getNetworkTransaction());
                             requestTransfer.run();
                             result.awaitUninterruptibly();
                             R66Result finalValue = result.getResult();
                             switch (finalValue.getCode()) {
-                                case QueryStillRunning:
-                                    finalResult.setCode(ErrorCode.QueryStillRunning);
-                                    finalResult.setOther(Messages.getString("TransferUtils.5")); //$NON-NLS-1$
-                                    break;
-                                case Running:
-                                    finalResult.setCode(ErrorCode.Running);
-                                    finalResult.setOther(Messages.getString("TransferUtils.6")); //$NON-NLS-1$
-                                    break;
-                                case PreProcessingOk:
-                                    finalResult.setCode(ErrorCode.PreProcessingOk);
-                                    finalResult.setOther(Messages.getString("TransferUtils.7")); //$NON-NLS-1$
-                                    break;
-                                case CompleteOk:
-                                    finalResult.setCode(ErrorCode.CompleteOk);
-                                    finalResult.setOther(Messages.getString("TransferUtils.8")); //$NON-NLS-1$
-                                    taskRunner.setPostTask();
-                                    TransferUtils.finalizeTaskWithNoSession(taskRunner, lcr);
-                                    taskRunner.setErrorExecutionStatus(ErrorCode.QueryAlreadyFinished);
-                                    taskRunner.forceSaveStatus();
-                                    break;
-                                case RemoteError:
-                                    finalResult.setCode(ErrorCode.RemoteError);
-                                    finalResult.setOther(Messages.getString("TransferUtils.9")); //$NON-NLS-1$
-                                    break;
-                                default:
-                                    finalResult.setCode(ErrorCode.Internal);
-                                    finalResult.setOther(Messages.getString("TransferUtils.10")); //$NON-NLS-1$
-                                    break;
+                            case QueryStillRunning:
+                                finalResult.setCode(ErrorCode.QueryStillRunning);
+                                finalResult.setOther(Messages.getString("TransferUtils.5")); //$NON-NLS-1$
+                                break;
+                            case Running:
+                                finalResult.setCode(ErrorCode.Running);
+                                finalResult.setOther(Messages.getString("TransferUtils.6")); //$NON-NLS-1$
+                                break;
+                            case PreProcessingOk:
+                                finalResult.setCode(ErrorCode.PreProcessingOk);
+                                finalResult.setOther(Messages.getString("TransferUtils.7")); //$NON-NLS-1$
+                                break;
+                            case CompleteOk:
+                                finalResult.setCode(ErrorCode.CompleteOk);
+                                finalResult.setOther(Messages.getString("TransferUtils.8")); //$NON-NLS-1$
+                                taskRunner.setPostTask();
+                                TransferUtils.finalizeTaskWithNoSession(taskRunner, lcr);
+                                taskRunner.setErrorExecutionStatus(ErrorCode.QueryAlreadyFinished);
+                                taskRunner.forceSaveStatus();
+                                break;
+                            case RemoteError:
+                                finalResult.setCode(ErrorCode.RemoteError);
+                                finalResult.setOther(Messages.getString("TransferUtils.9")); //$NON-NLS-1$
+                                break;
+                            default:
+                                finalResult.setCode(ErrorCode.Internal);
+                                finalResult.setOther(Messages.getString("TransferUtils.10")); //$NON-NLS-1$
+                                break;
                             }
                         }
                     } else {
@@ -172,7 +172,7 @@ public class TransferUtils {
             throws OpenR66RunnerErrorException {
         R66Session session = new R66Session();
         session.setStatus(50);
-        String remoteId = taskRunner.isSelfRequested() ?
+        String remoteId = taskRunner.isSelfRequested()?
                 taskRunner.getRequester() :
                 taskRunner.getRequested();
         session.getAuth().specialNoSessionAuth(false, remoteId);
@@ -239,7 +239,7 @@ public class TransferUtils {
             int rank = taskRunner.getRank();
             lcr.sessionNewState(R66FiniteDualStates.ERROR);
             ErrorPacket perror = new ErrorPacket(Messages.getString("TransferUtils.13") + rank, //$NON-NLS-1$
-                    code.getCode(), ErrorPacket.FORWARDCLOSECODE);
+                                                 code.getCode(), ErrorPacket.FORWARDCLOSECODE);
             try {
                 // XXX ChannelUtils.writeAbstractLocalPacket(lcr, perror);
                 // inform local instead of remote
@@ -272,7 +272,7 @@ public class TransferUtils {
                 ((StringBuilder) map).append(taskRunner.toSpecializedHtml(
                         session,
                         body,
-                        lcr != null ? Messages.getString("HttpSslHandler.Active") : Messages
+                        lcr != null? Messages.getString("HttpSslHandler.Active") : Messages
                                 .getString("HttpSslHandler.NotActive")));
             }
         }
@@ -300,16 +300,19 @@ public class TransferUtils {
      */
     public static void stopSelectedTransfers(DbSession dbSession, int limit,
                                              Object map, R66Session session, String body,
-                                             String startid, String stopid, Timestamp tstart, Timestamp tstop, String rule,
+                                             String startid, String stopid, Timestamp tstart, Timestamp tstop,
+                                             String rule,
                                              String req, boolean pending, boolean transfer, boolean error) {
         stopSelectedTransfers(dbSession, limit, map, session, body, startid, stopid, tstart, tstop,
-                rule, req, pending, transfer, error, null);
+                              rule, req, pending, transfer, error, null);
     }
 
     public static void stopSelectedTransfers(DbSession dbSession, int limit,
                                              Object map, R66Session session, String body,
-                                             String startid, String stopid, Timestamp tstart, Timestamp tstop, String rule,
-                                             String req, boolean pending, boolean transfer, boolean error, String host) {
+                                             String startid, String stopid, Timestamp tstart, Timestamp tstop,
+                                             String rule,
+                                             String req, boolean pending, boolean transfer, boolean error,
+                                             String host) {
         if (dbSession == null || dbSession.isDisActive()) {
             // do it without DB
             if (ClientRunner.activeRunners != null) {
@@ -327,8 +330,8 @@ public class TransferUtils {
         try {
             preparedStatement =
                     DbTaskRunner.getFilterPrepareStatement(dbSession, limit, true,
-                            startid, stopid, tstart, tstop, rule, req,
-                            pending, transfer, error, false, false, host);
+                                                           startid, stopid, tstart, tstop, rule, req,
+                                                           pending, transfer, error, false, false, host);
             preparedStatement.executeQuery();
             while (preparedStatement.getNext()) {
                 DbTaskRunner taskRunner = DbTaskRunner.getFromStatement(preparedStatement);
@@ -395,7 +398,7 @@ public class TransferUtils {
                 ((StringBuilder) map).append(taskRunner.toSpecializedHtml(
                         session,
                         body,
-                        lcr != null ? Messages.getString("HttpSslHandler.Active") : Messages
+                        lcr != null? Messages.getString("HttpSslHandler.Active") : Messages
                                 .getString("HttpSslHandler.NotActive")));
             }
         }
@@ -422,16 +425,19 @@ public class TransferUtils {
      */
     public static void cleanSelectedTransfers(DbSession dbSession, int limit,
                                               Object map, R66Session session, String body,
-                                              String startid, String stopid, Timestamp tstart, Timestamp tstop, String rule,
+                                              String startid, String stopid, Timestamp tstart, Timestamp tstop,
+                                              String rule,
                                               String req, boolean pending, boolean transfer, boolean error) {
         cleanSelectedTransfers(dbSession, limit, map, session, body, startid, stopid, tstart, tstop,
-                rule, req, pending, transfer, error, null);
+                               rule, req, pending, transfer, error, null);
     }
 
     public static void cleanSelectedTransfers(DbSession dbSession, int limit,
                                               Object map, R66Session session, String body,
-                                              String startid, String stopid, Timestamp tstart, Timestamp tstop, String rule,
-                                              String req, boolean pending, boolean transfer, boolean error, String host) {
+                                              String startid, String stopid, Timestamp tstart, Timestamp tstop,
+                                              String rule,
+                                              String req, boolean pending, boolean transfer, boolean error,
+                                              String host) {
         if (dbSession == null || dbSession.isDisActive()) {
             // do it without DB
             if (ClientRunner.activeRunners != null) {
@@ -450,8 +456,8 @@ public class TransferUtils {
         try {
             preparedStatement =
                     DbTaskRunner.getFilterPrepareStatement(dbSession, limit, true,
-                            startid, stopid, tstart, tstop, rule, req,
-                            pending, transfer, error, false, false, host);
+                                                           startid, stopid, tstart, tstop, rule, req,
+                                                           pending, transfer, error, false, false, host);
             preparedStatement.executeQuery();
             while (preparedStatement.getNext()) {
                 DbTaskRunner taskRunner = DbTaskRunner.getFromStatement(preparedStatement);

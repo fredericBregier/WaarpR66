@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -34,11 +33,11 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * Class for Recv Through client
- * 
+ *
  * This class does not included the real file transfer since it is up to the business project to
  * implement how to write new data received from the remote host. If an error occurs, no transfer
  * log is kept.
- * 
+ *
  * 1) Configuration must have been loaded<br>
  * <br>
  * 2) Pipeline and NetworkTransaction must have been initiated:<br>
@@ -60,16 +59,16 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * <tt>     networkTransaction.closeAll();</tt><br>
  * <br>
  * <br>
- * 
+ *
  * @see TestRecvThroughClient Class as example of usage in test part
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class RecvThroughClient extends AbstractTransfer {
     protected final NetworkTransaction networkTransaction;
-    protected LocalChannelReference localChannelReference;
     protected final RecvThroughHandler handler;
+    protected LocalChannelReference localChannelReference;
 
     /**
      * @param future
@@ -83,11 +82,11 @@ public class RecvThroughClient extends AbstractTransfer {
      * @param networkTransaction
      */
     public RecvThroughClient(R66Future future, RecvThroughHandler handler, String remoteHost,
-            String filename, String rulename, String fileinfo, boolean isMD5,
-            int blocksize, long id, NetworkTransaction networkTransaction) {
+                             String filename, String rulename, String fileinfo, boolean isMD5,
+                             int blocksize, long id, NetworkTransaction networkTransaction) {
         // timestart since immediate
         super(RecvThroughClient.class,
-                future, filename, rulename, fileinfo, isMD5, remoteHost, blocksize, id, null);
+              future, filename, rulename, fileinfo, isMD5, remoteHost, blocksize, id, null);
         this.networkTransaction = networkTransaction;
         this.handler = handler;
     }
@@ -117,20 +116,20 @@ public class RecvThroughClient extends AbstractTransfer {
                 } catch (OpenR66RunnerErrorException e) {
                     logger.error("Cannot Transfer", e);
                     future.setResult(new R66Result(e, null, true,
-                            ErrorCode.Internal, taskRunner));
+                                                   ErrorCode.Internal, taskRunner));
                     future.setFailure(e);
                     return;
                 } catch (OpenR66ProtocolNoConnectionException e) {
                     logger.error("Cannot Connect", e);
                     future.setResult(new R66Result(e, null, true,
-                            ErrorCode.ConnectionImpossible, taskRunner));
+                                                   ErrorCode.ConnectionImpossible, taskRunner));
                     finalizeInErrorTransferRequest(runner, taskRunner, ErrorCode.ConnectionImpossible);
                     future.setFailure(e);
                     return;
                 } catch (OpenR66ProtocolPacketException e) {
                     logger.error("Bad Protocol", e);
                     future.setResult(new R66Result(e, null, true,
-                            ErrorCode.TransferError, taskRunner));
+                                                   ErrorCode.TransferError, taskRunner));
                     future.setFailure(e);
                     return;
                 } catch (OpenR66ProtocolNotYetConnectionException e) {
@@ -143,7 +142,7 @@ public class RecvThroughClient extends AbstractTransfer {
                 taskRunner.setLocalChannelReference(new LocalChannelReference());
                 logger.error("Cannot Connect", exc);
                 future.setResult(new R66Result(exc, null, true,
-                        ErrorCode.ConnectionImpossible, taskRunner));
+                                               ErrorCode.ConnectionImpossible, taskRunner));
                 future.setFailure(exc);
                 return;
             }

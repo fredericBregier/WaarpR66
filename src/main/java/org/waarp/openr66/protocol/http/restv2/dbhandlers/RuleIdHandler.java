@@ -45,23 +45,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.WILDCARD;
-import static org.waarp.common.role.RoleDefault.ROLE.NOACCESS;
-import static org.waarp.common.role.RoleDefault.ROLE.RULE;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
+import static org.waarp.common.role.RoleDefault.ROLE.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * a single rule REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on a single rule REST entry point.
  */
 @Path(RULE_ID_HANDLER_URI)
 public class RuleIdHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final HttpHeaders OPTIONS_HEADERS;
 
@@ -85,12 +81,11 @@ public class RuleIdHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to retrieve a transfer rule with the id given in the
-     * request URI.
+     * Method called to retrieve a transfer rule with the id given in the request URI.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested rule's name
+     * @param id the requested rule's name
      */
     @GET
     @Consumes(WILDCARD)
@@ -122,9 +117,9 @@ public class RuleIdHandler extends AbstractRestDbHandler {
     /**
      * Method called to update a transfer rule.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested rule's name
+     * @param id the requested rule's name
      */
     @PUT
     @Consumes(APPLICATION_JSON)
@@ -162,9 +157,9 @@ public class RuleIdHandler extends AbstractRestDbHandler {
     /**
      * Method called to delete a transfer rule from the database.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested rule's name
+     * @param id the requested rule's name
      */
     @DELETE
     @Consumes(WILDCARD)
@@ -192,12 +187,12 @@ public class RuleIdHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested rule's name
+     * @param id the requested rule's name
      */
     @OPTIONS
     @Consumes(WILDCARD)

@@ -1,34 +1,27 @@
 package org.waarp.openr66.dao.database;
 
+import org.waarp.common.logging.WaarpLogger;
+import org.waarp.common.logging.WaarpLoggerFactory;
+import org.waarp.openr66.context.ErrorCode;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.TransferDAO;
+import org.waarp.openr66.dao.exception.DAOException;
+import org.waarp.openr66.database.DbConstant;
+import org.waarp.openr66.pojo.Transfer;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.waarp.common.logging.WaarpLogger;
-import org.waarp.common.logging.WaarpLoggerFactory;
-import org.waarp.openr66.context.ErrorCode;
-import org.waarp.openr66.database.DbConstant;
-import org.waarp.openr66.dao.TransferDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.dao.exception.DAOException;
-import org.waarp.openr66.pojo.Transfer;
-import org.waarp.openr66.pojo.UpdatedInfo;
-import org.waarp.openr66.protocol.configuration.Configuration;
 
 /**
  * Implementation of TransferDAO for a standard SQL database
  */
 public abstract class DBTransferDAO extends StatementExecutor implements TransferDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBTransferDAO.class);
-
-    // Table  name
-    protected static final String TABLE = "runner";
 
     // Field name
     public static final String ID_FIELD = "specialid";
@@ -53,78 +46,84 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
     public static final String REQUESTED_FIELD = "requested";
     public static final String REQUESTER_FIELD = "requester";
     public static final String UPDATED_INFO_FIELD = "updatedInfo";
-
+    // Table  name
+    protected static final String TABLE = "runner";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBTransferDAO.class);
     // CRUD requests
     protected static String SQL_DELETE = "DELETE FROM " + TABLE
-            + " WHERE " + ID_FIELD + " = ? AND "
-            + REQUESTER_FIELD + " = ? AND "
-            + REQUESTED_FIELD + " = ? AND "
-            + OWNER_REQUEST_FIELD  + " = ?";
+                                         + " WHERE " + ID_FIELD + " = ? AND "
+                                         + REQUESTER_FIELD + " = ? AND "
+                                         + REQUESTED_FIELD + " = ? AND "
+                                         + OWNER_REQUEST_FIELD + " = ?";
     protected static String SQL_DELETE_ALL = "DELETE FROM " + TABLE;
     protected static String SQL_EXIST = "SELECT 1 FROM " + TABLE + " WHERE "
-            + ID_FIELD + " = ? AND "
-            + REQUESTER_FIELD + " = ? AND "
-            + REQUESTED_FIELD + " = ? AND "
-            + OWNER_REQUEST_FIELD + " = ?";
+                                        + ID_FIELD + " = ? AND "
+                                        + REQUESTER_FIELD + " = ? AND "
+                                        + REQUESTED_FIELD + " = ? AND "
+                                        + OWNER_REQUEST_FIELD + " = ?";
     protected static String SQL_GET_ALL = "SELECT * FROM " + TABLE;
     protected static String SQL_INSERT = "INSERT INTO " + TABLE
-            + " (" + GLOBAL_STEP_FIELD + ", "
-            + GLOBAL_LAST_STEP_FIELD + ", "
-            + STEP_FIELD + ", "
-            + RANK_FIELD + ", "
-            + STEP_STATUS_FIELD + ", "
-            + RETRIEVE_MODE_FIELD + ", "
-            + FILENAME_FIELD + ", "
-            + IS_MOVED_FIELD + ", "
-            + ID_RULE_FIELD + ", "
-            + BLOCK_SIZE_FIELD + ", "
-            + ORIGINAL_NAME_FIELD + ", "
-            + FILE_INFO_FIELD + ", "
-            + TRANSFER_INFO_FIELD + ", "
-            + TRANSFER_MODE_FIELD + ", "
-            + TRANSFER_START_FIELD + ", "
-            + TRANSFER_STOP_FIELD + ", "
-            + INFO_STATUS_FIELD + ", "
-            + OWNER_REQUEST_FIELD + ", "
-            + REQUESTED_FIELD + ", "
-            + REQUESTER_FIELD + ", "
-            + ID_FIELD + ", "
-            + UPDATED_INFO_FIELD
-            + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                                         + " (" + GLOBAL_STEP_FIELD + ", "
+                                         + GLOBAL_LAST_STEP_FIELD + ", "
+                                         + STEP_FIELD + ", "
+                                         + RANK_FIELD + ", "
+                                         + STEP_STATUS_FIELD + ", "
+                                         + RETRIEVE_MODE_FIELD + ", "
+                                         + FILENAME_FIELD + ", "
+                                         + IS_MOVED_FIELD + ", "
+                                         + ID_RULE_FIELD + ", "
+                                         + BLOCK_SIZE_FIELD + ", "
+                                         + ORIGINAL_NAME_FIELD + ", "
+                                         + FILE_INFO_FIELD + ", "
+                                         + TRANSFER_INFO_FIELD + ", "
+                                         + TRANSFER_MODE_FIELD + ", "
+                                         + TRANSFER_START_FIELD + ", "
+                                         + TRANSFER_STOP_FIELD + ", "
+                                         + INFO_STATUS_FIELD + ", "
+                                         + OWNER_REQUEST_FIELD + ", "
+                                         + REQUESTED_FIELD + ", "
+                                         + REQUESTER_FIELD + ", "
+                                         + ID_FIELD + ", "
+                                         + UPDATED_INFO_FIELD
+                                         + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static String SQL_SELECT = "SELECT * FROM " + TABLE
-            + " WHERE " + ID_FIELD + " = ? AND "
-            + REQUESTER_FIELD + " = ? AND "
-            + REQUESTED_FIELD + " = ? AND "
-            + OWNER_REQUEST_FIELD + " = ?";
+                                         + " WHERE " + ID_FIELD + " = ? AND "
+                                         + REQUESTER_FIELD + " = ? AND "
+                                         + REQUESTED_FIELD + " = ? AND "
+                                         + OWNER_REQUEST_FIELD + " = ?";
     protected static String SQL_UPDATE = "UPDATE " + TABLE
-            + " SET " + ID_FIELD + " = ?, "
-            + GLOBAL_STEP_FIELD + " = ?, "
-            + GLOBAL_LAST_STEP_FIELD + " = ?, "
-            + STEP_FIELD + " = ?, "
-            + RANK_FIELD + " = ?, "
-            + STEP_STATUS_FIELD + " = ?, "
-            + RETRIEVE_MODE_FIELD + " = ?, "
-            + FILENAME_FIELD + " = ?, "
-            + IS_MOVED_FIELD + " = ?, "
-            + ID_RULE_FIELD + " = ?, "
-            + BLOCK_SIZE_FIELD + " = ?, "
-            + ORIGINAL_NAME_FIELD + " = ?, "
-            + FILE_INFO_FIELD + " = ?, "
-            + TRANSFER_INFO_FIELD + " = ?, "
-            + TRANSFER_MODE_FIELD + " = ?, "
-            + TRANSFER_START_FIELD + " = ?, "
-            + TRANSFER_STOP_FIELD + " = ?, "
-            + INFO_STATUS_FIELD + " = ?, "
-            + OWNER_REQUEST_FIELD + " = ?, "
-            + REQUESTED_FIELD + " = ?, "
-            + REQUESTER_FIELD + " = ?, "
-            + UPDATED_INFO_FIELD + " = ?  WHERE "
-            + OWNER_REQUEST_FIELD + " = ? AND "
-            + REQUESTER_FIELD + " = ? AND "
-            + REQUESTED_FIELD + " = ? AND "
-            + ID_FIELD + " = ?";
+                                         + " SET " + ID_FIELD + " = ?, "
+                                         + GLOBAL_STEP_FIELD + " = ?, "
+                                         + GLOBAL_LAST_STEP_FIELD + " = ?, "
+                                         + STEP_FIELD + " = ?, "
+                                         + RANK_FIELD + " = ?, "
+                                         + STEP_STATUS_FIELD + " = ?, "
+                                         + RETRIEVE_MODE_FIELD + " = ?, "
+                                         + FILENAME_FIELD + " = ?, "
+                                         + IS_MOVED_FIELD + " = ?, "
+                                         + ID_RULE_FIELD + " = ?, "
+                                         + BLOCK_SIZE_FIELD + " = ?, "
+                                         + ORIGINAL_NAME_FIELD + " = ?, "
+                                         + FILE_INFO_FIELD + " = ?, "
+                                         + TRANSFER_INFO_FIELD + " = ?, "
+                                         + TRANSFER_MODE_FIELD + " = ?, "
+                                         + TRANSFER_START_FIELD + " = ?, "
+                                         + TRANSFER_STOP_FIELD + " = ?, "
+                                         + INFO_STATUS_FIELD + " = ?, "
+                                         + OWNER_REQUEST_FIELD + " = ?, "
+                                         + REQUESTED_FIELD + " = ?, "
+                                         + REQUESTER_FIELD + " = ?, "
+                                         + UPDATED_INFO_FIELD + " = ?  WHERE "
+                                         + OWNER_REQUEST_FIELD + " = ? AND "
+                                         + REQUESTER_FIELD + " = ? AND "
+                                         + REQUESTED_FIELD + " = ? AND "
+                                         + ID_FIELD + " = ?";
 
     protected Connection connection;
+
+    public DBTransferDAO(Connection con) {
+        this.connection = con;
+    }
 
     protected String getDeleteRequest() {
         return SQL_DELETE;
@@ -152,10 +151,6 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
 
     protected String getUpdateRequest() {
         return SQL_UPDATE;
-    }
-
-    public DBTransferDAO(Connection con) {
-        this.connection = con;
     }
 
     @Override
@@ -260,7 +255,7 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
         ArrayList<Transfer> transfers = new ArrayList<Transfer>();
         // Create the SQL query
         Object[] params = new Object[filters.size()];
-        StringBuilder query =  new StringBuilder(
+        StringBuilder query = new StringBuilder(
                 prepareFindQuery(filters, params));
         // Set LIMIT
         if (limit > 0) {
@@ -291,7 +286,7 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
         ArrayList<Transfer> transfers = new ArrayList<Transfer>();
         // Create the SQL query
         Object[] params = new Object[filters.size()];
-        StringBuilder query =  new StringBuilder(
+        StringBuilder query = new StringBuilder(
                 prepareFindQuery(filters, params));
         // Set LIMIT
         if (limit > 0) {
@@ -326,7 +321,7 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
         ArrayList<Transfer> transfers = new ArrayList<Transfer>();
         // Create the SQL query
         Object[] params = new Object[filters.size()];
-        StringBuilder query =  new StringBuilder(
+        StringBuilder query = new StringBuilder(
                 prepareFindQuery(filters, params));
         // Set ORDER BY
         if ((column != null) && (!column.equals(""))) {
@@ -361,7 +356,7 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
         ArrayList<Transfer> transfers = new ArrayList<Transfer>();
         // Create the SQL query
         Object[] params = new Object[filters.size()];
-        StringBuilder query =  new StringBuilder(
+        StringBuilder query = new StringBuilder(
                 prepareFindQuery(filters, params));
         // Set ORDER BY
         if ((column != null) && (!column.equals(""))) {
@@ -400,7 +395,7 @@ public abstract class DBTransferDAO extends StatementExecutor implements Transfe
         ArrayList<Transfer> transfers = new ArrayList<Transfer>();
         // Create the SQL query
         Object[] params = new Object[filters.size()];
-        StringBuilder query =  new StringBuilder(
+        StringBuilder query = new StringBuilder(
                 prepareFindQuery(filters, params));
         // Set ORDER BY
         query.append(" ORDER BY " + column);

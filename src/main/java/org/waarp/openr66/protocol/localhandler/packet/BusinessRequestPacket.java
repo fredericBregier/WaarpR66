@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -24,11 +23,11 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Business Request Message class for packet
- * 
+ *
  * 1 string and on integer and one byte:<br>
  * - sheader = full text with class at first place, following (space separated) by extra arguments - smiddle = integer - send =
  * byte
- * 
+ *
  * @author frederic bregier
  */
 public class BusinessRequestPacket extends AbstractLocalPacket {
@@ -43,8 +42,20 @@ public class BusinessRequestPacket extends AbstractLocalPacket {
 
     private byte way;
 
+    public BusinessRequestPacket(String header, int delay, byte way) {
+        this.sheader = header;
+        this.delay = delay;
+        this.way = way;
+    }
+
+    public BusinessRequestPacket(String header, int delay) {
+        this.sheader = header;
+        this.delay = delay;
+        this.way = ASKVALIDATE;
+    }
+
     public static BusinessRequestPacket createFromBuffer(int headerLength,
-            int middleLength, int endLength, ByteBuf buf)
+                                                         int middleLength, int endLength, ByteBuf buf)
             throws OpenR66ProtocolPacketException {
         final byte[] bheader = new byte[headerLength - 1];
         if (headerLength - 1 > 0) {
@@ -59,18 +70,6 @@ public class BusinessRequestPacket extends AbstractLocalPacket {
         }
         byte valid = buf.readByte();
         return new BusinessRequestPacket(new String(bheader), delay, valid);
-    }
-
-    public BusinessRequestPacket(String header, int delay, byte way) {
-        this.sheader = header;
-        this.delay = delay;
-        this.way = way;
-    }
-
-    public BusinessRequestPacket(String header, int delay) {
-        this.sheader = header;
-        this.delay = delay;
-        this.way = ASKVALIDATE;
     }
 
     @Override

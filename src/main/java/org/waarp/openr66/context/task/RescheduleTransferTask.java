@@ -1,26 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
-
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
 
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -29,6 +23,11 @@ import org.waarp.openr66.context.R66Result;
 import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.context.task.exception.OpenR66RunnerErrorException;
 import org.waarp.openr66.database.data.DbTaskRunner;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Reschedule Transfer task to a time delayed by the specified number of milliseconds, if the error
@@ -94,18 +93,16 @@ import org.waarp.openr66.database.data.DbTaskRunner;
  */
 public class RescheduleTransferTask extends AbstractTask {
     /**
-     * Internal Logger
-     */
-    private static final WaarpLogger logger = WaarpLoggerFactory
-            .getLogger(RescheduleTransferTask.class);
-
-    /**
      * Delimiter for -count option in Reschedule to be placed in the transfer info of transfer as
      * {"CPTLIMIT": limit} where limit is an integer.
      */
     public static final String CPTLIMIT = "CPTLIMIT";
     public static final String CPTTOTAL = "CPTTOTAL";
-
+    /**
+     * Internal Logger
+     */
+    private static final WaarpLogger logger = WaarpLoggerFactory
+            .getLogger(RescheduleTransferTask.class);
     protected long newdate = 0;
 
     protected Calendar newDate = null;
@@ -127,14 +124,14 @@ public class RescheduleTransferTask extends AbstractTask {
      * @param session
      */
     public RescheduleTransferTask(String argRule, int delay,
-            String argTransfer, R66Session session) {
+                                  String argTransfer, R66Session session) {
         super(TaskType.RESCHEDULE, delay, argRule, argTransfer, session);
     }
 
     @Override
     public void run() {
         logger.info("Reschedule with " + argRule + ":" + argTransfer +
-                " and {}", session);
+                    " and {}", session);
         runner = session.getRunner();
         if (runner == null) {
             futureCompletion.setFailure(new OpenR66RunnerErrorException(
@@ -144,7 +141,7 @@ public class RescheduleTransferTask extends AbstractTask {
         if (runner.isRescheduledTransfer()) {
             // Already rescheduled so ignore
             R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                    runner);
+                                             runner);
             futureCompletion.setResult(result);
             logger.warn("Transfer already Rescheduled: " + runner.toShortString());
             futureCompletion.setSuccess();
@@ -153,7 +150,7 @@ public class RescheduleTransferTask extends AbstractTask {
         if (runner.isSelfRequested()) {
             // Self Requested Request so reschedule is ignored
             R66Result result = new R66Result(session, false, ErrorCode.LoopSelfRequestedHost,
-                    runner);
+                                             runner);
             futureCompletion.setResult(result);
             futureCompletion.setFailure(new OpenR66RunnerErrorException(
                     "No valid runner in Reschedule since Self Requested"));
@@ -164,7 +161,7 @@ public class RescheduleTransferTask extends AbstractTask {
         String[] args = finalname.split(" ");
         if (args.length < 4) {
             R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                    runner);
+                                             runner);
             futureCompletion.setResult(result);
             logger.warn("Not enough argument in Reschedule: " + runner.toShortString());
             futureCompletion.setSuccess();
@@ -172,7 +169,7 @@ public class RescheduleTransferTask extends AbstractTask {
         }
         if (!validateArgs(args)) {
             R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                    runner);
+                                             runner);
             futureCompletion.setResult(result);
             logger.warn("Reschedule unallowed due to argument: " + runner.toShortString());
             futureCompletion.setSuccess();
@@ -192,7 +189,7 @@ public class RescheduleTransferTask extends AbstractTask {
                 } catch (OpenR66RunnerErrorException e) {
                 }
                 R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                        runner);
+                                                 runner);
                 futureCompletion.setResult(result);
                 logger.warn("Reschedule unallowed due to limit reached: " + runner.toShortString());
                 futureCompletion.setSuccess();
@@ -208,19 +205,19 @@ public class RescheduleTransferTask extends AbstractTask {
         } catch (OpenR66RunnerErrorException e) {
             logger.error(
                     "Prepare transfer in     FAILURE      " +
-                            runner.toShortString() + "     <AT>" +
-                            (new Date(newdate)).toString() + "</AT>", e);
+                    runner.toShortString() + "     <AT>" +
+                    (new Date(newdate)).toString() + "</AT>", e);
             futureCompletion.setFailure(new OpenR66RunnerErrorException(
                     "Reschedule failed: " + e.getMessage(), e));
             return;
         }
         runner.setRescheduledTransfer();
         R66Result result = new R66Result(session, false, ErrorCode.Warning,
-                runner);
+                                         runner);
         futureCompletion.setResult(result);
         logger.warn("Reschedule transfer in     SUCCESS     " +
-                runner.toShortString() + "     <AT>" +
-                (new Date(newdate)).toString() + "</AT>");
+                    runner.toShortString() + "     <AT>" +
+                    (new Date(newdate)).toString() + "</AT>");
         futureCompletion.setSuccess();
     }
 
@@ -322,7 +319,7 @@ public class RescheduleTransferTask extends AbstractTask {
                     stop = Calendar.getInstance();
                 }
                 logger.debug("Dates before check: Not between " + start.getTime() + " and "
-                        + stop.getTime());
+                             + stop.getTime());
                 // Check that start < stop
                 if (start.compareTo(stop) > 0) {
                     // no so add 24H to stop
@@ -334,17 +331,17 @@ public class RescheduleTransferTask extends AbstractTask {
                     stop.add(Calendar.DAY_OF_MONTH, 1);
                 }
                 logger.debug("Dates after check: Not between " + start.getTime() + " and "
-                        + stop.getTime());
+                             + stop.getTime());
                 if (!startModified) {
                     if (newDate.compareTo(stop) < 0) {
                         logger.debug("newDate: " + newDate.getTime() + " Should not be between "
-                                + start.getTime() + " and " + stop.getTime());
+                                     + start.getTime() + " and " + stop.getTime());
                         return false;
                     }
                 } else if (start.compareTo(newDate) < 0) {
                     if ((!stopModified) || (newDate.compareTo(stop) < 0)) {
                         logger.debug("newDate: " + newDate.getTime() + " Should not be between "
-                                + start.getTime() + " and " + stop.getTime());
+                                     + start.getTime() + " and " + stop.getTime());
                         return false;
                     }
                 }
@@ -369,7 +366,7 @@ public class RescheduleTransferTask extends AbstractTask {
                     stop = Calendar.getInstance();
                 }
                 logger.debug("Dates before check: Between " + start.getTime() + " and "
-                        + stop.getTime());
+                             + stop.getTime());
                 // Check that start < stop
                 if (start.compareTo(stop) > 0) {
                     // no so add 24H to stop
@@ -381,17 +378,17 @@ public class RescheduleTransferTask extends AbstractTask {
                     stop.add(Calendar.DAY_OF_MONTH, 1);
                 }
                 logger.debug("Dates before check: Between " + start.getTime() + " and "
-                        + stop.getTime());
+                             + stop.getTime());
                 if (!startModified) {
                     if (newDate.compareTo(stop) < 0) {
                         logger.debug("newDate: " + newDate.getTime() + " is between "
-                                + start.getTime() + " and " + stop.getTime());
+                                     + start.getTime() + " and " + stop.getTime());
                         betweenResult = true;
                     }
                 } else if (start.compareTo(newDate) < 0) {
                     if ((!stopModified) || (newDate.compareTo(stop) < 0)) {
                         logger.debug("newDate: " + newDate.getTime() + " is between "
-                                + start.getTime() + " and " + stop.getTime());
+                                     + start.getTime() + " and " + stop.getTime());
                         betweenResult = true;
                     }
                 }
@@ -399,7 +396,7 @@ public class RescheduleTransferTask extends AbstractTask {
         }
         if (betweenTest) {
             logger.debug("Since between is specified, do we found newDate: " + newDate.getTime()
-                    + " Result: " + betweenResult);
+                         + " Result: " + betweenResult);
             return betweenResult;
         }
         logger.debug("newDate: " + newDate.getTime() + " rescheduled");
@@ -421,88 +418,89 @@ public class RescheduleTransferTask extends AbstractTask {
                 int addvalue = 0; // will be different of 0
                 int value = -1; // will be >= 0
                 switch (values[j].charAt(0)) {
-                    case '+':
-                        try {
-                            addvalue = Integer.parseInt(values[j].substring(2));
-                        } catch (NumberFormatException e) {
-                            continue;
-                        }
-                        break;
-                    case '-':
-                        try {
-                            addvalue = Integer.parseInt(values[j].substring(1));
-                        } catch (NumberFormatException e) {
-                            continue;
-                        }
-                        break;
-                    case '=':
-                        try {
-                            value = Integer.parseInt(values[j].substring(2));
-                        } catch (NumberFormatException e) {
-                            continue;
-                        }
-                        break;
-                    default: // no sign
-                        try {
-                            value = Integer.parseInt(values[j].substring(1));
-                        } catch (NumberFormatException e) {
-                            continue;
-                        }
+                case '+':
+                    try {
+                        addvalue = Integer.parseInt(values[j].substring(2));
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+                    break;
+                case '-':
+                    try {
+                        addvalue = Integer.parseInt(values[j].substring(1));
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+                    break;
+                case '=':
+                    try {
+                        value = Integer.parseInt(values[j].substring(2));
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+                    break;
+                default: // no sign
+                    try {
+                        value = Integer.parseInt(values[j].substring(1));
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
                 }
                 switch (values[j].charAt(0)) {
-                    case 'Y':
-                        if (value >= 0) {
-                            newcal.set(Calendar.YEAR, value);
-                        } else {
-                            newcal.add(Calendar.YEAR, addvalue);
-                        }
-                        isModified = true;
-                        break;
-                    case 'M':
-                        if (value >= 0) {
-                            newcal.set(Calendar.MONTH, value);
-                        } else {
-                            newcal.add(Calendar.MONTH, addvalue);
-                        }
-                        isModified = true;
-                        break;
-                    case 'D':
-                        if (value >= 0) {
-                            newcal.set(Calendar.DAY_OF_MONTH, value);
-                        } else {
-                            newcal.add(Calendar.DAY_OF_MONTH, addvalue);
-                        }
-                        isModified = true;
-                        break;
-                    case 'H':
-                        if (value >= 0) {
-                            newcal.set(Calendar.HOUR_OF_DAY, value);
-                        } else {
-                            newcal.add(Calendar.HOUR_OF_DAY, addvalue);
-                        }
-                        isModified = true;
-                        break;
-                    case 'm':
-                        if (value >= 0) {
-                            newcal.set(Calendar.MINUTE, value);
-                        } else {
-                            newcal.add(Calendar.MINUTE, addvalue);
-                        }
-                        isModified = true;
-                        break;
-                    case 'S':
-                        if (value >= 0) {
-                            newcal.set(Calendar.SECOND, value);
-                        } else {
-                            newcal.add(Calendar.SECOND, addvalue);
-                        }
-                        isModified = true;
-                        break;
+                case 'Y':
+                    if (value >= 0) {
+                        newcal.set(Calendar.YEAR, value);
+                    } else {
+                        newcal.add(Calendar.YEAR, addvalue);
+                    }
+                    isModified = true;
+                    break;
+                case 'M':
+                    if (value >= 0) {
+                        newcal.set(Calendar.MONTH, value);
+                    } else {
+                        newcal.add(Calendar.MONTH, addvalue);
+                    }
+                    isModified = true;
+                    break;
+                case 'D':
+                    if (value >= 0) {
+                        newcal.set(Calendar.DAY_OF_MONTH, value);
+                    } else {
+                        newcal.add(Calendar.DAY_OF_MONTH, addvalue);
+                    }
+                    isModified = true;
+                    break;
+                case 'H':
+                    if (value >= 0) {
+                        newcal.set(Calendar.HOUR_OF_DAY, value);
+                    } else {
+                        newcal.add(Calendar.HOUR_OF_DAY, addvalue);
+                    }
+                    isModified = true;
+                    break;
+                case 'm':
+                    if (value >= 0) {
+                        newcal.set(Calendar.MINUTE, value);
+                    } else {
+                        newcal.add(Calendar.MINUTE, addvalue);
+                    }
+                    isModified = true;
+                    break;
+                case 'S':
+                    if (value >= 0) {
+                        newcal.set(Calendar.SECOND, value);
+                    } else {
+                        newcal.add(Calendar.SECOND, addvalue);
+                    }
+                    isModified = true;
+                    break;
                 }
             }
         }
-        if (isModified)
+        if (isModified) {
             return newcal;
+        }
         return null;
     }
 }

@@ -1,5 +1,19 @@
 package org.waarp.openr66.dao.database;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.waarp.common.logging.WaarpLogger;
+import org.waarp.common.logging.WaarpLoggerFactory;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.RuleDAO;
+import org.waarp.openr66.dao.exception.DAOException;
+import org.waarp.openr66.pojo.Rule;
+import org.waarp.openr66.pojo.RuleTask;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -10,31 +24,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.waarp.openr66.pojo.UpdatedInfo;
-
-import org.waarp.common.logging.WaarpLogger;
-import org.waarp.common.logging.WaarpLoggerFactory;
-import org.waarp.openr66.dao.RuleDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.dao.exception.DAOException;
-import org.waarp.openr66.pojo.Rule;
-import org.waarp.openr66.pojo.RuleTask;
-
 /**
  * Implementation of RuleDAO for standard SQL databases
  */
 public class DBRuleDAO extends StatementExecutor implements RuleDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBRuleDAO.class);
-
-    protected static final String TABLE = "rules";
 
     public static final String ID_FIELD = "idrule";
     public static final String HOSTIDS_FIELD = "hostids";
@@ -50,47 +43,46 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
     public static final String S_POST_TASKS_FIELD = "sposttasks";
     public static final String S_ERROR_TASKS_FIELD = "serrortasks";
     public static final String UPDATED_INFO_FIELD = "updatedinfo";
-
+    protected static final String TABLE = "rules";
     protected static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE;
     protected static final String SQL_DELETE = "DELETE FROM " + TABLE
-        + " WHERE " + ID_FIELD + " = ?";
+                                               + " WHERE " + ID_FIELD + " = ?";
     protected static final String SQL_GET_ALL = "SELECT * FROM " + TABLE;
     protected static final String SQL_EXIST = "SELECT 1 FROM " + TABLE
-        + " WHERE " + ID_FIELD + " = ?";
+                                              + " WHERE " + ID_FIELD + " = ?";
     protected static final String SQL_SELECT = "SELECT * FROM " + TABLE
-        + " WHERE " + ID_FIELD + " = ?";
+                                               + " WHERE " + ID_FIELD + " = ?";
     protected static final String SQL_INSERT = "INSERT INTO " + TABLE
-        + " (" + ID_FIELD + ", "
-        + HOSTIDS_FIELD + ", "
-        + MODE_TRANS_FIELD + ", "
-        + RECV_PATH_FIELD + ", "
-        + SEND_PATH_FIELD + ", "
-        + ARCHIVE_PATH_FIELD + ", "
-        + WORK_PATH_FIELD + ", "
-        + R_PRE_TASKS_FIELD + ", "
-        + R_POST_TASKS_FIELD + ", "
-        + R_ERROR_TASKS_FIELD + ", "
-        + S_PRE_TASKS_FIELD + ", "
-        + S_POST_TASKS_FIELD + ", "
-        + S_ERROR_TASKS_FIELD + ", "
-        + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+                                               + " (" + ID_FIELD + ", "
+                                               + HOSTIDS_FIELD + ", "
+                                               + MODE_TRANS_FIELD + ", "
+                                               + RECV_PATH_FIELD + ", "
+                                               + SEND_PATH_FIELD + ", "
+                                               + ARCHIVE_PATH_FIELD + ", "
+                                               + WORK_PATH_FIELD + ", "
+                                               + R_PRE_TASKS_FIELD + ", "
+                                               + R_POST_TASKS_FIELD + ", "
+                                               + R_ERROR_TASKS_FIELD + ", "
+                                               + S_PRE_TASKS_FIELD + ", "
+                                               + S_POST_TASKS_FIELD + ", "
+                                               + S_ERROR_TASKS_FIELD + ", "
+                                               + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String SQL_UPDATE = "UPDATE " + TABLE
-        + " SET " + ID_FIELD + " = ?, "
-        + HOSTIDS_FIELD + " = ?, "
-        + MODE_TRANS_FIELD + " = ? ,"
-        + RECV_PATH_FIELD + " = ?, "
-        + SEND_PATH_FIELD + " = ?, "
-        + ARCHIVE_PATH_FIELD + " = ? ,"
-        + WORK_PATH_FIELD + " = ? ,"
-        + R_PRE_TASKS_FIELD + " = ? ,"
-        + R_POST_TASKS_FIELD + " = ? ,"
-        + R_ERROR_TASKS_FIELD + " = ? ,"
-        + S_PRE_TASKS_FIELD + " = ? ,"
-        + S_POST_TASKS_FIELD + " = ? ,"
-        + S_ERROR_TASKS_FIELD + " = ? ,"
-        + UPDATED_INFO_FIELD + " = ? WHERE " + ID_FIELD + " = ?";
-
+                                               + " SET " + ID_FIELD + " = ?, "
+                                               + HOSTIDS_FIELD + " = ?, "
+                                               + MODE_TRANS_FIELD + " = ? ,"
+                                               + RECV_PATH_FIELD + " = ?, "
+                                               + SEND_PATH_FIELD + " = ?, "
+                                               + ARCHIVE_PATH_FIELD + " = ? ,"
+                                               + WORK_PATH_FIELD + " = ? ,"
+                                               + R_PRE_TASKS_FIELD + " = ? ,"
+                                               + R_POST_TASKS_FIELD + " = ? ,"
+                                               + R_ERROR_TASKS_FIELD + " = ? ,"
+                                               + S_PRE_TASKS_FIELD + " = ? ,"
+                                               + S_POST_TASKS_FIELD + " = ? ,"
+                                               + S_ERROR_TASKS_FIELD + " = ? ,"
+                                               + UPDATED_INFO_FIELD + " = ? WHERE " + ID_FIELD + " = ?";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBRuleDAO.class);
     protected Connection connection;
 
     public DBRuleDAO(Connection con) {
@@ -232,20 +224,20 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
     @Override
     public void insert(Rule rule) throws DAOException {
         Object[] params = {
-            rule.getName(),
-            rule.getXMLHostids(),
-            rule.getMode(),
-            rule.getRecvPath(),
-            rule.getSendPath(),
-            rule.getArchivePath(),
-            rule.getWorkPath(),
-            rule.getXMLRPreTasks(),
-            rule.getXMLRPostTasks(),
-            rule.getXMLRErrorTasks(),
-            rule.getXMLSPreTasks(),
-            rule.getXMLSPostTasks(),
-            rule.getXMLSErrorTasks(),
-            rule.getUpdatedInfo().ordinal()
+                rule.getName(),
+                rule.getXMLHostids(),
+                rule.getMode(),
+                rule.getRecvPath(),
+                rule.getSendPath(),
+                rule.getArchivePath(),
+                rule.getWorkPath(),
+                rule.getXMLRPreTasks(),
+                rule.getXMLRPostTasks(),
+                rule.getXMLRErrorTasks(),
+                rule.getXMLSPreTasks(),
+                rule.getXMLSPostTasks(),
+                rule.getXMLSErrorTasks(),
+                rule.getUpdatedInfo().ordinal()
         };
 
         PreparedStatement stm = null;
@@ -263,21 +255,21 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
     @Override
     public void update(Rule rule) throws DAOException {
         Object[] params = {
-            rule.getName(),
-            rule.getXMLHostids(),
-            rule.getMode(),
-            rule.getRecvPath(),
-            rule.getSendPath(),
-            rule.getArchivePath(),
-            rule.getWorkPath(),
-            rule.getXMLRPreTasks(),
-            rule.getXMLRPostTasks(),
-            rule.getXMLRErrorTasks(),
-            rule.getXMLSPreTasks(),
-            rule.getXMLSPostTasks(),
-            rule.getXMLSErrorTasks(),
-            rule.getUpdatedInfo().ordinal(),
-            rule.getName()
+                rule.getName(),
+                rule.getXMLHostids(),
+                rule.getMode(),
+                rule.getRecvPath(),
+                rule.getSendPath(),
+                rule.getArchivePath(),
+                rule.getWorkPath(),
+                rule.getXMLRPreTasks(),
+                rule.getXMLRPostTasks(),
+                rule.getXMLRErrorTasks(),
+                rule.getXMLSPreTasks(),
+                rule.getXMLSPostTasks(),
+                rule.getXMLSErrorTasks(),
+                rule.getUpdatedInfo().ordinal(),
+                rule.getName()
         };
 
         PreparedStatement stm = null;
@@ -293,7 +285,7 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
     }
 
     protected Rule getFromResultSet(ResultSet set) throws SQLException,
-              DAOException {
+                                                          DAOException {
         return new Rule(
                 set.getString(ID_FIELD),
                 set.getInt(MODE_TRANS_FIELD),
@@ -320,7 +312,7 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
         try {
             InputStream stream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
             document = DocumentBuilderFactory.newInstance().
-            newDocumentBuilder().parse(stream);
+                    newDocumentBuilder().parse(stream);
         } catch (Exception e) {
             throw new DAOException(e);
         }
@@ -342,7 +334,7 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
         try {
             InputStream stream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-            .parse(stream);
+                                             .parse(stream);
         } catch (Exception e) {
             throw new DAOException(e);
         }
@@ -351,12 +343,12 @@ public class DBRuleDAO extends StatementExecutor implements RuleDAO {
         NodeList tasksList = document.getElementsByTagName("task");
         for (int i = 0; i < tasksList.getLength(); i++) {
             Node node = tasksList.item(i);
-            if(node.getNodeType() == Node.ELEMENT_NODE) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element e = (Element) node;
                 String type = e.getElementsByTagName("type").item(0).getTextContent();
                 String path = e.getElementsByTagName("path").item(0).getTextContent();
                 int delay = Integer.parseInt(e.getElementsByTagName("delay")
-                        .item(0).getTextContent());
+                                              .item(0).getTextContent());
                 res.add(new RuleTask(type, path, delay));
             }
         }

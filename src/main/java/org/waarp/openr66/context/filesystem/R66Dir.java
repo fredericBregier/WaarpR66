@@ -1,27 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.filesystem;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.command.exception.Reply550Exception;
@@ -34,11 +27,17 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.context.authentication.R66Auth;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Directory representation
- * 
+ *
  * @author frederic bregier
- * 
+ *
  */
 public class R66Dir extends FilesystemBasedDirImpl {
 
@@ -49,6 +48,20 @@ public class R66Dir extends FilesystemBasedDirImpl {
         super(session, new FilesystemBasedOptsMLSxImpl());
     }
 
+    /**
+     *
+     * @param file
+     * @return the final unique basename without the temporary extension
+     */
+    public static String getFinalUniqueFilename(R66File file) {
+        String finalpath = file.getBasename();
+        int pos = finalpath.lastIndexOf(Configuration.EXT_R66);
+        if (pos > 0) {
+            finalpath = finalpath.substring(0, pos);
+        }
+        return finalpath;
+    }
+
     public R66File newFile(String path, boolean append)
             throws CommandAbstractException {
         return new R66File((R66Session) getSession(), this, path, append);
@@ -56,7 +69,7 @@ public class R66Dir extends FilesystemBasedDirImpl {
 
     /**
      * Same as setUnique() except that File will be prefixed by id and postfixed by filename
-     * 
+     *
      * @param prefix
      * @param filename
      * @return the R66File with a unique filename and a temporary extension
@@ -76,33 +89,19 @@ public class R66Dir extends FilesystemBasedDirImpl {
         }
         try {
             file = File.createTempFile(prename, "_" + basename +
-                    Configuration.EXT_R66, getFileFromPath(currentDir));
+                                                Configuration.EXT_R66, getFileFromPath(currentDir));
         } catch (IOException e) {
             throw new Reply550Exception("Cannot create unique file from " +
-                    basename);
+                                        basename);
         }
         String currentFile = getRelativePath(file);
         return newFile(normalizePath(currentFile), false);
     }
 
     /**
-     * 
-     * @param file
-     * @return the final unique basename without the temporary extension
-     */
-    public static String getFinalUniqueFilename(R66File file) {
-        String finalpath = file.getBasename();
-        int pos = finalpath.lastIndexOf(Configuration.EXT_R66);
-        if (pos > 0) {
-            finalpath = finalpath.substring(0, pos);
-        }
-        return finalpath;
-    }
-
-    /**
      * Finds all files matching a wildcard expression (based on '?', '~' or '*') but without
      * checking BusinessPath, thus returning absolute path.
-     * 
+     *
      * @param pathWithWildcard
      *            The wildcard expression with a business path.
      * @return List of String as relative paths matching the wildcard expression. Those files are
@@ -178,7 +177,7 @@ public class R66Dir extends FilesystemBasedDirImpl {
 
     /**
      * Create a new file according to the path without checking BusinessPath, so as external File.
-     * 
+     *
      * @param path
      * @return the File created
      * @throws CommandAbstractException
@@ -190,7 +189,7 @@ public class R66Dir extends FilesystemBasedDirImpl {
         List<String> paths = wildcardFilesNoCheck(newpath);
         if (paths.size() != 1) {
             throw new Reply550Exception("File not found from: " + newpath + " and " +
-                    paths.size() + " founds");
+                                        paths.size() + " founds");
         }
         String extDir = paths.get(0);
         return new R66File((R66Session) getSession(), this, extDir);
@@ -198,7 +197,7 @@ public class R66Dir extends FilesystemBasedDirImpl {
 
     /**
      * This method returns the Full path for the current directory
-     * 
+     *
      * @return the full path associated with the current Dir
      */
     public String getFullPath() {

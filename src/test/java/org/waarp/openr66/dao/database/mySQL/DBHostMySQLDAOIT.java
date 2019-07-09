@@ -1,21 +1,20 @@
 package org.waarp.openr66.dao.database.mySQL;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import org.junit.ClassRule;
 import org.testcontainers.containers.MySQLContainer;
 import org.waarp.openr66.dao.database.DBHostDAOIT;
 
-public class DBHostMySQLDAOIT extends DBHostDAOIT {
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-    private String createScript = "mysql/create.sql";
-    private String populateScript = "mysql/populate.sql";
-    private String cleanScript = "mysql/clean.sql";
+public class DBHostMySQLDAOIT extends DBHostDAOIT {
 
     @ClassRule
     public static MySQLContainer db = new MySQLContainer();
+    private String createScript = "mysql/create.sql";
+    private String populateScript = "mysql/populate.sql";
+    private String cleanScript = "mysql/clean.sql";
 
     @Override
     public Connection getConnection() throws SQLException {

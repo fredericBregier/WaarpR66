@@ -29,9 +29,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Thrown to indicate that the request made to the server is invalid, and lists
- * all the errors found as a list of {@link RestError} objects.
- * Typically, these errors will be sent back as a '400 - Bad Request' HTTP response.
+ * Thrown to indicate that the request made to the server is invalid, and lists all the errors found as a list of {@link
+ * RestError} objects. Typically, these errors will be sent back as a '400 - Bad Request' HTTP response.
  */
 public class RestErrorException extends RuntimeException {
 
@@ -60,11 +59,11 @@ public class RestErrorException extends RuntimeException {
     }
 
     /**
-     * Returns the exception's list of Error as an {@link ArrayNode} contained in
-     * an {@link ObjectNode}.
+     * Returns the exception's list of Error as an {@link ArrayNode} contained in an {@link ObjectNode}.
      *
      * @param lang the language of the error messages.
-     * @return     the serialized list of errors.
+     *
+     * @return the serialized list of errors.
      */
     public ObjectNode makeNode(Locale lang) {
         ArrayNode errorsArray = new ArrayNode(JsonNodeFactory.instance);

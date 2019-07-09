@@ -46,22 +46,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
+import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ALREADY_EXISTING;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the host configuration REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the host configuration REST entry point.
  */
 @Path(CONFIG_HANDLER_URI)
 public class HostConfigHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final HttpHeaders OPTIONS_HEADERS;
 
@@ -88,7 +86,7 @@ public class HostConfigHandler extends AbstractRestDbHandler {
     /**
      * Method called to retrieve a host's configuration entry in the database.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @GET
@@ -117,10 +115,9 @@ public class HostConfigHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to initialize a host's configuration database entry if none
-     * already exists.
+     * Method called to initialize a host's configuration database entry if none already exists.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @POST
@@ -155,7 +152,7 @@ public class HostConfigHandler extends AbstractRestDbHandler {
     /**
      * Method called to update a host's configuration in the database if it exists.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @PUT
@@ -192,7 +189,7 @@ public class HostConfigHandler extends AbstractRestDbHandler {
     /**
      * Method called to delete a host's configuration entry in the database.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @DELETE
@@ -219,10 +216,10 @@ public class HostConfigHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @OPTIONS

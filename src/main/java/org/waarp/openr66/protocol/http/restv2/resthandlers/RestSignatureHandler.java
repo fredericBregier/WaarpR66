@@ -30,29 +30,31 @@ import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.openr66.protocol.http.restv2.dbhandlers.AbstractRestDbHandler;
 
-import static io.netty.channel.ChannelFutureListener.CLOSE;
-import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
-import static io.netty.handler.codec.http.HttpResponseStatus.UNAUTHORIZED;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.AUTH_SIGNATURE;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.UTF8_CHARSET;
+import static io.netty.channel.ChannelFutureListener.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static io.netty.handler.codec.http.HttpVersion.*;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 
 /**
- * Handler checking the REST request signature when signature checking is
- * enabled.
+ * Handler checking the REST request signature when signature checking is enabled.
  */
 public class RestSignatureHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    /** The logger for all events during the execution. */
+    /**
+     * The logger for all events during the execution.
+     */
     private final WaarpLogger logger =
             WaarpLoggerFactory.getLogger(this.getClass());
 
-    /** The HMAC key used to create the request's signature. */
+    /**
+     * The HMAC key used to create the request's signature.
+     */
     private final HmacSha256 hmac;
 
     /**
      * Initializes the handler with the given HMAC key.
+     *
      * @param hmac The REST HMAC signing key.
      */
     public RestSignatureHandler(HmacSha256 hmac) {
@@ -60,15 +62,13 @@ public class RestSignatureHandler extends SimpleChannelInboundHandler<FullHttpRe
     }
 
     /**
-     * Checks if the request given as parameter by the channel pipeline is
-     * properly signed or not. If the signature is valid, the request is
-     * forwarded to the corresponding {@link AbstractRestDbHandler}, otherwise
-     * a reply is directly sent stating that the request needs to be signed.
-     * If an unexpected error occurs during the execution, an error 500 HTTP
-     * status is sent instead.
+     * Checks if the request given as parameter by the channel pipeline is properly signed or not. If the signature is
+     * valid, the request is forwarded to the corresponding {@link AbstractRestDbHandler}, otherwise a reply is directly
+     * sent stating that the request needs to be signed. If an unexpected error occurs during the execution, an error
+     * 500 HTTP status is sent instead.
      *
-     * @param ctx       The context of the Netty channel handler.
-     * @param request   The original HTTP request.
+     * @param ctx The context of the Netty channel handler.
+     * @param request The original HTTP request.
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {

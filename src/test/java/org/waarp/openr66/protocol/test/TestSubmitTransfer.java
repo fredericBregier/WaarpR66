@@ -1,25 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.test;
-
-import java.sql.Timestamp;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
@@ -27,14 +22,25 @@ import org.waarp.openr66.client.SubmitTransfer;
 import org.waarp.openr66.database.DbConstant;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.sql.Timestamp;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Test class for multiple SubmitTransfer
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestSubmitTransfer extends SubmitTransfer {
     static int nb = 100;
+
+    public TestSubmitTransfer(R66Future future, String remoteHost,
+                              String filename, String rulename, String fileinfo, boolean isMD5, int blocksize,
+                              Timestamp starttime) {
+        super(future, remoteHost, filename, rulename, fileinfo, isMD5, blocksize,
+              DbConstant.ILLEGALVALUE, starttime);
+    }
 
     /**
      * @param args
@@ -52,13 +58,6 @@ public class TestSubmitTransfer extends SubmitTransfer {
             }
         }
         return true;
-    }
-
-    public TestSubmitTransfer(R66Future future, String remoteHost,
-            String filename, String rulename, String fileinfo, boolean isMD5, int blocksize,
-            Timestamp starttime) {
-        super(future, remoteHost, filename, rulename, fileinfo, isMD5, blocksize,
-                DbConstant.ILLEGALVALUE, starttime);
     }
 
     public static void main(String[] args) {
@@ -88,7 +87,8 @@ public class TestSubmitTransfer extends SubmitTransfer {
                 newstart = new Timestamp(newstart.getTime() + i * 10);
             }
             TestSubmitTransfer transaction = new TestSubmitTransfer(arrayFuture[i],
-                    rhost, localFilename, rule, fileInfo, ismd5, block, newstart);
+                                                                    rhost, localFilename, rule, fileInfo, ismd5, block,
+                                                                    newstart);
             transaction.normalInfoAsWarn = snormalInfoAsWarn;
             // executorService.execute(transaction);
             transaction.run();

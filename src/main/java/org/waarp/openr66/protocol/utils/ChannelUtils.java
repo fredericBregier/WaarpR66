@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -58,21 +57,20 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Channel Utils
- * 
+ *
  * @author Frederic Bregier
  */
 public class ChannelUtils extends Thread {
+    public static final Integer NOCHANNEL = Integer.MIN_VALUE;
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(ChannelUtils.class);
 
-    public static final Integer NOCHANNEL = Integer.MIN_VALUE;
-
     /**
      * Get the Remote InetAddress
-     * 
+     *
      * @param channel
      * @return the remote InetAddress
      */
@@ -86,7 +84,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Get the Local InetAddress
-     * 
+     *
      * @param channel
      * @return the local InetAddress
      */
@@ -97,7 +95,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Get the Remote InetSocketAddress
-     * 
+     *
      * @param channel
      * @return the remote InetSocketAddress
      */
@@ -107,7 +105,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Get the Local InetSocketAddress
-     * 
+     *
      * @param channel
      * @return the local InetSocketAddress
      */
@@ -116,33 +114,8 @@ public class ChannelUtils extends Thread {
     }
 
     /**
-     * Finalize resources attached to handlers
-     * 
-     * @author Frederic Bregier
-     */
-    private static class R66ChannelGroupFutureListener implements
-            ChannelGroupFutureListener {
-        String name;
-        EventLoopGroup group;
-
-        public R66ChannelGroupFutureListener(String name, EventLoopGroup group) {
-            this.name = name;
-            this.group = group;
-        }
-
-        public void operationComplete(ChannelGroupFuture future)
-                throws Exception {
-            logger.info("Start with shutdown external resources for " + name);
-            if (group != null) {
-                group.shutdownGracefully();
-            }
-            logger.info("Done with shutdown " + name);
-        }
-    }
-
-    /**
      * Terminate all registered channels
-     * 
+     *
      * @return the number of previously registered network channels
      */
     private static int terminateCommandChannels() {
@@ -152,16 +125,16 @@ public class ChannelUtils extends Thread {
         final int result = Configuration.configuration.getServerChannelGroup().size();
         logger.info("ServerChannelGroup: " + result);
         Configuration.configuration.getServerChannelGroup().close()
-                .addListener(
-                        new R66ChannelGroupFutureListener(
-                                "ServerChannelGroup",
-                                Configuration.configuration.getHandlerGroup()));
+                                   .addListener(
+                                           new R66ChannelGroupFutureListener(
+                                                   "ServerChannelGroup",
+                                                   Configuration.configuration.getHandlerGroup()));
         return result;
     }
 
     /**
      * Terminate all registered Http channels
-     * 
+     *
      * @return the number of previously registered http network channels
      */
     private static int terminateHttpChannels() {
@@ -176,7 +149,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Return the current number of network connections
-     * 
+     *
      * @param configuration
      * @return the current number of network connections
      */
@@ -186,7 +159,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * To be used only with LocalChannel (NetworkChannel could be using SSL)
-     * 
+     *
      * @param channel
      */
     public final static void close(final LocalChannel channel) {
@@ -198,7 +171,7 @@ public class ChannelUtils extends Thread {
     }
 
     /**
-     * 
+     *
      * @param localChannelReference
      * @param block
      * @return the ChannelFuture of this write operation
@@ -224,7 +197,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Write the EndTransfer
-     * 
+     *
      * @param localChannelReference
      * @throws OpenR66ProtocolPacketException
      */
@@ -238,7 +211,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Write the EndTransfer plus Global Hash
-     * 
+     *
      * @param localChannelReference
      * @param hash
      * @throws OpenR66ProtocolPacketException
@@ -254,7 +227,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Write an AbstractLocalPacket to the network Channel
-     * 
+     *
      * @param localChannelReference
      * @param packet
      * @param wait
@@ -268,10 +241,11 @@ public class ChannelUtils extends Thread {
         final NetworkPacket networkPacket;
         try {
             networkPacket = new NetworkPacket(localChannelReference
-                    .getLocalId(), localChannelReference.getRemoteId(), packet, localChannelReference);
+                                                      .getLocalId(), localChannelReference.getRemoteId(), packet,
+                                              localChannelReference);
         } catch (OpenR66ProtocolPacketException e) {
             logger.error(Messages.getString("ChannelUtils.6") + packet.toString(), //$NON-NLS-1$
-                    e);
+                         e);
             throw e;
         }
         if (wait) {
@@ -290,7 +264,7 @@ public class ChannelUtils extends Thread {
 
     /**
      * Write an AbstractLocalPacket to the Local Channel
-     * 
+     *
      * @param localChannelReference
      * @param packet
      * @return the ChannelFuture on write operation
@@ -304,20 +278,20 @@ public class ChannelUtils extends Thread {
 
     /**
      * Compute Wait for Traffic in Write (ugly turn around)
-     * 
+     *
      * @param localChannelReference
      * @param size
      * @return the wait in ms
      */
     public static final long willBeWaitingWriting(LocalChannelReference localChannelReference,
-            int size) {
+                                                  int size) {
         ChannelTrafficShapingHandler cts = localChannelReference.getChannelTrafficShapingHandler();
         return willBeWaitingWriting(cts, size);
     }
 
     /**
      * Compute Wait for Traffic in Write (ugly turn around)
-     * 
+     *
      * @param cts
      * @param size
      * @return the wait in ms
@@ -328,8 +302,8 @@ public class ChannelUtils extends Thread {
             TrafficCounter tc = cts.trafficCounter();
             if (tc != null) {
                 long wait = waitTraffic(Configuration.configuration.getServerChannelWriteLimit(),
-                        tc.currentWrittenBytes() + size,
-                        tc.lastTime(), currentTime);
+                                        tc.currentWrittenBytes() + size,
+                                        tc.lastTime(), currentTime);
                 if (wait > 0) {
                     return wait;
                 }
@@ -337,11 +311,11 @@ public class ChannelUtils extends Thread {
         }
         if (Configuration.configuration.getServerGlobalWriteLimit() > 0) {
             TrafficCounter tc = Configuration.configuration
-                .getGlobalTrafficShapingHandler().trafficCounter();
+                    .getGlobalTrafficShapingHandler().trafficCounter();
             if (tc != null) {
                 long wait = waitTraffic(Configuration.configuration.getServerGlobalWriteLimit(),
-                        tc.currentWrittenBytes() + size,
-                        tc.lastTime(), currentTime);
+                                        tc.currentWrittenBytes() + size,
+                                        tc.lastTime(), currentTime);
                 if (wait > 0) {
                     return wait;
                 }
@@ -351,7 +325,7 @@ public class ChannelUtils extends Thread {
     }
 
     private static final long waitTraffic(long limit, long bytes, long lastTime,
-            long curtime) {
+                                          long curtime) {
         long interval = curtime - lastTime;
         if (interval == 0) {
             // Time is too short, so just lets continue
@@ -370,7 +344,7 @@ public class ChannelUtils extends Thread {
         }
         // First try to StopAll
         TransferUtils.stopSelectedTransfers(DbConstant.admin.getSession(), 0,
-                null, null, null, null, null, null, null, null, null, true, true, true);
+                                            null, null, null, null, null, null, null, null, null, true, true, true);
         Configuration.configuration.setShutdown(true);
         Configuration.configuration.prepareServerStop();
         final long delay = Configuration.configuration.getTIMEOUTCON();
@@ -422,6 +396,18 @@ public class ChannelUtils extends Thread {
     }
 
     /**
+     * Start Shutdown
+     */
+    public final static void startShutdown() {
+        if (R66ShutdownHook.isInShutdown()) {
+            return;
+        }
+        Thread thread = new Thread(new ChannelUtils(), "R66 Shutdown Thread");
+        thread.setDaemon(false);
+        thread.start();
+    }
+
+    /**
      * This function is the top function to be called when the server is to be shutdown.
      */
     @Override
@@ -432,14 +418,27 @@ public class ChannelUtils extends Thread {
     }
 
     /**
-     * Start Shutdown
+     * Finalize resources attached to handlers
+     *
+     * @author Frederic Bregier
      */
-    public final static void startShutdown() {
-        if (R66ShutdownHook.isInShutdown()) {
-            return;
+    private static class R66ChannelGroupFutureListener implements
+                                                       ChannelGroupFutureListener {
+        String name;
+        EventLoopGroup group;
+
+        public R66ChannelGroupFutureListener(String name, EventLoopGroup group) {
+            this.name = name;
+            this.group = group;
         }
-        Thread thread = new Thread(new ChannelUtils(), "R66 Shutdown Thread");
-        thread.setDaemon(false);
-        thread.start();
+
+        public void operationComplete(ChannelGroupFuture future)
+                throws Exception {
+            logger.info("Start with shutdown external resources for " + name);
+            if (group != null) {
+                group.shutdownGracefully();
+            }
+            logger.info("Done with shutdown " + name);
+        }
     }
 }

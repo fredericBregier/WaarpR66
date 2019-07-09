@@ -1,33 +1,32 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context;
 
-import java.util.EnumSet;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.waarp.common.state.MachineState;
 import org.waarp.common.state.Transition;
 
+import java.util.EnumSet;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Finite Dual State Machine for OpenR66 (Requester=R, requesteD=D, Sender=S, Receive=R)
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public enum R66FiniteDualStates {
     OPENEDCHANNEL, CLOSEDCHANNEL, ERROR,
@@ -43,12 +42,43 @@ public enum R66FiniteDualStates {
     // CONNECTERROR,
     // KEEPALIVEPACKET;
 
+    private static ConcurrentHashMap<R66FiniteDualStates, EnumSet<?>> stateMap =
+            new ConcurrentHashMap<R66FiniteDualStates, EnumSet<?>>();
+
+    /**
+     * This method should be called once at startup to initialize the Finite States association.
+     */
+    public static void initR66FiniteStates() {
+        for (R66Transition trans : R66Transition.values()) {
+            stateMap.put(trans.elt.getState(), trans.elt.getSet());
+        }
+    }
+
+    /**
+     *
+     * @return a new Session MachineState for OpenR66
+     */
+    public static MachineState<R66FiniteDualStates> newSessionMachineState() {
+        MachineState<R66FiniteDualStates> machine =
+                new MachineState<R66FiniteDualStates>(OPENEDCHANNEL, stateMap);
+        return machine;
+    }
+
+    /**
+     *
+     * @param machine
+     *            the Session MachineState to release
+     */
+    public static void endSessionMachineSate(MachineState<R66FiniteDualStates> machine) {
+        machine.release();
+    }
+
     private static enum R66Transition {
         tOPENEDCHANNEL(OPENEDCHANNEL, EnumSet.of(STARTUP, CLOSEDCHANNEL, ERROR)),
         tSTARTUP(STARTUP, EnumSet.of(AUTHENTR, AUTHENTD, CLOSEDCHANNEL, ERROR)),
         tAUTHENTR(AUTHENTR, EnumSet.of(AUTHENTD, CLOSEDCHANNEL, ERROR)),
         tAUTHENTD(AUTHENTD, EnumSet.of(REQUESTR, VALIDOTHER, INFORMATION, SHUTDOWN, TEST,
-                BUSINESSR, BUSINESSD, ENDREQUESTS, CLOSEDCHANNEL, ERROR)),
+                                       BUSINESSR, BUSINESSD, ENDREQUESTS, CLOSEDCHANNEL, ERROR)),
         tREQUESTR(REQUESTR, EnumSet.of(VALID, REQUESTD, CLOSEDCHANNEL, ERROR)),
         tREQUESTD(REQUESTD, EnumSet.of(VALID, DATAS, DATAR, ENDTRANSFERS, CLOSEDCHANNEL, ERROR)),
         tVALID(VALID, EnumSet.of(REQUESTD, DATAR, ENDTRANSFERS, CLOSEDCHANNEL, ERROR)),
@@ -72,36 +102,5 @@ public enum R66FiniteDualStates {
         private R66Transition(R66FiniteDualStates state, EnumSet<R66FiniteDualStates> set) {
             this.elt = new Transition<R66FiniteDualStates>(state, set);
         }
-    }
-
-    private static ConcurrentHashMap<R66FiniteDualStates, EnumSet<?>> stateMap =
-            new ConcurrentHashMap<R66FiniteDualStates, EnumSet<?>>();
-
-    /**
-     * This method should be called once at startup to initialize the Finite States association.
-     */
-    public static void initR66FiniteStates() {
-        for (R66Transition trans : R66Transition.values()) {
-            stateMap.put(trans.elt.getState(), trans.elt.getSet());
-        }
-    }
-
-    /**
-     * 
-     * @return a new Session MachineState for OpenR66
-     */
-    public static MachineState<R66FiniteDualStates> newSessionMachineState() {
-        MachineState<R66FiniteDualStates> machine =
-                new MachineState<R66FiniteDualStates>(OPENEDCHANNEL, stateMap);
-        return machine;
-    }
-
-    /**
-     * 
-     * @param machine
-     *            the Session MachineState to release
-     */
-    public static void endSessionMachineSate(MachineState<R66FiniteDualStates> machine) {
-        machine.release();
     }
 }

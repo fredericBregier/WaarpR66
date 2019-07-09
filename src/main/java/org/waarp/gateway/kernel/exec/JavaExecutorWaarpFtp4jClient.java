@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.gateway.kernel.exec;
-
-import java.io.File;
-import java.io.IOException;
 
 import org.waarp.common.digest.FilesystemBasedDigest;
 import org.waarp.common.digest.FilesystemBasedDigest.DigestAlgo;
@@ -26,11 +22,14 @@ import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.ftp.client.WaarpFtp4jClient;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * FTP client compatible for Waarp Gateway Kernel as JavaExecutor<br>
  * <br>
  * Ftp Transfer task: synchronous<br>
- * 
+ *
  * Result of arguments will be as FTP command.<br>
  * Format is the following:<br>
  * "-file filepath <br>
@@ -71,10 +70,10 @@ import org.waarp.ftp.client.WaarpFtp4jClient;
  * ACCT,PASS,REIN,USER,APPE,STOR,STOU,RETR,RMD,RNFR,RNTO,ABOR,CWD,CDUP,MODE,PASV,PORT,STRU,TYPE
  * ,MDTM,MLSD,MLST,SIZE,AUTH)<br>
  * 13) QUIT<br>
- * 
- * 
+ *
+ *
  * @author "Frederic Bregier"
- * 
+ *
  */
 public class JavaExecutorWaarpFtp4jClient implements GatewayRunnable {
     /**
@@ -192,12 +191,12 @@ public class JavaExecutorWaarpFtp4jClient implements GatewayRunnable {
             }
         }
         if (filepath == null || requested == null || port <= 0 || user == null || pwd == null ||
-                codeCommand == 0) {
+            codeCommand == 0) {
             status = -2;
             int code = 0 +
-                    (filepath == null ? 1 : 0) + (requested == null ? 10 : 0) +
-                    (port <= 0 ? 100 : 0) + (user == null ? 1000 : 0) + (pwd == null ? 10000 : 0) +
-                    (codeCommand == 0 ? 100000 : 0);
+                       (filepath == null? 1 : 0) + (requested == null? 10 : 0) +
+                       (port <= 0? 100 : 0) + (user == null? 1000 : 0) + (pwd == null? 10000 : 0) +
+                       (codeCommand == 0? 100000 : 0);
             logger.error("Not enough arguments: " + code);
             return;
         }
@@ -207,7 +206,7 @@ public class JavaExecutorWaarpFtp4jClient implements GatewayRunnable {
         }
         WaarpFtp4jClient ftpClient =
                 new WaarpFtp4jClient(requested, port, user, pwd, acct, isPassive, ssl,
-                        5000, timeout);
+                                     5000, timeout);
         boolean connected = false;
         for (int i = 0; i < 3; i++) {
             if (ftpClient.connect()) {
@@ -243,26 +242,26 @@ public class JavaExecutorWaarpFtp4jClient implements GatewayRunnable {
                 String params = null;
                 DigestAlgo algo = null;
                 switch (digest) {
-                    case 1: // CRC
-                        params = "XCRC ";
-                        algo = DigestAlgo.CRC32;
-                        break;
-                    case 2: // MD5
-                        params = "XMD5 ";
-                        algo = DigestAlgo.MD5;
-                        break;
-                    case 3: // SHA1
-                    default:
-                        params = "XSHA1 ";
-                        algo = DigestAlgo.SHA1;
-                        break;
+                case 1: // CRC
+                    params = "XCRC ";
+                    algo = DigestAlgo.CRC32;
+                    break;
+                case 2: // MD5
+                    params = "XMD5 ";
+                    algo = DigestAlgo.MD5;
+                    break;
+                case 3: // SHA1
+                default:
+                    params = "XSHA1 ";
+                    algo = DigestAlgo.SHA1;
+                    break;
                 }
                 params += filename;
                 String[] values = ftpClient.executeCommand(params);
                 String hashresult = null;
                 if (values != null) {
                     values = values[0].split(" ");
-                    hashresult = (values.length > 3 ? values[1] : values[0]);
+                    hashresult = (values.length > 3? values[1] : values[0]);
                 }
                 if (hashresult == null) {
                     status = -5;
@@ -293,7 +292,7 @@ public class JavaExecutorWaarpFtp4jClient implements GatewayRunnable {
             ftpClient.logout();
         }
         logger.info("FTP transfer in\n    SUCCESS\n    " + filepath +
-                "\n    <REMOTE>" + requested + "</REMOTE>");
+                    "\n    <REMOTE>" + requested + "</REMOTE>");
         status = 0;
     }
 

@@ -1,12 +1,11 @@
 package org.waarp.openr66.protocol.configuration;
 
+import org.waarp.common.utility.SystemPropertyUtil;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
-import org.waarp.common.utility.SystemPropertyUtil;
-import org.waarp.openr66.context.ErrorCode;
 
 public class Messages {
     private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$

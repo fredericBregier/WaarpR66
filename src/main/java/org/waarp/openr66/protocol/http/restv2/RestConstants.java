@@ -32,88 +32,107 @@ import java.nio.charset.Charset;
 /**
  * A list of all constants of the RESTv2 API.
  * <p>
- * This includes the URI of all the entry points, the name of HTTP headers
- * specific to the API, the name of the JSON objects' fields, and
- * a {@link DAOFactory} to create DAOs for access to the database.
+ * This includes the URI of all the entry points, the name of HTTP headers specific to the API, the name of the JSON
+ * objects' fields, and a {@link DAOFactory} to create DAOs for access to the database.
  */
 public final class RestConstants {
+
+    /**
+     * The name of this R66 server instance.
+     */
+    public static final String SERVER_NAME = Configuration.configuration.getHOST_ID();
+    /**
+     * The DAO_FACTORY to generate connections to the underlying database.
+     */
+    public static final DAOFactory DAO_FACTORY;
+
+    //########################## SERVER CONSTANTS ##############################
+    /**
+     * The UTF-8 {@link java.nio.charset.Charset} constant.
+     */
+    public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    /**
+     * Name of the HTTP header used to store the user who made a request.
+     */
+    public static final AsciiString AUTH_USER = AsciiString.cached("X-Auth-User");
+    /**
+     * Name of the HTTP header used to store the timestamp of the request.
+     */
+    public static final AsciiString AUTH_TIMESTAMP = AsciiString.cached("X-Auth-Timestamp");
+
+
+    //######################### HTTP HEADER NAMES ##############################
+    /**
+     * Name of the HTTP header used to store the signature key of a request.
+     */
+    public static final AsciiString AUTH_SIGNATURE = AsciiString.cached("X-Auth-Key");
+    /**
+     * Root directory of the API.
+     */
+    public static final String VERSION_PREFIX = "/v2/";
+    /**
+     * Name of the URI parameter containing the id of an entry in a collection.
+     */
+    public static final String URI_ID = "id";
+
+
+    //########################## ENTRY POINTS URI ##############################
+    /**
+     * Access point of the transfers collection.
+     */
+    public static final String TRANSFERS_HANDLER_URI = VERSION_PREFIX + "transfers/";
+    /**
+     * Access point of the server commands.
+     */
+    public static final String SERVER_HANDLER_URI = VERSION_PREFIX + "server/";
+    /**
+     * Access point of the transfer rules collection.
+     */
+    public static final String RULES_HANDLER_URI = VERSION_PREFIX + "rules/";
+    /**
+     * Access point of the bandwidth limits.
+     */
+    public static final String LIMITS_HANDLER_URI = VERSION_PREFIX + "limits/";
+    /**
+     * Access point of the hosts collection.
+     */
+    public static final String HOSTS_HANDLER_URI = VERSION_PREFIX + "hosts/";
+    /**
+     * Access point of the host configuration.
+     */
+    public static final String CONFIG_HANDLER_URI = VERSION_PREFIX + "hostconfig/";
+    /**
+     * Regex corresponding to the id URI parameter of an entry in a collection.
+     */
+    private static final String ID_PARAMETER = "/{" + URI_ID + "}";
+    /**
+     * Access point of a single transfer entry.
+     */
+    public static final String TRANSFER_ID_HANDLER_URI = TRANSFERS_HANDLER_URI + ID_PARAMETER;
+    /**
+     * Access point of a single transfer rules entry.
+     */
+    public static final String RULE_ID_HANDLER_URI = RULES_HANDLER_URI + ID_PARAMETER;
+    /**
+     * Access point of a single host entry.
+     */
+    public static final String HOST_ID_HANDLER_URI = HOSTS_HANDLER_URI + ID_PARAMETER;
 
     static {
         DAOFactory.initialize(ConnectionFactory.getInstance());
         DAO_FACTORY = DAOFactory.getInstance();
     }
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private RestConstants() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
-    //########################## SERVER CONSTANTS ##############################
-
-    /** The name of this R66 server instance. */
-    public static final String SERVER_NAME = Configuration.configuration.getHOST_ID();
-
-    /** The DAO_FACTORY to generate connections to the underlying database. */
-    public static final DAOFactory DAO_FACTORY;
-
-    /** The UTF-8 {@link java.nio.charset.Charset} constant. */
-    public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
-
-
-    //######################### HTTP HEADER NAMES ##############################
-
-    /** Name of the HTTP header used to store the user who made a request. */
-    public static final AsciiString AUTH_USER = AsciiString.cached("X-Auth-User");
-
-    /** Name of the HTTP header used to store the timestamp of the request. */
-    public static final AsciiString AUTH_TIMESTAMP = AsciiString.cached("X-Auth-Timestamp");
-
-    /** Name of the HTTP header used to store the signature key of a request. */
-    public static final AsciiString AUTH_SIGNATURE = AsciiString.cached("X-Auth-Key");
-
-
-    //########################## ENTRY POINTS URI ##############################
-
-    /** Root directory of the API. */
-    public static final String VERSION_PREFIX = "/v2/";
-
-    /** Name of the URI parameter containing the id of an entry in a collection. */
-    public static final String URI_ID = "id";
-
-    /** Regex corresponding to the id URI parameter of an entry in a collection. */
-    private static final String ID_PARAMETER = "/{"+ URI_ID + "}";
-
-    /** Access point of the transfers collection. */
-    public static final String TRANSFERS_HANDLER_URI = VERSION_PREFIX + "transfers/";
-
-    /** Access point of a single transfer entry. */
-    public static final String TRANSFER_ID_HANDLER_URI = TRANSFERS_HANDLER_URI + ID_PARAMETER;
-
-    /** Access point of the server commands. */
-    public static final String SERVER_HANDLER_URI = VERSION_PREFIX + "server/";
-
-    /** Access point of the transfer rules collection. */
-    public static final String RULES_HANDLER_URI = VERSION_PREFIX + "rules/";
-
-    /** Access point of a single transfer rules entry. */
-    public static final String RULE_ID_HANDLER_URI = RULES_HANDLER_URI + ID_PARAMETER;
-
-    /** Access point of the bandwidth limits. */
-    public static final String LIMITS_HANDLER_URI = VERSION_PREFIX + "limits/";
-
-    /** Access point of the hosts collection. */
-    public static final String HOSTS_HANDLER_URI = VERSION_PREFIX + "hosts/";
-
-    /** Access point of a single host entry. */
-    public static final String HOST_ID_HANDLER_URI = HOSTS_HANDLER_URI + ID_PARAMETER;
-
-    /** Access point of the host configuration. */
-    public static final String CONFIG_HANDLER_URI = VERSION_PREFIX + "hostconfig/";
-
     /**
-     *  The names of all the sub-paths of the {@link ServerHandler} corresponding
-     *  to the server commands.
+     * The names of all the sub-paths of the {@link ServerHandler} corresponding to the server commands.
      */
     public static final class ServerCommandsURI {
         public static final String STATUS_URI = "status";
@@ -125,8 +144,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the sub-paths of the {@link TransferIdHandler} corresponding
-     * to the transfer commands.
+     * The names of the sub-paths of the {@link TransferIdHandler} corresponding to the transfer commands.
      */
     public static final class TransferCommandsURI {
         public static final String RESTART_URI = "restart";
@@ -137,7 +155,9 @@ public final class RestConstants {
 
     //######################### JSON FIELDS NAMES ##############################
 
-    /** The names of the fields of a HostConfig JSON object. */
+    /**
+     * The names of the fields of a HostConfig JSON object.
+     */
     public static final class HostConfigFields {
         public static final String BUSINESS = "business";
         public static final String ROLES = "roles";
@@ -148,7 +168,9 @@ public final class RestConstants {
         public static final String ALIAS_LIST = "aliasList";
     }
 
-    /** The names of the fields of a Host JSON object. */
+    /**
+     * The names of the fields of a Host JSON object.
+     */
     public static final class HostFields {
         public static final String HOST_NAME = "name";
         public static final String ADDRESS = "address";
@@ -161,7 +183,9 @@ public final class RestConstants {
         public static final String IS_PROXY = "isProxy";
     }
 
-    /** The names of the fields of a Limits JSON object. */
+    /**
+     * The names of the fields of a Limits JSON object.
+     */
     public static final class LimitsFields {
         public static final String WRITE_GLOBAL_LIMIT = "upGlobalLimit";
         public static final String READ_GLOBAL_LIMIT = "downGlobalLimit";
@@ -170,7 +194,9 @@ public final class RestConstants {
         public static final String DELAY_LIMIT = "delayLimit";
     }
 
-    /** The names of the fields of a Rule JSON object. */
+    /**
+     * The names of the fields of a Rule JSON object.
+     */
     public static final class RuleFields {
         public static final String RULE_NAME = "name";
         public static final String HOST_IDS = "hostIds";
@@ -190,7 +216,9 @@ public final class RestConstants {
         public static final String TASK_DELAY = "delay";
     }
 
-    /** The names of the fields of a Transfer JSON object. */
+    /**
+     * The names of the fields of a Transfer JSON object.
+     */
     public static final class TransferFields {
         public static final String TRANSFER_ID = "id";
         public static final String GLOBAL_STEP = "globalStep";
@@ -217,8 +245,7 @@ public final class RestConstants {
     //######################### QUERY PARAM NAMES ##############################
 
     /**
-     * The names of the query parameters of the {@code GET} method on the host
-     * collection entry point.
+     * The names of the query parameters of the {@code GET} method on the host collection entry point.
      */
     public static final class GetHostsParams {
         public static final String LIMIT = "limit";
@@ -230,8 +257,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the query parameters of the {@code GET} method on the rule
-     * collection entry point.
+     * The names of the query parameters of the {@code GET} method on the rule collection entry point.
      */
     public static final class GetRulesParams {
         public static final String LIMIT = "limit";
@@ -241,8 +267,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the query parameters of the {@code GET} method on the server
-     * status entry point.
+     * The names of the query parameters of the {@code GET} method on the server status entry point.
      */
     public static final class GetStatusParams {
         public static final String PERIOD = "period";
@@ -250,8 +275,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the query parameters of the {@code GET} method on the transfer
-     * logs entry point.
+     * The names of the query parameters of the {@code GET} method on the transfer logs entry point.
      */
     public static final class GetLogsParams {
         public static final String PURGE = "purge";
@@ -266,8 +290,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the query parameters of the {@code GET} method on the server
-     * configuration entry point.
+     * The names of the query parameters of the {@code GET} method on the server configuration entry point.
      */
     public static final class ExportConfigParams {
         public static final String EXPORT_HOSTS = "exportHosts";
@@ -278,8 +301,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the query parameters of the {@code PUT} method on the server
-     * configuration entry point.
+     * The names of the query parameters of the {@code PUT} method on the server configuration entry point.
      */
     public static final class ImportConfigParams {
         public static final String PURGE_HOST = "purgeHosts";
@@ -295,8 +317,7 @@ public final class RestConstants {
     }
 
     /**
-     * The names of the query parameters of the {@code GET} method on the transfer
-     * collection entry point.
+     * The names of the query parameters of the {@code GET} method on the transfer collection entry point.
      */
     public static final class GetTransfersParams {
         public static final String LIMIT = "limit";

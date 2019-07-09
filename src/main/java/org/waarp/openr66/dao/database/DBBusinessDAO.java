@@ -1,13 +1,5 @@
 package org.waarp.openr66.dao.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.openr66.dao.BusinessDAO;
@@ -16,14 +8,18 @@ import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.pojo.Business;
 import org.waarp.openr66.pojo.UpdatedInfo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Implementation of BusinessDAO for standard SQL databases
  */
 public class DBBusinessDAO extends StatementExecutor implements BusinessDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBBusinessDAO.class);
-
-    protected static final String TABLE = "hostconfig";
 
     public static final String HOSTID_FIELD = "hostid";
     public static final String BUSINESS_FIELD = "business";
@@ -31,30 +27,30 @@ public class DBBusinessDAO extends StatementExecutor implements BusinessDAO {
     public static final String ALIASES_FIELD = "aliases";
     public static final String OTHERS_FIELD = "others";
     public static final String UPDATED_INFO_FIELD = "updatedInfo";
-
+    protected static final String TABLE = "hostconfig";
     protected static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE;
     protected static final String SQL_DELETE = "DELETE FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
-    protected static final  String SQL_GET_ALL = "SELECT * FROM " + TABLE;
+                                               + " WHERE " + HOSTID_FIELD + " = ?";
+    protected static final String SQL_GET_ALL = "SELECT * FROM " + TABLE;
     protected static final String SQL_EXIST = "SELECT 1 FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
+                                              + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_SELECT = "SELECT * FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
+                                               + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_INSERT = "INSERT INTO " + TABLE
-        + " (" + HOSTID_FIELD + ", "
-        + BUSINESS_FIELD + ", "
-        + ROLES_FIELD + ", "
-        + ALIASES_FIELD + ", "
-        + OTHERS_FIELD + ", "
-        + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?)";
+                                               + " (" + HOSTID_FIELD + ", "
+                                               + BUSINESS_FIELD + ", "
+                                               + ROLES_FIELD + ", "
+                                               + ALIASES_FIELD + ", "
+                                               + OTHERS_FIELD + ", "
+                                               + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?)";
     protected static final String SQL_UPDATE = "UPDATE " + TABLE
-        + " SET " + HOSTID_FIELD + " = ?, "
-        + BUSINESS_FIELD + " = ?, "
-        + ROLES_FIELD + " = ?, "
-        + ALIASES_FIELD + " = ?, "
-        + OTHERS_FIELD + " = ?, "
-        + UPDATED_INFO_FIELD + " = ? WHERE " + HOSTID_FIELD + " = ?";
-
+                                               + " SET " + HOSTID_FIELD + " = ?, "
+                                               + BUSINESS_FIELD + " = ?, "
+                                               + ROLES_FIELD + " = ?, "
+                                               + ALIASES_FIELD + " = ?, "
+                                               + OTHERS_FIELD + " = ?, "
+                                               + UPDATED_INFO_FIELD + " = ? WHERE " + HOSTID_FIELD + " = ?";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBBusinessDAO.class);
     protected Connection connection;
 
     public DBBusinessDAO(Connection con) {
@@ -196,12 +192,12 @@ public class DBBusinessDAO extends StatementExecutor implements BusinessDAO {
     @Override
     public void insert(Business business) throws DAOException {
         Object[] params = {
-            business.getHostid(),
-            business.getBusiness(),
-            business.getRoles(),
-            business.getAliases(),
-            business.getOthers(),
-            business.getUpdatedInfo().ordinal()
+                business.getHostid(),
+                business.getBusiness(),
+                business.getRoles(),
+                business.getAliases(),
+                business.getOthers(),
+                business.getUpdatedInfo().ordinal()
         };
 
         PreparedStatement stm = null;
@@ -219,13 +215,13 @@ public class DBBusinessDAO extends StatementExecutor implements BusinessDAO {
     @Override
     public void update(Business business) throws DAOException {
         Object[] params = {
-            business.getHostid(),
-            business.getBusiness(),
-            business.getRoles(),
-            business.getAliases(),
-            business.getOthers(),
-            business.getUpdatedInfo().ordinal(),
-            business.getHostid()
+                business.getHostid(),
+                business.getBusiness(),
+                business.getRoles(),
+                business.getAliases(),
+                business.getOthers(),
+                business.getUpdatedInfo().ordinal(),
+                business.getHostid()
         };
 
         PreparedStatement stm = null;

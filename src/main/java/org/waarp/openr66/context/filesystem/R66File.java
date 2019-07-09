@@ -1,34 +1,22 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.filesystem;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.netty.channel.ChannelFuture;
-
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.digest.FilesystemBasedDigest;
 import org.waarp.common.exception.FileEndOfTransferException;
@@ -51,11 +39,21 @@ import org.waarp.openr66.protocol.localhandler.RetrieveRunner;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.FileUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * File representation
- * 
+ *
  * @author frederic bregier
- * 
+ *
  */
 public class R66File extends FilesystemBasedFileImpl {
     /**
@@ -83,7 +81,7 @@ public class R66File extends FilesystemBasedFileImpl {
 
     /**
      * This constructor is for External file
-     * 
+     *
      * @param session
      * @param dir
      * @param path
@@ -94,15 +92,32 @@ public class R66File extends FilesystemBasedFileImpl {
     }
 
     /**
+     *
+     * @param path
+     * @return the basename from the given path
+     */
+    public static String getBasename(String path) {
+        int pos = path.lastIndexOf('/');
+        int pos2 = path.lastIndexOf('\\');
+        if (pos2 > pos) {
+            pos = pos2;
+        }
+        if (pos > 0) {
+            return path.substring(pos + 1);
+        }
+        return path;
+    }
+
+    /**
      * Start the retrieve (send to the remote host the local file)
-     * 
+     *
      * @param running
      *            When false, should stop the runner
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      */
     public void retrieveBlocking(AtomicBoolean running) throws OpenR66RunnerErrorException,
-            OpenR66ProtocolSystemException {
+                                                               OpenR66ProtocolSystemException {
         boolean retrieveDone = false;
         LocalChannelReference localChannelReference = getSession()
                 .getLocalChannelReference();
@@ -200,15 +215,15 @@ public class R66File extends FilesystemBasedFileImpl {
                     .setFinalizeTransfer(
                             false,
                             new R66Result(new OpenR66ProtocolSystemException(e),
-                                    getSession(), false, ErrorCode.TransferError, getSession()
-                                            .getRunner()));
+                                          getSession(), false, ErrorCode.TransferError, getSession()
+                                                  .getRunner()));
         } catch (OpenR66ProtocolPacketException e) {
             // An error occurs!
             getSession()
                     .setFinalizeTransfer(
                             false,
                             new R66Result(e, getSession(), false,
-                                    ErrorCode.Internal, getSession().getRunner()));
+                                          ErrorCode.Internal, getSession().getRunner()));
         } finally {
             if (retrieveDone) {
                 String hash = null;
@@ -226,22 +241,22 @@ public class R66File extends FilesystemBasedFileImpl {
                     getSession().setFinalizeTransfer(
                             false,
                             new R66Result(e, getSession(), false,
-                                    ErrorCode.Internal, getSession().getRunner()));
+                                          ErrorCode.Internal, getSession().getRunner()));
                 }
             } else {
                 // An error occurs!
                 getSession().setFinalizeTransfer(
                         false,
                         new R66Result(new OpenR66ProtocolSystemException("Transfer in error"),
-                                getSession(), false, ErrorCode.TransferError, getSession()
-                                        .getRunner()));
+                                      getSession(), false, ErrorCode.TransferError, getSession()
+                                              .getRunner()));
             }
         }
     }
 
     /**
      * This method is a good to have in a true FileInterface implementation.
-     * 
+     *
      * @return the File associated with the current FileInterface operation
      */
     public File getTrueFile() {
@@ -257,28 +272,11 @@ public class R66File extends FilesystemBasedFileImpl {
     }
 
     /**
-     * 
+     *
      * @return the basename of the current file
      */
     public String getBasename() {
         return getBasename(currentFile);
-    }
-
-    /**
-     * 
-     * @param path
-     * @return the basename from the given path
-     */
-    public static String getBasename(String path) {
-        int pos = path.lastIndexOf('/');
-        int pos2 = path.lastIndexOf('\\');
-        if (pos2 > pos) {
-            pos = pos2;
-        }
-        if (pos > 0) {
-            return path.substring(pos + 1);
-        }
-        return path;
     }
 
     @Override
@@ -386,7 +384,7 @@ public class R66File extends FilesystemBasedFileImpl {
 
     /**
      * Returns the FileOutputStream in Out mode associated with the current file.
-     * 
+     *
      * @param append
      *            True if the FileOutputStream should be in append mode
      * @return the FileOutputStream (OUT)
@@ -489,7 +487,7 @@ public class R66File extends FilesystemBasedFileImpl {
                 }
             }
             if (newFile.exists()) {
-                logger.warn("Target file already exists: "+newFile.getAbsolutePath());
+                logger.warn("Target file already exists: " + newFile.getAbsolutePath());
                 return false;
             }
             if (newFile.getAbsolutePath().equals(file.getAbsolutePath())) {
@@ -506,7 +504,7 @@ public class R66File extends FilesystemBasedFileImpl {
                         } catch (FileNotFoundException e) {
                             logger
                                     .warn("Cannot find file: " + newFile.getName(),
-                                            e);
+                                          e);
                             return false;
                         }
                         FileChannel fileChannelOut = fileOutputStream.getChannel();
@@ -542,7 +540,7 @@ public class R66File extends FilesystemBasedFileImpl {
 
     /**
      * Move the current file to the path as destination
-     * 
+     *
      * @param path
      * @param external
      *            if True, the path is outside authentication control
@@ -570,7 +568,7 @@ public class R66File extends FilesystemBasedFileImpl {
                 }
             }
             if (newFile.exists()) {
-                logger.warn("Target file already exists: "+newFile.getAbsolutePath());
+                logger.warn("Target file already exists: " + newFile.getAbsolutePath());
                 return false;
             }
             if (newFile.getAbsolutePath().equals(file.getAbsolutePath())) {
@@ -587,7 +585,7 @@ public class R66File extends FilesystemBasedFileImpl {
                         } catch (FileNotFoundException e) {
                             logger
                                     .warn("Cannot find file: " + newFile.getName(),
-                                            e);
+                                          e);
                             return false;
                         }
                         FileChannel fileChannelOut = fileOutputStream.getChannel();
@@ -611,7 +609,7 @@ public class R66File extends FilesystemBasedFileImpl {
                     }
                 }
                 currentFile = FilesystemBasedDirImpl.normalizePath(newFile
-                        .getAbsolutePath());
+                                                                           .getAbsolutePath());
                 isExternal = true;
                 isReady = true;
                 return true;
@@ -624,7 +622,7 @@ public class R66File extends FilesystemBasedFileImpl {
 
     /**
      * Replace the current file with the new filename after closing the previous one.
-     * 
+     *
      * @param filename
      * @param isExternal
      * @throws CommandAbstractException
@@ -646,7 +644,7 @@ public class R66File extends FilesystemBasedFileImpl {
     }
 
     /**
-     * 
+     *
      * @return True if this file is outside OpenR66 Base directory
      */
     public boolean isExternal() {
@@ -656,6 +654,6 @@ public class R66File extends FilesystemBasedFileImpl {
     @Override
     public String toString() {
         return "File: " + currentFile + " Ready " + isReady + " isExternal " + isExternal + " " +
-                getPosition();
+               getPosition();
     }
 }

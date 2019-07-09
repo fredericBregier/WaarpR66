@@ -1,12 +1,12 @@
 package org.waarp.openr66.dao.database;
 
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.ResultSet;
-
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 abstract class StatementExecutor {
 
@@ -15,9 +15,9 @@ abstract class StatementExecutor {
 
     public void setParameters(PreparedStatement stm, Object... values)
             throws SQLException {
-            for (int i = 0; i < values.length; i++) {
-                stm.setObject(i+1, values[i]);
-            }
+        for (int i = 0; i < values.length; i++) {
+            stm.setObject(i + 1, values[i]);
+        }
     }
 
     public void executeUpdate(PreparedStatement stm) throws SQLException {

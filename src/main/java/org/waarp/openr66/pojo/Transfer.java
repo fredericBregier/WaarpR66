@@ -24,124 +24,58 @@ import static org.waarp.openr66.dao.database.DBTransferDAO.*;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Transfer {
 
-    public enum TASKSTEP {
-        NOTASK(0), PRETASK(1), TRANSFERTASK(2), POSTTASK(3), ALLDONETASK(4),
-        ERRORTASK(5);
-
-        private int taskNo;
-
-        private static Map<Integer, TASKSTEP> map
-            = new HashMap<Integer, TASKSTEP>();
-
-        static {
-            for (TASKSTEP task : TASKSTEP.values()) {
-                map.put(task.taskNo, task);
-            }
-        }
-
-        TASKSTEP(final int task) {
-            taskNo = task;
-        }
-
-        public static TASKSTEP valueOf(int taskStep) {
-            return map.get(taskStep);
-        }
-
-        public DbTaskRunner.TASKSTEP toLegacy() {
-            return DbTaskRunner.TASKSTEP.valueOf(this.name());
-        }
-    }
-
     @XmlElement(name = ID_FIELD)
     private long id = DbConstant.ILLEGALVALUE;
-
     /**
-     * True if requester is the sender of the file (SEND MODE)
-     * False if requested is the sender of the file (RETRIEVE MODE)
+     * True if requester is the sender of the file (SEND MODE) False if requested is the sender of the file (RETRIEVE
+     * MODE)
      */
     @XmlElement(name = RETRIEVE_MODE_FIELD)
     private boolean retrieveMode = false;
-
     @XmlElement(name = ID_RULE_FIELD)
     private String rule = "";
-
     @XmlElement(name = TRANSFER_MODE_FIELD)
     private int transferMode = 1;
-
     @XmlElement(name = FILENAME_FIELD)
     private String filename = "";
-
     @XmlElement(name = ORIGINAL_NAME_FIELD)
     private String originalName = "";
-
     @XmlElement(name = FILE_INFO_FIELD)
     private String fileInfo = "";
-
     @XmlElement(name = IS_MOVED_FIELD)
     private boolean isFileMoved = false;
-
     @XmlElement(name = BLOCK_SIZE_FIELD)
     private int blockSize;
-
     @XmlElement(name = OWNER_REQUEST_FIELD)
     private String ownerRequest = Configuration.configuration.getHOST_ID();
-
     @XmlElement(name = REQUESTER_FIELD)
     private String requester = "";
-
     @XmlElement(name = REQUESTED_FIELD)
     private String requested = "";
-
     @XmlTransient
     private String transferInfo = "";
-
     @XmlElement(name = GLOBAL_STEP_FIELD)
     private TASKSTEP globalStep = TASKSTEP.NOTASK;
-
     @XmlElement(name = GLOBAL_LAST_STEP_FIELD)
     private TASKSTEP lastGlobalStep = TASKSTEP.NOTASK;
-
     @XmlElement(name = STEP_FIELD)
     private int step = -1;
-
     @XmlElement(name = STEP_STATUS_FIELD)
     private ErrorCode stepStatus = ErrorCode.Unknown;
-
     @XmlElement(name = INFO_STATUS_FIELD)
     private ErrorCode infoStatus = ErrorCode.Unknown;
-
     @XmlElement(name = RANK_FIELD)
     private int rank = 0;
-
     @XmlTransient
     private Timestamp start = new Timestamp(0);
-
     @XmlTransient
     private Timestamp stop = new Timestamp(0);
-
     @XmlTransient
     private UpdatedInfo updatedInfo = UpdatedInfo.UNKNOWN;
 
-    @XmlElement(name = TRANSFER_START_FIELD)
-    public long getXmlStart() {
-        return start.getTime();
-    }
-
-    public void setXmlStart(long xml) {
-        start = new Timestamp(xml);
-    }
-
-    @XmlElement(name = TRANSFER_STOP_FIELD)
-    public long getXmlStop() {
-        return stop.getTime();
-    }
-
-    public void setXmlStop(long xml) {
-        stop = new Timestamp(xml);
-    }
-
     /**
      * Full Constructor to create Transfer from the database
+     *
      * @param id
      * @param rule
      * @param mode
@@ -166,21 +100,22 @@ public class Transfer {
      * @param updatedInfo
      */
     public Transfer(long id, String rule, int mode, String filename,
-            String originalName, String fileInfo, boolean isFileMoved,
-            int blockSize, boolean retrieveMode, String ownerReq, String requester,
-            String requested, String transferInfo,TASKSTEP globalStep,
-            TASKSTEP lastGlobalStep, int step, ErrorCode stepStatus,
-            ErrorCode infoStatus, int rank, Timestamp start, Timestamp stop,
-            UpdatedInfo updatedInfo) {
-        this (id, rule, mode, filename, originalName, fileInfo, isFileMoved,
-                blockSize, retrieveMode, ownerReq, requester, requested, transferInfo,
-                globalStep, lastGlobalStep, step, stepStatus, infoStatus, rank,
-                start, stop);
+                    String originalName, String fileInfo, boolean isFileMoved,
+                    int blockSize, boolean retrieveMode, String ownerReq, String requester,
+                    String requested, String transferInfo, TASKSTEP globalStep,
+                    TASKSTEP lastGlobalStep, int step, ErrorCode stepStatus,
+                    ErrorCode infoStatus, int rank, Timestamp start, Timestamp stop,
+                    UpdatedInfo updatedInfo) {
+        this(id, rule, mode, filename, originalName, fileInfo, isFileMoved,
+             blockSize, retrieveMode, ownerReq, requester, requested, transferInfo,
+             globalStep, lastGlobalStep, step, stepStatus, infoStatus, rank,
+             start, stop);
         this.updatedInfo = updatedInfo;
     }
 
     /**
      * Constructor to create Transfer from remote requests
+     *
      * @param id
      * @param rule
      * @param mode
@@ -204,11 +139,11 @@ public class Transfer {
      * @param stop
      */
     public Transfer(long id, String rule, int mode, String filename,
-            String originalName, String fileInfo, boolean isFileMoved,
-            int blockSize, boolean retrieveMode, String ownerReq, String requester,
-            String requested, String transferInfo,TASKSTEP globalStep,
-            TASKSTEP lastGlobalStep, int step, ErrorCode stepStatus,
-            ErrorCode infoStatus, int rank, Timestamp start, Timestamp stop) {
+                    String originalName, String fileInfo, boolean isFileMoved,
+                    int blockSize, boolean retrieveMode, String ownerReq, String requester,
+                    String requested, String transferInfo, TASKSTEP globalStep,
+                    TASKSTEP lastGlobalStep, int step, ErrorCode stepStatus,
+                    ErrorCode infoStatus, int rank, Timestamp start, Timestamp stop) {
         this.id = id;
         this.rule = rule;
         this.transferMode = mode;
@@ -234,7 +169,6 @@ public class Transfer {
 
     /**
      * Constructor to create transfer locally with delayed start time
-     *
      *
      * @param rule
      * @param retrieveMode
@@ -268,16 +202,35 @@ public class Transfer {
      * @param blockSize
      */
     public Transfer(String remote, String rule, int ruleMode, boolean retrieveMode, String file,
-            String fileInfo, int blockSize) {
+                    String fileInfo, int blockSize) {
         this(remote, rule, ruleMode, retrieveMode, file, fileInfo, blockSize,
-                new Timestamp(new Date().getTime()));
+             new Timestamp(new Date().getTime()));
     }
 
     /**
      * Empty constructor for compatibility issues
      */
     @Deprecated
-    public Transfer() {}
+    public Transfer() {
+    }
+
+    @XmlElement(name = TRANSFER_START_FIELD)
+    public long getXmlStart() {
+        return start.getTime();
+    }
+
+    public void setXmlStart(long xml) {
+        start = new Timestamp(xml);
+    }
+
+    @XmlElement(name = TRANSFER_STOP_FIELD)
+    public long getXmlStop() {
+        return stop.getTime();
+    }
+
+    public void setXmlStop(long xml) {
+        stop = new Timestamp(xml);
+    }
 
     public long getId() {
         return this.id;
@@ -390,6 +343,7 @@ public class Transfer {
     public void setGlobalStep(TASKSTEP globalStep) {
         this.globalStep = globalStep;
     }
+
     public TASKSTEP getLastGlobalStep() {
         return this.lastGlobalStep;
     }
@@ -452,5 +406,33 @@ public class Transfer {
 
     public void setUpdatedInfo(UpdatedInfo info) {
         this.updatedInfo = info;
+    }
+
+    public enum TASKSTEP {
+        NOTASK(0), PRETASK(1), TRANSFERTASK(2), POSTTASK(3), ALLDONETASK(4),
+        ERRORTASK(5);
+
+        private static Map<Integer, TASKSTEP> map
+                = new HashMap<Integer, TASKSTEP>();
+
+        static {
+            for (TASKSTEP task : TASKSTEP.values()) {
+                map.put(task.taskNo, task);
+            }
+        }
+
+        private int taskNo;
+
+        TASKSTEP(final int task) {
+            taskNo = task;
+        }
+
+        public static TASKSTEP valueOf(int taskStep) {
+            return map.get(taskStep);
+        }
+
+        public DbTaskRunner.TASKSTEP toLegacy() {
+            return DbTaskRunner.TASKSTEP.valueOf(this.name());
+        }
     }
 }

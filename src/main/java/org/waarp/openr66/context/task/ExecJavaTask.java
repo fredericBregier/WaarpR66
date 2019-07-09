@@ -1,25 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -28,21 +23,24 @@ import org.waarp.openr66.context.ErrorCode;
 import org.waarp.openr66.context.R66Result;
 import org.waarp.openr66.context.R66Session;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Execute a Java command through Class.forName call
- * 
- * 
+ *
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class ExecJavaTask extends AbstractTask {
-    protected boolean businessRequest = false;
-
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(ExecJavaTask.class);
+    protected boolean businessRequest = false;
 
     /**
      * @param argRule
@@ -51,13 +49,13 @@ public class ExecJavaTask extends AbstractTask {
      * @param session
      */
     public ExecJavaTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                        R66Session session) {
         super(TaskType.EXECJAVA, delay, argRule, argTransfer, session);
     }
 
     /**
      * Set the type
-     * 
+     *
      * @param businessRequest
      */
     public void setBusinessRequest(boolean businessRequest) {
@@ -82,10 +80,10 @@ public class ExecJavaTask extends AbstractTask {
         boolean isSpooled = className.equals(SpooledInformTask.class.getName());
         if (isSpooled) {
             logger.debug("Exec with " + className + ":" + argTransfer + " and {}",
-                    session);
+                         session);
         } else {
             logger.debug("Exec with " + argRule + ":" + argTransfer + " and {}",
-                    session);
+                         session);
         }
         R66Runnable runnable = null;
         try {
@@ -93,7 +91,7 @@ public class ExecJavaTask extends AbstractTask {
         } catch (Exception e) {
             logger.error("ExecJava command is not available: " + className, e);
             R66Result result = new R66Result(session, false,
-                    ErrorCode.CommandNotFound, session.getRunner());
+                                             ErrorCode.CommandNotFound, session.getRunner());
             futureCompletion.setResult(result);
             futureCompletion.cancel();
             return;
@@ -101,11 +99,13 @@ public class ExecJavaTask extends AbstractTask {
         if (businessRequest) {
             boolean istovalidate = Boolean.parseBoolean(args[args.length - 1]);
             runnable.setArgs(this.session, this.waitForValidation, this.useLocalExec,
-                    this.delay, className, finalname.substring(finalname.indexOf(' ') + 1, finalname.lastIndexOf(' ')),
-                    businessRequest, istovalidate);
+                             this.delay, className,
+                             finalname.substring(finalname.indexOf(' ') + 1, finalname.lastIndexOf(' ')),
+                             businessRequest, istovalidate);
         } else {
             runnable.setArgs(this.session, this.waitForValidation, this.useLocalExec,
-                    this.delay, className, finalname.substring(className.length() + 1), businessRequest, false);
+                             this.delay, className, finalname.substring(className.length() + 1), businessRequest,
+                             false);
         }
         logger.debug(className + " " + runnable.getClass().getName());
         if (!waitForValidation) {
@@ -133,18 +133,20 @@ public class ExecJavaTask extends AbstractTask {
                             status = runnable.getFinalStatus();
                         }
                     } else {
-                        while (!executorService.awaitTermination(30, TimeUnit.SECONDS))
+                        while (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
                             ;
+                        }
                         status = runnable.getFinalStatus();
                     }
                 } else {
-                    while (!executorService.awaitTermination(30, TimeUnit.SECONDS))
+                    while (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
                         ;
+                    }
                     status = runnable.getFinalStatus();
                 }
             } catch (InterruptedException e) {
                 logger.error("Status: " + e.getMessage() + " \t Exec in error with " +
-                        runnable);
+                             runnable);
                 if (waitForValidation) {
                     futureCompletion.cancel();
                 }
@@ -173,7 +175,7 @@ public class ExecJavaTask extends AbstractTask {
             }
         } else {
             logger.error("Status: " + status + " Exec in error with " +
-                    runnable);
+                         runnable);
             if (waitForValidation) {
                 futureCompletion.cancel();
             }

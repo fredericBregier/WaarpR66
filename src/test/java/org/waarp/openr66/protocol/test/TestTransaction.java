@@ -1,25 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.test;
-
-import java.net.SocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -35,11 +30,15 @@ import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.net.SocketAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Test class for internal ping pong test
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestTransaction implements Runnable {
     /**
@@ -56,7 +55,7 @@ public class TestTransaction implements Runnable {
     final private TestPacket testPacket;
 
     public TestTransaction(NetworkTransaction networkTransaction,
-            R66Future future, SocketAddress socketAddress, TestPacket packet) {
+                           R66Future future, SocketAddress socketAddress, TestPacket packet) {
         if (logger == null) {
             logger = WaarpLoggerFactory.getLogger(TestTransaction.class);
         }
@@ -64,26 +63,6 @@ public class TestTransaction implements Runnable {
         this.future = future;
         this.socketAddress = socketAddress;
         testPacket = packet;
-    }
-
-    public void run() {
-        LocalChannelReference localChannelReference = networkTransaction
-                .createConnectionWithRetry(socketAddress, false, future);
-        if (localChannelReference == null) {
-            logger.error("Cannot connect: ", future.getCause());
-            future.setResult(null);
-            future.setFailure(future.getCause());
-            return;
-        }
-        localChannelReference.sessionNewState(R66FiniteDualStates.TEST);
-        try {
-            ChannelUtils.writeAbstractLocalPacket(localChannelReference, testPacket, false);
-        } catch (OpenR66ProtocolPacketException e) {
-            future.setResult(null);
-            future.setFailure(e);
-            localChannelReference.getLocalChannel().close();
-            return;
-        }
     }
 
     public static void main(String[] args) {
@@ -143,9 +122,29 @@ public class TestTransaction implements Runnable {
         }
         long time2 = System.currentTimeMillis();
         logger.warn("Success: " + success + " Error: " + error + " NB/s: " +
-                success * TestPacket.pingpong * 1000 / (time2 - time1));
+                    success * TestPacket.pingpong * 1000 / (time2 - time1));
         executorService.shutdown();
         networkTransaction.closeAll();
+    }
+
+    public void run() {
+        LocalChannelReference localChannelReference = networkTransaction
+                .createConnectionWithRetry(socketAddress, false, future);
+        if (localChannelReference == null) {
+            logger.error("Cannot connect: ", future.getCause());
+            future.setResult(null);
+            future.setFailure(future.getCause());
+            return;
+        }
+        localChannelReference.sessionNewState(R66FiniteDualStates.TEST);
+        try {
+            ChannelUtils.writeAbstractLocalPacket(localChannelReference, testPacket, false);
+        } catch (OpenR66ProtocolPacketException e) {
+            future.setResult(null);
+            future.setFailure(e);
+            localChannelReference.getLocalChannel().close();
+            return;
+        }
     }
 
 }

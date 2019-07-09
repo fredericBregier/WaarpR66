@@ -18,5 +18,7 @@
  * Waarp . If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** A series of utility classes for the RESTv2 handlers. */
+/**
+ * A series of utility classes for the RESTv2 handlers.
+ */
 package org.waarp.openr66.protocol.http.restv2.utils;

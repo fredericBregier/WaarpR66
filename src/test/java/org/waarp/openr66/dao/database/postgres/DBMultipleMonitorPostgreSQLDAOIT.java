@@ -1,21 +1,20 @@
 package org.waarp.openr66.dao.database.postgres;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import org.junit.ClassRule;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.waarp.openr66.dao.database.DBMultipleMonitorDAOIT;
 
-public class DBMultipleMonitorPostgreSQLDAOIT extends DBMultipleMonitorDAOIT {
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-    private String createScript = "postgresql/create.sql";
-    private String populateScript = "postgresql/populate.sql";
-    private String cleanScript = "postgresql/clean.sql";
+public class DBMultipleMonitorPostgreSQLDAOIT extends DBMultipleMonitorDAOIT {
 
     @ClassRule
     public static PostgreSQLContainer db = new PostgreSQLContainer();
+    private String createScript = "postgresql/create.sql";
+    private String populateScript = "postgresql/populate.sql";
+    private String cleanScript = "postgresql/clean.sql";
 
     @Override
     public Connection getConnection() throws SQLException {

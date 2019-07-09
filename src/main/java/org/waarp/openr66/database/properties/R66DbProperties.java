@@ -1,10 +1,13 @@
 package org.waarp.openr66.database.properties;
 
-import org.waarp.common.database.properties.*;
+import org.waarp.common.database.properties.DbProperties;
+import org.waarp.common.database.properties.H2Properties;
+import org.waarp.common.database.properties.MariaDBProperties;
+import org.waarp.common.database.properties.MySQLProperties;
+import org.waarp.common.database.properties.OracleProperties;
+import org.waarp.common.database.properties.PostgreSQLProperties;
 
 public abstract class R66DbProperties {
-
-    public abstract String getCreateQuery();
 
     public static R66DbProperties getInstance(DbProperties prop) {
         if (prop instanceof H2Properties) {
@@ -21,4 +24,6 @@ public abstract class R66DbProperties {
             return null;
         }
     }
+
+    public abstract String getCreateQuery();
 }

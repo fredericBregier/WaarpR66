@@ -1,22 +1,22 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.localhandler.packet;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.waarp.common.json.JsonHandler;
@@ -28,84 +28,119 @@ import org.waarp.openr66.protocol.configuration.PartnerConfiguration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolPacketException;
 import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Request class
- * 
+ *
  * header = "rulename MODETRANS" middle = way+"FILENAME BLOCKSIZE RANK specialId code (optional length)" end =
  * "fileInformation"
- * 
+ *
  * or
- * 
+ *
  * header = "{rule:rulename, mode:MODETRANS}" middle = way{filename:FILENAME, block:BLOCKSIZE, rank:RANK, id:specialId, code:code,
  * length:length}" end =
  * "fileInformation"
- * 
+ *
  * @author frederic bregier
  */
 public class RequestPacket extends AbstractLocalPacket {
+    protected static final byte REQVALIDATE = 0;
+    protected static final byte REQANSWERVALIDATE = 1;
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(RequestPacket.class);
-
-    public static enum TRANSFERMODE {
-        UNKNOWNMODE, SENDMODE, RECVMODE, SENDMD5MODE, RECVMD5MODE,
-        SENDTHROUGHMODE, RECVTHROUGHMODE, SENDMD5THROUGHMODE, RECVMD5THROUGHMODE;
-    }
-
-    protected static enum FIELDS {
-        rule, mode, filename, block, rank, id, code, length, limit
-    }
-
-    protected static final byte REQVALIDATE = 0;
-
-    protected static final byte REQANSWERVALIDATE = 1;
-
     protected final String rulename;
-
     protected final int mode;
-
-    protected String filename;
-
     protected final int blocksize;
-
-    protected int rank;
-
-    protected long specialId;
-
-    protected byte way;
-
-    protected char code;
-
-    protected long originalSize;
-
-    protected long limit = 0;
-
     protected final String fileInformation;
-
+    protected String filename;
+    protected int rank;
+    protected long specialId;
+    protected byte way;
+    protected char code;
+    protected long originalSize;
+    protected long limit = 0;
     protected String separator = PartnerConfiguration.getSEPARATOR_FIELD();
 
     /**
-     * 
+     * @param rulename
+     * @param mode
+     * @param filename
+     * @param blocksize
+     * @param rank
+     * @param specialId
+     * @param valid
+     * @param fileInformation
+     * @param code
+     * @param originalSize
+     */
+    private RequestPacket(String rulename, int mode, String filename,
+                          int blocksize, int rank, long specialId, byte valid,
+                          String fileInformation, char code, long originalSize, String separator) {
+        this.rulename = rulename;
+        this.mode = mode;
+        this.filename = filename;
+        if (blocksize < 100) {
+            this.blocksize = Configuration.configuration.getBLOCKSIZE();
+        } else {
+            this.blocksize = blocksize;
+        }
+        this.rank = rank;
+        this.specialId = specialId;
+        way = valid;
+        this.fileInformation = fileInformation;
+        this.code = code;
+        this.originalSize = originalSize;
+        this.separator = separator;
+    }
+
+    /**
+     * @param rulename
+     * @param mode
+     * @param filename
+     * @param blocksize
+     * @param rank
+     * @param specialId
+     * @param fileInformation
+     */
+    public RequestPacket(String rulename, int mode, String filename,
+                         int blocksize, int rank, long specialId, String fileInformation, long originalSize,
+                         String separator) {
+        this(rulename, mode, filename, blocksize, rank, specialId,
+             REQVALIDATE, fileInformation, ErrorCode.InitOk.code, originalSize, separator);
+    }
+
+    /**
+     * Create a Request packet with a speed negociation
+     */
+    private RequestPacket(String rulename, int mode, String filename,
+                          int blocksize, int rank, long specialId, byte valid,
+                          String fileInformation, char code, long originalSize, long limit,
+                          String separator) {
+        this(rulename, mode, filename, blocksize, rank, specialId,
+             valid, fileInformation, code, originalSize, separator);
+        this.limit = limit;
+    }
+
+    /**
+     *
      * @param mode
      * @return the same mode (RECV or SEND) in MD5 version
      */
     public final static int getModeMD5(int mode) {
         switch (mode) {
-            case 1:
-            case 2:
-            case 5:
-            case 6:
-                return mode + 2;
+        case 1:
+        case 2:
+        case 5:
+        case 6:
+            return mode + 2;
         }
         return mode;
     }
 
     /**
-     * 
+     *
      * @param mode
      * @return true if this mode is a RECV(MD5) mode
      */
@@ -113,11 +148,11 @@ public class RequestPacket extends AbstractLocalPacket {
         return (mode == TRANSFERMODE.RECVMODE.ordinal() ||
                 mode == TRANSFERMODE.RECVMD5MODE.ordinal() ||
                 mode == TRANSFERMODE.RECVTHROUGHMODE.ordinal() || mode == TRANSFERMODE.RECVMD5THROUGHMODE
-                    .ordinal());
+                .ordinal());
     }
 
     /**
-     * 
+     *
      * @param mode
      * @param isRequested
      * @return True if this mode is a THROUGH (MD5) mode
@@ -127,7 +162,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @param mode
      * @return True if this mode is a SEND THROUGH (MD5) mode
      */
@@ -137,7 +172,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @param mode
      * @param isRequested
      * @return True if this mode is a THROUGH (MD5) mode
@@ -147,7 +182,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @param mode
      * @return True if this mode is a RECV THROUGH (MD5) mode
      */
@@ -161,17 +196,17 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @param mode
      * @return True if this mode is a THROUGH mode (with or without MD5)
      */
     public final static boolean isThroughMode(int mode) {
         return mode >= TRANSFERMODE.SENDTHROUGHMODE.ordinal() &&
-                mode <= TRANSFERMODE.RECVMD5THROUGHMODE.ordinal();
+               mode <= TRANSFERMODE.RECVMD5THROUGHMODE.ordinal();
     }
 
     /**
-     * 
+     *
      * @param mode
      * @return true if this mode is a MD5 mode
      */
@@ -179,18 +214,18 @@ public class RequestPacket extends AbstractLocalPacket {
         return (mode == TRANSFERMODE.RECVMD5MODE.ordinal() ||
                 mode == TRANSFERMODE.SENDMD5MODE.ordinal() ||
                 mode == TRANSFERMODE.SENDMD5THROUGHMODE.ordinal() || mode == TRANSFERMODE.RECVMD5THROUGHMODE
-                    .ordinal());
+                .ordinal());
     }
 
     /**
-     * 
+     *
      * @param mode1
      * @param mode2
      * @return true if both modes are compatible (both send, or both recv)
      */
     public final static boolean isCompatibleMode(int mode1, int mode2) {
         return ((RequestPacket.isRecvMode(mode1) && RequestPacket.isRecvMode(mode2))
-        || ((!RequestPacket.isRecvMode(mode1)) && (!RequestPacket.isRecvMode(mode2))));
+                || ((!RequestPacket.isRecvMode(mode1)) && (!RequestPacket.isRecvMode(mode2))));
     }
 
     /**
@@ -202,7 +237,7 @@ public class RequestPacket extends AbstractLocalPacket {
      * @throws OpenR66ProtocolPacketException
      */
     public static RequestPacket createFromBuffer(int headerLength,
-            int middleLength, int endLength, ByteBuf buf)
+                                                 int middleLength, int endLength, ByteBuf buf)
             throws OpenR66ProtocolPacketException {
         if (headerLength - 1 <= 0) {
             throw new OpenR66ProtocolPacketException("Not enough data");
@@ -234,17 +269,17 @@ public class RequestPacket extends AbstractLocalPacket {
             ObjectNode map = JsonHandler.getFromString(sheader);
             ObjectNode map2 = JsonHandler.getFromString(smiddle);
             return new RequestPacket(map.path(FIELDS.rule.name()).asText(),
-                    map.path(FIELDS.mode.name()).asInt(),
-                    map2.path(FIELDS.filename.name()).asText(),
-                    map2.path(FIELDS.block.name()).asInt(),
-                    map2.path(FIELDS.rank.name()).asInt(), 
-                    map2.path(FIELDS.id.name()).asLong(),
-                    valid, send,
-                    (char) map2.path(FIELDS.code.name()).asInt(),
-                    map2.path(FIELDS.length.name()).asLong(),
-                    // Get speed if it exists if not speed is set to 0
-                    map2.path(FIELDS.limit.name()).asLong(0),
-                    PartnerConfiguration.BAR_JSON_FIELD);
+                                     map.path(FIELDS.mode.name()).asInt(),
+                                     map2.path(FIELDS.filename.name()).asText(),
+                                     map2.path(FIELDS.block.name()).asInt(),
+                                     map2.path(FIELDS.rank.name()).asInt(),
+                                     map2.path(FIELDS.id.name()).asLong(),
+                                     valid, send,
+                                     (char) map2.path(FIELDS.code.name()).asInt(),
+                                     map2.path(FIELDS.length.name()).asLong(),
+                                     // Get speed if it exists if not speed is set to 0
+                                     map2.path(FIELDS.limit.name()).asLong(0),
+                                     PartnerConfiguration.BAR_JSON_FIELD);
         }
 
         String[] aheader = sheader.split(PartnerConfiguration.BLANK_SEPARATOR_FIELD);
@@ -273,66 +308,7 @@ public class RequestPacket extends AbstractLocalPacket {
             originalSize = Long.parseLong(amiddle[5]);
         }
         return new RequestPacket(aheader[0], Integer.parseInt(aheader[1]),
-                amiddle[0], blocksize, rank, specialId, valid, send, code, originalSize, sep);
-    }
-
-    /**
-     * @param rulename
-     * @param mode
-     * @param filename
-     * @param blocksize
-     * @param rank
-     * @param specialId
-     * @param valid
-     * @param fileInformation
-     * @param code
-     * @param originalSize
-     */
-    private RequestPacket(String rulename, int mode, String filename,
-            int blocksize, int rank, long specialId, byte valid,
-            String fileInformation, char code, long originalSize, String separator) {
-        this.rulename = rulename;
-        this.mode = mode;
-        this.filename = filename;
-        if (blocksize < 100) {
-            this.blocksize = Configuration.configuration.getBLOCKSIZE();
-        } else {
-            this.blocksize = blocksize;
-        }
-        this.rank = rank;
-        this.specialId = specialId;
-        way = valid;
-        this.fileInformation = fileInformation;
-        this.code = code;
-        this.originalSize = originalSize;
-        this.separator = separator;
-    }
-
-    /**
-     * @param rulename
-     * @param mode
-     * @param filename
-     * @param blocksize
-     * @param rank
-     * @param specialId
-     * @param fileInformation
-     */
-    public RequestPacket(String rulename, int mode, String filename,
-            int blocksize, int rank, long specialId, String fileInformation, long originalSize, String separator) {
-        this(rulename, mode, filename, blocksize, rank, specialId,
-                REQVALIDATE, fileInformation, ErrorCode.InitOk.code, originalSize, separator);
-    }
-
-    /**
-     * Create a Request packet with a speed negociation
-     */
-    private RequestPacket(String rulename, int mode, String filename,
-            int blocksize, int rank, long specialId, byte valid,
-            String fileInformation, char code, long originalSize, long limit,
-            String separator) {
-        this(rulename, mode, filename, blocksize, rank, specialId,
-                valid, fileInformation, code, originalSize, separator);
-        this.limit = limit;
+                                 amiddle[0], blocksize, rank, specialId, valid, send, code, originalSize, sep);
     }
 
     @Override
@@ -355,8 +331,8 @@ public class RequestPacket extends AbstractLocalPacket {
             header = Unpooled.wrappedBuffer(JsonHandler.writeAsString(node).getBytes());
         } else {
             header = Unpooled.wrappedBuffer(rulename.getBytes(),
-                    PartnerConfiguration.BLANK_SEPARATOR_FIELD.getBytes(),
-                    Integer.toString(mode).getBytes());
+                                            PartnerConfiguration.BLANK_SEPARATOR_FIELD.getBytes(),
+                                            Integer.toString(mode).getBytes());
         }
     }
 
@@ -381,13 +357,13 @@ public class RequestPacket extends AbstractLocalPacket {
             middle = Unpooled.wrappedBuffer(away, JsonHandler.writeAsString(node).getBytes());
         } else {
             middle = Unpooled.wrappedBuffer(away, filename.getBytes(),
-                    this.separator.getBytes(),
-                    Integer.toString(blocksize).getBytes(),
-                    this.separator.getBytes(),
-                    Integer.toString(rank).getBytes(), this.separator.getBytes(),
-                    Long.toString(specialId).getBytes(), this.separator.getBytes(),
-                    Character.toString(code).getBytes(), this.separator.getBytes(),
-                    Long.toString(originalSize).getBytes());
+                                            this.separator.getBytes(),
+                                            Integer.toString(blocksize).getBytes(),
+                                            this.separator.getBytes(),
+                                            Integer.toString(rank).getBytes(), this.separator.getBytes(),
+                                            Long.toString(specialId).getBytes(), this.separator.getBytes(),
+                                            Character.toString(code).getBytes(), this.separator.getBytes(),
+                                            Long.toString(originalSize).getBytes());
         }
     }
 
@@ -399,9 +375,9 @@ public class RequestPacket extends AbstractLocalPacket {
     @Override
     public String toString() {
         return "RequestPacket: " + rulename + " : " + mode + " : " + filename +
-                " : " + fileInformation + " : " + blocksize + " : " + rank +
-                " : " + way + " : " + code + " : " + originalSize +
-                " : " + limit;
+               " : " + fileInformation + " : " + blocksize + " : " + rank +
+               " : " + way + " : " + code + " : " + originalSize +
+               " : " + limit;
     }
 
     /**
@@ -419,6 +395,14 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
+     * @param filename
+     *            the filename to set
+     */
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    /**
      * @return the mode
      */
     public int getMode() {
@@ -426,7 +410,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @return True if this packet concerns a Retrieve operation
      */
     public boolean isRetrieve() {
@@ -478,18 +462,18 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
+     * @return the specialId
+     */
+    public long getSpecialId() {
+        return specialId;
+    }
+
+    /**
      * @param specialId
      *            the specialId to set
      */
     public void setSpecialId(long specialId) {
         this.specialId = specialId;
-    }
-
-    /**
-     * @return the specialId
-     */
-    public long getSpecialId() {
-        return specialId;
     }
 
     /**
@@ -505,14 +489,6 @@ public class RequestPacket extends AbstractLocalPacket {
     public void validate() {
         way = REQANSWERVALIDATE;
         middle = null;
-    }
-
-    /**
-     * @param filename
-     *            the filename to set
-     */
-    public void setFilename(String filename) {
-        this.filename = filename;
     }
 
     /**
@@ -536,5 +512,14 @@ public class RequestPacket extends AbstractLocalPacket {
 
     public void setLimit(long limit) {
         this.limit = limit;
+    }
+
+    public static enum TRANSFERMODE {
+        UNKNOWNMODE, SENDMODE, RECVMODE, SENDMD5MODE, RECVMD5MODE,
+        SENDTHROUGHMODE, RECVTHROUGHMODE, SENDMD5THROUGHMODE, RECVMD5THROUGHMODE;
+    }
+
+    protected static enum FIELDS {
+        rule, mode, filename, block, rank, id, code, length, limit
     }
 }

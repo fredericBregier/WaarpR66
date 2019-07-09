@@ -1,28 +1,24 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.localhandler;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalChannel;
-
 import org.waarp.common.file.DataBlock;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -41,11 +37,13 @@ import org.waarp.openr66.protocol.localhandler.packet.ErrorPacket;
 import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Retrieve transfer runner
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class RetrieveRunner extends Thread {
     /**
@@ -58,10 +56,8 @@ public class RetrieveRunner extends Thread {
     private final LocalChannelReference localChannelReference;
 
     private final LocalChannel channel;
-
-    private boolean done = false;
-
     protected AtomicBoolean running = new AtomicBoolean(true);
+    private boolean done = false;
 
     protected RetrieveRunner() {
         // empty constructor
@@ -71,7 +67,7 @@ public class RetrieveRunner extends Thread {
     }
 
     /**
-     * 
+     *
      * @param session
      * @param channel
      *            local channel
@@ -80,6 +76,55 @@ public class RetrieveRunner extends Thread {
         this.session = session;
         localChannelReference = this.session.getLocalChannelReference();
         this.channel = channel;
+    }
+
+    /**
+     * Write the next block when the channel is ready to prevent OOM
+     *
+     * @param block
+     * @param localChannelReference
+     * @return the ChannelFuture on the write operation
+     * @throws OpenR66ProtocolPacketException
+     * @throws OpenR66RunnerErrorException
+     * @throws OpenR66ProtocolSystemException
+     */
+    public static ChannelFuture writeWhenPossible(
+            DataBlock block, LocalChannelReference localChannelReference)
+            throws OpenR66ProtocolPacketException, OpenR66RunnerErrorException,
+                   OpenR66ProtocolSystemException {
+        return ChannelUtils.writeBackDataBlock(localChannelReference, block);
+        // XXX Keep this in case the bug comes back
+        /*
+         * // Test if channel is writable in order to prevent OOM if (!
+         * localChannelReference.getNetworkChannel().isWritable()) { return
+         * ChannelUtils.writeBackDataBlock(localChannelReference, block); } else if
+         * (Configuration.configuration.anyBandwidthLimitation) { // Patch to limit the impact when
+         * no real reason to wait for writing // double computation of traffic but ok long wait =
+         * ChannelUtils.willBeWaitingWriting(localChannelReference, block.getByteCount()); if (wait
+         * == 0) { ChannelUtils.writeBackDataBlock(localChannelReference, block); return
+         * Channels.succeededFuture(localChannelReference.getNetworkChannel()); } return
+         * ChannelUtils.writeBackDataBlock(localChannelReference, block); } else {
+         * ChannelUtils.writeBackDataBlock(localChannelReference, block); return
+         * Channels.succeededFuture(localChannelReference.getNetworkChannel()); }
+         */
+    }
+
+    /**
+     * Utility method for send through mode
+     *
+     * @param data
+     *            the data byte, if null it is the last block
+     * @return the DataBlock associated to the data
+     */
+    public static DataBlock transformToDataBlock(byte[] data) {
+        DataBlock block = new DataBlock();
+        if (data == null) {
+            // last block
+            block.setEOF(true);
+        } else {
+            block.setBlock(Unpooled.wrappedBuffer(data));
+        }
+        return block;
     }
 
     /**
@@ -125,16 +170,16 @@ public class RetrieveRunner extends Thread {
                 }
             }
             logger.debug("Await future End Transfer done: " +
-                    localChannelReference.getFutureEndTransfer().isSuccess());
+                         localChannelReference.getFutureEndTransfer().isSuccess());
             if (localChannelReference.getFutureEndTransfer().isDone() &&
-                    localChannelReference.getFutureEndTransfer().isSuccess()) {
+                localChannelReference.getFutureEndTransfer().isSuccess()) {
                 // send a validation
                 requestValidDone = true;
                 localChannelReference.sessionNewState(R66FiniteDualStates.ENDREQUESTS);
                 EndRequestPacket validPacket = new EndRequestPacket(ErrorCode.CompleteOk.ordinal());
                 if (session.getExtendedProtocol() &&
-                        session.getBusinessObject() != null &&
-                        session.getBusinessObject().getInfo(session) != null) {
+                    session.getBusinessObject() != null &&
+                    session.getBusinessObject().getInfo(session) != null) {
                     validPacket.setOptional(session.getBusinessObject().getInfo(session));
                 }
                 try {
@@ -151,7 +196,7 @@ public class RetrieveRunner extends Thread {
                         // ignore
                     }
                     localChannelReference.validateRequest(localChannelReference
-                            .getFutureEndTransfer().getResult());
+                                                                  .getFutureEndTransfer().getResult());
                 }
                 if (session.getRunner() != null && session.getRunner().isSelfRequested()) {
                     ChannelUtils.close(localChannelReference.getLocalChannel());
@@ -165,11 +210,11 @@ public class RetrieveRunner extends Thread {
                         ErrorPacket error = new ErrorPacket(
                                 localChannelReference.getErrorMessage(),
                                 localChannelReference.getFutureEndTransfer().getResult().getCode()
-                                        .getCode(),
+                                                     .getCode(),
                                 ErrorPacket.FORWARDCLOSECODE);
                         try {
                             ChannelUtils.writeAbstractLocalPacket(localChannelReference, error,
-                                    true);
+                                                                  true);
                         } catch (OpenR66ProtocolPacketException e) {
                         }
                     }
@@ -179,7 +224,7 @@ public class RetrieveRunner extends Thread {
                     if (result == null) {
                         result =
                                 new R66Result(session, false, ErrorCode.TransferError,
-                                        session.getRunner());
+                                              session.getRunner());
                     }
                     localChannelReference.invalidateRequest(result);
                 }
@@ -189,19 +234,19 @@ public class RetrieveRunner extends Thread {
         } finally {
             if (!done) {
                 if (localChannelReference.getFutureEndTransfer().isDone() &&
-                        localChannelReference.getFutureEndTransfer().isSuccess()) {
+                    localChannelReference.getFutureEndTransfer().isSuccess()) {
                     if (!requestValidDone) {
                         localChannelReference.sessionNewState(R66FiniteDualStates.ENDREQUESTS);
                         EndRequestPacket validPacket = new EndRequestPacket(
                                 ErrorCode.CompleteOk.ordinal());
                         if (session.getExtendedProtocol() &&
-                                session.getBusinessObject() != null &&
-                                session.getBusinessObject().getInfo(session) != null) {
+                            session.getBusinessObject() != null &&
+                            session.getBusinessObject().getInfo(session) != null) {
                             validPacket.setOptional(session.getBusinessObject().getInfo(session));
                         }
                         try {
                             ChannelUtils.writeAbstractLocalPacket(localChannelReference,
-                                    validPacket, true);
+                                                                  validPacket, true);
                         } catch (OpenR66ProtocolPacketException e) {
                         }
                     }
@@ -212,7 +257,7 @@ public class RetrieveRunner extends Thread {
                         // ignore
                     }
                     localChannelReference.validateRequest(localChannelReference
-                            .getFutureEndTransfer().getResult());
+                                                                  .getFutureEndTransfer().getResult());
                     if (session.getRunner() != null && session.getRunner().isSelfRequested()) {
                         ChannelUtils.close(localChannelReference.getLocalChannel());
                     }
@@ -223,11 +268,11 @@ public class RetrieveRunner extends Thread {
                             ErrorPacket error = new ErrorPacket(
                                     localChannelReference.getErrorMessage(),
                                     localChannelReference.getFutureEndTransfer().getResult().getCode()
-                                            .getCode(),
+                                                         .getCode(),
                                     ErrorPacket.FORWARDCLOSECODE);
                             try {
                                 ChannelUtils.writeAbstractLocalPacket(localChannelReference, error,
-                                        true);
+                                                                      true);
                             } catch (OpenR66ProtocolPacketException e) {
                             }
                         }
@@ -236,7 +281,7 @@ public class RetrieveRunner extends Thread {
                         if (result == null) {
                             result =
                                     new R66Result(session, false, ErrorCode.TransferError,
-                                            session.getRunner());
+                                                  session.getRunner());
                         }
                         localChannelReference.invalidateRequest(result);
                     }
@@ -248,11 +293,11 @@ public class RetrieveRunner extends Thread {
 
     private void transferInError(OpenR66Exception e) {
         R66Result result = new R66Result(e, session, true,
-                ErrorCode.TransferError, session.getRunner());
+                                         ErrorCode.TransferError, session.getRunner());
         logger.error("Transfer in error", e);
         session.newState(R66FiniteDualStates.ERROR);
         ErrorPacket error = new ErrorPacket("Transfer in error",
-                ErrorCode.TransferError.getCode(), ErrorPacket.FORWARDCLOSECODE);
+                                            ErrorCode.TransferError.getCode(), ErrorPacket.FORWARDCLOSECODE);
         try {
             ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
         } catch (OpenR66ProtocolPacketException e1) {
@@ -260,54 +305,5 @@ public class RetrieveRunner extends Thread {
         localChannelReference.invalidateRequest(result);
         ChannelUtils.close(channel);
         done = true;
-    }
-
-    /**
-     * Write the next block when the channel is ready to prevent OOM
-     * 
-     * @param block
-     * @param localChannelReference
-     * @return the ChannelFuture on the write operation
-     * @throws OpenR66ProtocolPacketException
-     * @throws OpenR66RunnerErrorException
-     * @throws OpenR66ProtocolSystemException
-     */
-    public static ChannelFuture writeWhenPossible(
-            DataBlock block, LocalChannelReference localChannelReference)
-            throws OpenR66ProtocolPacketException, OpenR66RunnerErrorException,
-            OpenR66ProtocolSystemException {
-        return ChannelUtils.writeBackDataBlock(localChannelReference, block);
-        // XXX Keep this in case the bug comes back
-        /*
-         * // Test if channel is writable in order to prevent OOM if (!
-         * localChannelReference.getNetworkChannel().isWritable()) { return
-         * ChannelUtils.writeBackDataBlock(localChannelReference, block); } else if
-         * (Configuration.configuration.anyBandwidthLimitation) { // Patch to limit the impact when
-         * no real reason to wait for writing // double computation of traffic but ok long wait =
-         * ChannelUtils.willBeWaitingWriting(localChannelReference, block.getByteCount()); if (wait
-         * == 0) { ChannelUtils.writeBackDataBlock(localChannelReference, block); return
-         * Channels.succeededFuture(localChannelReference.getNetworkChannel()); } return
-         * ChannelUtils.writeBackDataBlock(localChannelReference, block); } else {
-         * ChannelUtils.writeBackDataBlock(localChannelReference, block); return
-         * Channels.succeededFuture(localChannelReference.getNetworkChannel()); }
-         */
-    }
-
-    /**
-     * Utility method for send through mode
-     * 
-     * @param data
-     *            the data byte, if null it is the last block
-     * @return the DataBlock associated to the data
-     */
-    public static DataBlock transformToDataBlock(byte[] data) {
-        DataBlock block = new DataBlock();
-        if (data == null) {
-            // last block
-            block.setEOF(true);
-        } else {
-            block.setBlock(Unpooled.wrappedBuffer(data));
-        }
-        return block;
     }
 }

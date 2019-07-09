@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -32,9 +31,9 @@ import org.waarp.openr66.protocol.utils.ChannelUtils;
 
 /**
  * Dummy Runnable Task that only logs
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public abstract class AbstractExecJavaTask implements R66Runnable {
     /**
@@ -58,7 +57,7 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
 
     /**
      * Server side method to validate the request
-     * 
+     *
      * @param packet
      */
     public void validate(BusinessRequestPacket packet) {
@@ -68,11 +67,11 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
             LocalChannelReference localChannelReference = session.getLocalChannelReference();
             if (localChannelReference != null) {
                 R66Result result = new R66Result(session, true,
-                        ErrorCode.CompleteOk, null);
+                                                 ErrorCode.CompleteOk, null);
                 localChannelReference.validateRequest(result);
                 try {
                     ChannelUtils.writeAbstractLocalPacket(localChannelReference,
-                            packet, true);
+                                                          packet, true);
                 } catch (OpenR66ProtocolPacketException e) {
                 }
             } else {
@@ -83,7 +82,7 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
 
     /**
      * To be called by the requester when finished
-     * 
+     *
      * @param object
      *            special object to get back
      */
@@ -93,7 +92,7 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
             LocalChannelReference localChannelReference = session.getLocalChannelReference();
             if (localChannelReference != null) {
                 R66Result result = new R66Result(session, true,
-                        ErrorCode.CompleteOk, null);
+                                                 ErrorCode.CompleteOk, null);
                 result.setOther(object);
                 localChannelReference.validateRequest(result);
                 ChannelUtils.close(localChannelReference.getLocalChannel());
@@ -112,12 +111,12 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
             return;
         }
         R66Result result = new R66Result(null, session, true,
-                ErrorCode.Unimplemented, session.getRunner());
+                                         ErrorCode.Unimplemented, session.getRunner());
         LocalChannelReference localChannelReference = session.getLocalChannelReference();
         if (localChannelReference != null) {
             localChannelReference.sessionNewState(R66FiniteDualStates.ERROR);
             ErrorPacket error = new ErrorPacket("Command Incompatible",
-                    ErrorCode.ExternalOp.getCode(), ErrorPacket.FORWARDCLOSECODE);
+                                                ErrorCode.ExternalOp.getCode(), ErrorPacket.FORWARDCLOSECODE);
             try {
                 ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
             } catch (OpenR66ProtocolPacketException e1) {
@@ -137,14 +136,15 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
             }
         }
         StringBuilder builder = new StringBuilder(this.getClass().getSimpleName()).append(":")
-                .append("args(").append(fullarg).append(")");
+                                                                                  .append("args(").append(fullarg)
+                                                                                  .append(")");
         logger.warn(builder.toString());
         this.status = 0;
     }
 
     public void setArgs(R66Session session, boolean waitForValidation,
-            boolean useLocalExec, int delay, String classname, String arg, boolean callFromBusiness,
-            boolean isToValidate) {
+                        boolean useLocalExec, int delay, String classname, String arg, boolean callFromBusiness,
+                        boolean isToValidate) {
         this.session = session;
         this.waitForValidation = waitForValidation;
         this.useLocalExec = useLocalExec;
@@ -163,7 +163,7 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
     public String toString() {
         if (status == -1 || finalInformation == null) {
             StringBuilder builder = new StringBuilder(this.getClass().getSimpleName()).append(": [")
-                    .append(fullarg).append(']');
+                                                                                      .append(fullarg).append(']');
             return builder.toString();
         } else {
             return finalInformation;

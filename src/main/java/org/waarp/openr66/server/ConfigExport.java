@@ -1,23 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.server;
-
-import java.net.SocketAddress;
 
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.logging.WaarpLogger;
@@ -44,19 +41,17 @@ import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.net.SocketAddress;
+
 /**
  * Config Export from a local client without database connection
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class ConfigExport implements Runnable {
-    /**
-     * Internal Logger
-     */
-    static volatile WaarpLogger logger;
-
-    protected static String _INFO_ARGS = "Need at least the configuration file as first argument then at least one from\n"
+    protected static String _INFO_ARGS =
+            "Need at least the configuration file as first argument then at least one from\n"
             +
             "    -hosts\n" +
             "    -rules\n" +
@@ -64,7 +59,16 @@ public class ConfigExport implements Runnable {
             "    -alias (if compatible)\n" +
             "    -role (if compatible)\n" +
             "    -host host (optional)";
-
+    protected static boolean shost = false;
+    protected static boolean srule = false;
+    protected static boolean sbusiness = false;
+    protected static boolean salias = false;
+    protected static boolean srole = false;
+    protected static String stohost = null;
+    /**
+     * Internal Logger
+     */
+    static volatile WaarpLogger logger;
     protected final R66Future future;
     protected final boolean host;
     protected final boolean rule;
@@ -73,9 +77,8 @@ public class ConfigExport implements Runnable {
     protected final boolean role;
     protected final NetworkTransaction networkTransaction;
     protected DbHostAuth dbhost;
-
     public ConfigExport(R66Future future, boolean host, boolean rule,
-            NetworkTransaction networkTransaction) {
+                        NetworkTransaction networkTransaction) {
         this.future = future;
         this.host = host;
         this.rule = rule;
@@ -85,10 +88,9 @@ public class ConfigExport implements Runnable {
         this.networkTransaction = networkTransaction;
         this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
     }
-
     public ConfigExport(R66Future future, boolean host, boolean rule,
-            boolean business, boolean alias, boolean role,
-            NetworkTransaction networkTransaction) {
+                        boolean business, boolean alias, boolean role,
+                        NetworkTransaction networkTransaction) {
         this.future = future;
         this.host = host;
         this.rule = rule;
@@ -97,6 +99,113 @@ public class ConfigExport implements Runnable {
         this.role = role;
         this.networkTransaction = networkTransaction;
         this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
+    }
+
+    protected static boolean getParams(String[] args) {
+        if (args.length < 2) {
+            logger.error(_INFO_ARGS);
+            return false;
+        }
+        if (!FileBasedConfiguration
+                .setClientConfigurationFromXml(Configuration.configuration, args[0])) {
+            logger.error(_INFO_ARGS);
+            return false;
+        }
+        for (int i = 1; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("-hosts")) {
+                shost = true;
+            } else if (args[i].equalsIgnoreCase("-rules")) {
+                srule = true;
+            } else if (args[i].equalsIgnoreCase("-business")) {
+                sbusiness = true;
+            } else if (args[i].equalsIgnoreCase("-alias")) {
+                salias = true;
+            } else if (args[i].equalsIgnoreCase("-roles")) {
+                srole = true;
+            } else if (args[i].equalsIgnoreCase("-host")) {
+                i++;
+                stohost = args[i];
+            }
+        }
+        if ((!shost) && (!srule)) {
+            logger.error("Need at least one of -hosts - rules");
+            return false;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(null));
+        if (logger == null) {
+            logger = WaarpLoggerFactory.getLogger(ConfigExport.class);
+        }
+        if (!getParams(args)) {
+            logger.error("Wrong initialization");
+            if (DbConstant.admin != null && DbConstant.admin.isActive()) {
+                DbConstant.admin.close();
+            }
+            System.exit(1);
+        }
+        long time1 = System.currentTimeMillis();
+        R66Future future = new R66Future(true);
+
+        Configuration.configuration.pipelineInit();
+        NetworkTransaction networkTransaction = new NetworkTransaction();
+        try {
+            ConfigExport transaction = new ConfigExport(future,
+                                                        shost, srule, sbusiness, salias, srole,
+                                                        networkTransaction);
+            if (stohost != null) {
+                try {
+                    transaction.setHost(new DbHostAuth(stohost));
+                } catch (WaarpDatabaseException e) {
+                    logger.error("COnfigExport in     FAILURE since Host is not found: " + stohost, e);
+                    networkTransaction.closeAll();
+                    System.exit(10);
+                }
+            } else {
+                stohost = Configuration.configuration.getHOST_SSLID();
+            }
+            transaction.run();
+            future.awaitUninterruptibly();
+            long time2 = System.currentTimeMillis();
+            long delay = time2 - time1;
+            R66Result result = future.getResult();
+            if (future.isSuccess()) {
+                boolean useJson = PartnerConfiguration.useJson(stohost);
+                logger.debug("UseJson: " + useJson);
+                String message = null;
+                if (useJson) {
+                    message = (result.getOther() != null? ((JsonCommandPacket) result.getOther()).getRequest() :
+                            "no file");
+                } else {
+                    message = (result.getOther() != null? ((ValidPacket) result.getOther()).getSheader() :
+                            "no file");
+                }
+                if (result.getCode() == ErrorCode.Warning) {
+                    logger.warn("WARNED on files:     " +
+                                message
+                                + "     delay: " + delay);
+                } else {
+                    logger.warn("SUCCESS on Final files:     " +
+                                message
+                                + "     delay: " + delay);
+                }
+            } else {
+                if (result.getCode() == ErrorCode.Warning) {
+                    logger.warn("ConfigExport is     WARNED", future.getCause());
+                    networkTransaction.closeAll();
+                    System.exit(result.getCode().ordinal());
+                } else {
+                    logger.error("ConfigExport in     FAILURE", future.getCause());
+                    networkTransaction.closeAll();
+                    System.exit(result.getCode().ordinal());
+                }
+            }
+        } finally {
+            networkTransaction.closeAll();
+            System.exit(0);
+        }
     }
 
     public void setHost(DbHostAuth host) {
@@ -159,7 +268,7 @@ public class ConfigExport implements Runnable {
             valid = new JsonCommandPacket(node, LocalPacketFactory.CONFEXPORTPACKET);
         } else {
             valid = new ValidPacket(Boolean.toString(host), Boolean.toString(rule),
-                    LocalPacketFactory.CONFEXPORTPACKET);
+                                    LocalPacketFactory.CONFEXPORTPACKET);
         }
         try {
             ChannelUtils.writeAbstractLocalPacket(localChannelReference, valid, false);
@@ -170,7 +279,7 @@ public class ConfigExport implements Runnable {
             dbhost = null;
             valid = null;
             future.setResult(new R66Result(e, null, true,
-                    ErrorCode.TransferError, null));
+                                           ErrorCode.TransferError, null));
             future.setFailure(e);
             return;
         }
@@ -178,126 +287,12 @@ public class ConfigExport implements Runnable {
         future.awaitUninterruptibly();
         String sresult = "no information";
         if (future.isSuccess() && future.getResult() != null && future.getResult().getOther() != null) {
-            sresult = (useJson ? ((JsonCommandPacket) future.getResult().getOther()).getRequest() :
+            sresult = (useJson? ((JsonCommandPacket) future.getResult().getOther()).getRequest() :
                     ((ValidPacket) future.getResult().getOther()).toString());
         }
-        logger.info("Config Export done with " + (future.isSuccess() ? "success" : "error") + " (" + sresult + ")");
+        logger.info("Config Export done with " + (future.isSuccess()? "success" : "error") + " (" + sresult + ")");
         localChannelReference.getLocalChannel().close();
         localChannelReference = null;
-    }
-
-    protected static boolean shost = false;
-    protected static boolean srule = false;
-    protected static boolean sbusiness = false;
-    protected static boolean salias = false;
-    protected static boolean srole = false;
-    protected static String stohost = null;
-
-    protected static boolean getParams(String[] args) {
-        if (args.length < 2) {
-            logger.error(_INFO_ARGS);
-            return false;
-        }
-        if (!FileBasedConfiguration
-                .setClientConfigurationFromXml(Configuration.configuration, args[0])) {
-            logger.error(_INFO_ARGS);
-            return false;
-        }
-        for (int i = 1; i < args.length; i++) {
-            if (args[i].equalsIgnoreCase("-hosts")) {
-                shost = true;
-            } else if (args[i].equalsIgnoreCase("-rules")) {
-                srule = true;
-            } else if (args[i].equalsIgnoreCase("-business")) {
-                sbusiness = true;
-            } else if (args[i].equalsIgnoreCase("-alias")) {
-                salias = true;
-            } else if (args[i].equalsIgnoreCase("-roles")) {
-                srole = true;
-            } else if (args[i].equalsIgnoreCase("-host")) {
-                i++;
-                stohost = args[i];
-            }
-        }
-        if ((!shost) && (!srule)) {
-            logger.error("Need at least one of -hosts - rules");
-            return false;
-        }
-        return true;
-    }
-
-    public static void main(String[] args) {
-        WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(null));
-        if (logger == null) {
-            logger = WaarpLoggerFactory.getLogger(ConfigExport.class);
-        }
-        if (!getParams(args)) {
-            logger.error("Wrong initialization");
-            if (DbConstant.admin != null && DbConstant.admin.isActive()) {
-                DbConstant.admin.close();
-            }
-            System.exit(1);
-        }
-        long time1 = System.currentTimeMillis();
-        R66Future future = new R66Future(true);
-
-        Configuration.configuration.pipelineInit();
-        NetworkTransaction networkTransaction = new NetworkTransaction();
-        try {
-            ConfigExport transaction = new ConfigExport(future,
-                    shost, srule, sbusiness, salias, srole,
-                    networkTransaction);
-            if (stohost != null) {
-                try {
-                    transaction.setHost(new DbHostAuth(stohost));
-                } catch (WaarpDatabaseException e) {
-                    logger.error("COnfigExport in     FAILURE since Host is not found: " + stohost, e);
-                    networkTransaction.closeAll();
-                    System.exit(10);
-                }
-            } else {
-                stohost = Configuration.configuration.getHOST_SSLID();
-            }
-            transaction.run();
-            future.awaitUninterruptibly();
-            long time2 = System.currentTimeMillis();
-            long delay = time2 - time1;
-            R66Result result = future.getResult();
-            if (future.isSuccess()) {
-                boolean useJson = PartnerConfiguration.useJson(stohost);
-                logger.debug("UseJson: " + useJson);
-                String message = null;
-                if (useJson) {
-                    message = (result.getOther() != null ? ((JsonCommandPacket) result.getOther()).getRequest() :
-                            "no file");
-                } else {
-                    message = (result.getOther() != null ? ((ValidPacket) result.getOther()).getSheader() :
-                            "no file");
-                }
-                if (result.getCode() == ErrorCode.Warning) {
-                    logger.warn("WARNED on files:     " +
-                            message
-                            + "     delay: " + delay);
-                } else {
-                    logger.warn("SUCCESS on Final files:     " +
-                            message
-                            + "     delay: " + delay);
-                }
-            } else {
-                if (result.getCode() == ErrorCode.Warning) {
-                    logger.warn("ConfigExport is     WARNED", future.getCause());
-                    networkTransaction.closeAll();
-                    System.exit(result.getCode().ordinal());
-                } else {
-                    logger.error("ConfigExport in     FAILURE", future.getCause());
-                    networkTransaction.closeAll();
-                    System.exit(result.getCode().ordinal());
-                }
-            }
-        } finally {
-            networkTransaction.closeAll();
-            System.exit(0);
-        }
     }
 
 }

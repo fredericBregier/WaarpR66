@@ -11,9 +11,9 @@ import java.sql.SQLException;
 public class MariaDBTransferDAO extends DBTransferDAO {
 
     protected static String SQL_GET_ID = "SELECT seq FROM Sequences " +
-            "WHERE name='RUNSEQ' FOR UPDATE";
+                                         "WHERE name='RUNSEQ' FOR UPDATE";
     private static String SQL_UPDATE_ID = "UPDATE Sequences SET seq = ? " +
-            "WHERE name='RUNSEQ'";
+                                          "WHERE name='RUNSEQ'";
 
     public MariaDBTransferDAO(Connection con) throws DAOException {
         super(con);

@@ -53,28 +53,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.openr66.dao.database.DBHostDAO.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.DAO_FACTORY;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.GetHostsParams.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.HOSTS_HANDLER_URI;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ALREADY_EXISTING;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ILLEGAL_PARAMETER_VALUE;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the host collection REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the host collection REST entry point.
  */
 @Path(HOSTS_HANDLER_URI)
 public class HostsHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final HttpHeaders OPTIONS_HEADERS;
 
@@ -97,36 +91,29 @@ public class HostsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of host entries from the server's database,
-     * with optional filters applied.
+     * Method called to get a list of host entries from the server's database, with optional filters applied.
      *
-     * @param request    The {@link HttpRequest} made on the resource.
-     * @param responder  The {@link HttpResponder} which sends the reply to
-     *                   the request.
-     * @param limit_str  HTTP query parameter, maximum number of entries
-     *                   allowed in the response.
-     * @param offset_str HTTP query parameter, index of the first accepted
-     *                   entry in the list of all valid answers.
-     * @param order_str  HTTP query parameter, the criteria used to sort
-     *                   the entries and the way of ordering.
-     * @param address    HTTP query parameter, filter only hosts with this address.
-     * @param isSSL_str  HTTP query parameter, filter only hosts that use SSL,
-     *                     or those that don't. Leave empty
-     *                     to get both.
-     * @param isActive_str HTTP query parameter, filter hosts that are active,
-     *                     or those that aren't. Leave empty
-     *                     to get both.
+     * @param request The {@link HttpRequest} made on the resource.
+     * @param responder The {@link HttpResponder} which sends the reply to the request.
+     * @param limit_str HTTP query parameter, maximum number of entries allowed in the response.
+     * @param offset_str HTTP query parameter, index of the first accepted entry in the list of all valid answers.
+     * @param order_str HTTP query parameter, the criteria used to sort the entries and the way of ordering.
+     * @param address HTTP query parameter, filter only hosts with this address.
+     * @param isSSL_str HTTP query parameter, filter only hosts that use SSL, or those that don't. Leave empty to get
+     * both.
+     * @param isActive_str HTTP query parameter, filter hosts that are active, or those that aren't. Leave empty to get
+     * both.
      */
     @GET
     @Consumes(APPLICATION_FORM_URLENCODED)
     @RequiredRole(ROLE.READONLY)
     public void filterHosts(HttpRequest request, HttpResponder responder,
                             @QueryParam(LIMIT) @DefaultValue("20")
-                                        String limit_str,
+                                    String limit_str,
                             @QueryParam(OFFSET) @DefaultValue("0")
-                                        String offset_str,
+                                    String offset_str,
                             @QueryParam(ORDER) @DefaultValue("ascId")
-                                        String order_str,
+                                    String order_str,
                             @QueryParam(ADDRESS) String address,
                             @QueryParam(IS_SSL) String isSSL_str,
                             @QueryParam(IS_ACTIVE) String isActive_str) {
@@ -137,7 +124,7 @@ public class HostsHandler extends AbstractRestDbHandler {
         HostConverter.Order order = HostConverter.Order.ascId;
         try {
             limit = Integer.parseInt(limit_str);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             errors.add(ILLEGAL_PARAMETER_VALUE(RestConstants.GetHostsParams.LIMIT, limit_str));
         }
         try {
@@ -147,7 +134,7 @@ public class HostsHandler extends AbstractRestDbHandler {
         }
         try {
             offset = Integer.parseInt(offset_str);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             errors.add(ILLEGAL_PARAMETER_VALUE(OFFSET, offset_str));
         }
 
@@ -173,7 +160,7 @@ public class HostsHandler extends AbstractRestDbHandler {
             }
         }
 
-        if(!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             throw new RestErrorException(errors);
         }
 
@@ -220,9 +207,8 @@ public class HostsHandler extends AbstractRestDbHandler {
     /**
      * Method called to add a new host authentication entry to the server database.
      *
-     * @param request   The {@link HttpRequest} made on the resource.
-     * @param responder The {@link HttpResponder} which sends the reply to
-     *                  the request.
+     * @param request The {@link HttpRequest} made on the resource.
+     * @param responder The {@link HttpResponder} which sends the reply to the request.
      */
     @POST
     @Consumes(APPLICATION_JSON)
@@ -260,12 +246,11 @@ public class HostsHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry point.
-     * The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   The {@link HttpRequest} made on the resource.
-     * @param responder The {@link HttpResponder} which sends the reply to
-     *                  the request.
+     * @param request The {@link HttpRequest} made on the resource.
+     * @param responder The {@link HttpResponder} which sends the reply to the request.
      */
     @OPTIONS
     @Consumes(WILDCARD)

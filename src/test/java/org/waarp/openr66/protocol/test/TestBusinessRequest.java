@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.test;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -33,11 +29,14 @@ import org.waarp.openr66.protocol.localhandler.packet.BusinessRequestPacket;
 import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Test class for internal Business test
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestBusinessRequest extends AbstractBusinessRequest {
     /**
@@ -46,7 +45,7 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
     private static WaarpLogger logger;
 
     public TestBusinessRequest(NetworkTransaction networkTransaction,
-            R66Future future, String remoteHost, BusinessRequestPacket packet) {
+                               R66Future future, String remoteHost, BusinessRequestPacket packet) {
         super(TestBusinessRequest.class, future, remoteHost, networkTransaction, packet);
     }
 
@@ -101,7 +100,7 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
         }
         long time2 = System.currentTimeMillis();
         logger.warn("Simple TestExecJavaTask Success: " + success + " Error: " + error + " NB/s: " +
-                success * 100 * 1000 / (time2 - time1));
+                    success * 100 * 1000 / (time2 - time1));
         R66Future future = new R66Future(true);
         classname = BusinessRequest.DEFAULT_CLASS;
         BusinessRequestPacket packet =
@@ -117,13 +116,13 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
         }
         long time3 = System.currentTimeMillis();
         logger.warn("Simple DefaultClass LOG Success: " + success + " Error: " + error + " NB/s: " +
-                1000 / (time3 - time2));
+                    1000 / (time3 - time2));
 
         future = new R66Future(true);
         classname = BusinessRequest.DEFAULT_CLASS;
         packet =
                 new BusinessRequestPacket(classname + " EXECJAVA " + TestExecJavaTask.class.getName()
-                        + " business 0 execjava business request 0", 0);
+                                          + " business 0 execjava business request 0", 0);
         transaction = new BusinessRequest(
                 networkTransaction, future, host.getHostid(), packet);
         transaction.run();
@@ -135,18 +134,19 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
         }
         long time4 = System.currentTimeMillis();
         logger.warn("Simple ExecJava Success: " + success + " Error: " + error + " NB/s: " +
-                1000 / (time4 - time3));
+                    1000 / (time4 - time3));
 
         logger.info("Start Test of Increasing Transaction");
         time1 = System.currentTimeMillis();
-        String argsAdd = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+        String argsAdd =
+                "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         String value = " business 0 ";
         int lastnb = nb;
         for (int i = 0; i < nb; i++) {
             arrayFuture[i] = new R66Future(true);
             try {
                 value += argsAdd + argsAdd + argsAdd + argsAdd + argsAdd + argsAdd + argsAdd + argsAdd + argsAdd
-                        + argsAdd;
+                         + argsAdd;
             } catch (OutOfMemoryError e) {
                 logger.warn("Send size: " + value.length());
                 lastnb = i;
@@ -171,8 +171,8 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
         }
         time2 = System.currentTimeMillis();
         logger.warn("Simple TestExecJavaTask with increasing argument size Success: " + success + " Error: " + error
-                + " NB/s: " +
-                success * 100 * 1000 / (time2 - time1));
+                    + " NB/s: " +
+                    success * 100 * 1000 / (time2 - time1));
 
         executorService.shutdown();
         networkTransaction.closeAll();

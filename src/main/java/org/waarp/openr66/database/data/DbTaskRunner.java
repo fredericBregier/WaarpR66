@@ -1,35 +1,24 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.database.data;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -88,9 +77,18 @@ import org.waarp.openr66.protocol.utils.NbAndSpecialId;
 import org.waarp.openr66.protocol.utils.R66Future;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Task Runner from pre operation to transfer to post operation, except in case of error
@@ -104,78 +102,6 @@ public class DbTaskRunner extends AbstractDbData {
     public static final String JSON_THROUGHMODE = "THROUGHMODE";
 
     public static final String JSON_RESCHEDULE = "RESCHEDULE";
-
-    /**
-     * Internal Logger
-     */
-    private static final WaarpLogger logger = WaarpLoggerFactory
-            .getLogger(DbTaskRunner.class);
-
-    /**
-     * HashTable in case of lack of database using LRU mode with
-     * 20 000 items maximum (< 200 MB?) for 180s
-     */
-    private static SynchronizedLruCache<Long, DbTaskRunner> dbR66TaskHashMap;
-
-    /**
-     * Create the LRU cache
-     *
-     * @param limit
-     *            limit of number of entries in the cache
-     * @param ttl
-     *            time to leave used
-     */
-    public static void createLruCache(int limit, long ttl) {
-        dbR66TaskHashMap = new SynchronizedLruCache<Long, DbTaskRunner>(limit, ttl);
-    }
-
-    public static String hashStatus() {
-        return "DbTaskRunner: [dbR66TaskHashMap: " + dbR66TaskHashMap.size() + "] ";
-    }
-
-    /**
-     * To enable clear of oldest entries in the cache
-     *
-     * @return the number of elements removed
-     */
-    public static int clearCache() {
-        return dbR66TaskHashMap.forceClearOldest();
-    }
-
-    /**
-     * To update the TTL for the cache (to 10xTIMEOUT)
-     *
-     * @param ttl
-     */
-    public static void updateLruCacheTimeout(long ttl) {
-        dbR66TaskHashMap.setNewTtl(ttl);
-    }
-
-    public static enum Columns {
-        GLOBALSTEP,
-        GLOBALLASTSTEP,
-        STEP,
-        RANK,
-        STEPSTATUS,
-        RETRIEVEMODE,
-        FILENAME,
-        ISMOVED,
-        IDRULE,
-        BLOCKSZ,
-        ORIGINALNAME,
-        FILEINFO,
-        TRANSFERINFO,
-        MODETRANS,
-        STARTTRANS,
-        STOPTRANS,
-        INFOSTATUS,
-        UPDATEDINFO,
-        OWNERREQ,
-        REQUESTER,
-        REQUESTED,
-        SPECIALID;
-    }
-
     public static final int[] dbTypes = {
             Types.INTEGER,
             Types.INTEGER,
@@ -200,54 +126,20 @@ public class DbTaskRunner extends AbstractDbData {
             Types.NVARCHAR,
             Types.BIGINT
     };
-
     public static final String table = " RUNNER ";
-
     public static final String fieldseq = "RUNSEQ";
-
     public static final Columns[] indexes = {
             Columns.STARTTRANS, Columns.OWNERREQ,
             Columns.STEPSTATUS, Columns.UPDATEDINFO,
             Columns.GLOBALSTEP, Columns.INFOSTATUS, Columns.SPECIALID
     };
-
     public static final String XMLRUNNERS = "taskrunners";
     public static final String XMLRUNNER = "runner";
     public static final String XMLEXTENSION = "_singlerunner.xml";
-
-    /**
-     * GlobalStep Bounds
-     */
-    public static enum TASKSTEP {
-        NOTASK, PRETASK, TRANSFERTASK, POSTTASK, ALLDONETASK, ERRORTASK;
-    }
-
-    /**
-     * Nested transfer for integration purposes
-     */
-    private Transfer transfer;
-
-    // Values
-    private DbRule rule;
-
-    private R66Session session;
-
-    private volatile boolean continueTransfer = true;
-
-    private boolean rescheduledTransfer = false;
-
-    private LocalChannelReference localChannelReference = null;
-
-    private boolean isRecvThrough = false;
-    private boolean isSendThrough = false;
-    private long originalSize = -1;
-
     /**
      * Special For DbTaskRunner
      */
     public static final int NBPRKEY = 4;
-    // ALL TABLE SHOULD IMPLEMENT THIS
-
     protected static final String selectAllFields =
             Columns.GLOBALSTEP.name() + ","
             + Columns.GLOBALLASTSTEP.name() + ","
@@ -271,7 +163,6 @@ public class DbTaskRunner extends AbstractDbData {
             + Columns.REQUESTER.name() + ","
             + Columns.REQUESTED.name() + ","
             + Columns.SPECIALID.name();
-
     protected static final String updateAllFields =
             Columns.GLOBALSTEP.name() + "=?,"
             + Columns.GLOBALLASTSTEP.name() + "=?,"
@@ -291,231 +182,34 @@ public class DbTaskRunner extends AbstractDbData {
             + Columns.STOPTRANS.name() + "=?,"
             + Columns.INFOSTATUS.name() + "=?,"
             + Columns.UPDATEDINFO.name() + "=?";
-
     protected static final String insertAllValues = " (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
-
-    @Override
-    protected void initObject() {
-        // empty transfer for initObject
-        transfer = new Transfer();
-        primaryKey = new DbValue[] {
-                new DbValue(transfer.getOwnerRequest(), Columns.OWNERREQ.name()),
-                new DbValue(transfer.getRequester(), Columns.REQUESTER.name()),
-                new DbValue(transfer.getRequested(), Columns.REQUESTED.name()),
-                new DbValue(transfer.getId(), Columns.SPECIALID.name()) };
-        otherFields = new DbValue[] {
-                // GLOBALSTEP, GLOBALLASTSTEP, STEP, RANK, STEPSTATUS, RETRIEVEMODE,
-                // FILENAME, ISMOVED, IDRULE,
-                // BLOCKSZ, ORIGINALNAME, FILEINFO, MODETRANS,
-                // STARTTRANS, STOPTRANS
-                // INFOSTATUS, UPDATEDINFO
-                new DbValue(transfer.getGlobalStep().ordinal(), Columns.GLOBALSTEP.name()),
-                new DbValue(transfer.getLastGlobalStep().ordinal(), Columns.GLOBALLASTSTEP.name()),
-                new DbValue(transfer.getStep(), Columns.STEP.name()),
-                new DbValue(transfer.getRank(), Columns.RANK.name()),
-                new DbValue(ErrorCode.Unknown.getCode(), Columns.STEPSTATUS.name()), // status.getCode()
-                new DbValue(transfer.getRetrieveMode(), Columns.RETRIEVEMODE.name()),
-                new DbValue(transfer.getFilename(), Columns.FILENAME.name()),
-                new DbValue(transfer.getIsMoved(), Columns.ISMOVED.name()),
-                new DbValue(transfer.getRule(), Columns.IDRULE.name()),
-                new DbValue(transfer.getBlockSize(), Columns.BLOCKSZ.name()),
-                new DbValue(transfer.getOriginalName(), Columns.ORIGINALNAME.name()),
-                new DbValue(transfer.getFileInfo(), Columns.FILEINFO.name(), true),
-                new DbValue(transfer.getTransferInfo(), Columns.TRANSFERINFO.name(), true),
-                new DbValue(transfer.getTransferMode(), Columns.MODETRANS.name()),
-                new DbValue(transfer.getStart(), Columns.STARTTRANS.name()),
-                new DbValue(transfer.getStop(), Columns.STOPTRANS.name()),
-                new DbValue(ErrorCode.Unknown.getCode(), Columns.INFOSTATUS.name()),// infostatus.getCode()
-                new DbValue(transfer.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
-
-        allFields = new DbValue[] {
-                otherFields[0], otherFields[1], otherFields[2], otherFields[3],
-                otherFields[4], otherFields[5], otherFields[6], otherFields[7],
-                otherFields[8], otherFields[9], otherFields[10], otherFields[11],
-                otherFields[12], otherFields[13], otherFields[14], otherFields[15],
-                otherFields[16], otherFields[17],
-                primaryKey[0], primaryKey[1], primaryKey[2], primaryKey[3] };
-    }
-
-    @Override
-    protected String getSelectAllFields() {
-        return selectAllFields;
-    }
-
-    @Override
-    protected String getTable() {
-        return table;
-    }
-
-    @Override
-    protected String getInsertAllValues() {
-        return insertAllValues;
-    }
-
-    @Override
-    protected String getUpdateAllFields() {
-        return updateAllFields;
-    }
-
-    @Override
-    protected void setToArray() {
-        allFields[Columns.GLOBALSTEP.ordinal()].setValue(transfer.getGlobalStep());
-        allFields[Columns.GLOBALLASTSTEP.ordinal()].setValue(transfer.getLastGlobalStep());
-        allFields[Columns.STEP.ordinal()].setValue(transfer.getStep());
-        allFields[Columns.RANK.ordinal()].setValue(transfer.getRank());
-        allFields[Columns.STEPSTATUS.ordinal()].setValue(transfer.getStepStatus().getCode());
-        allFields[Columns.RETRIEVEMODE.ordinal()].setValue(transfer.getRetrieveMode());
-        allFields[Columns.FILENAME.ordinal()].setValue(transfer.getFilename());
-        allFields[Columns.ISMOVED.ordinal()].setValue(transfer.getIsMoved());
-        allFields[Columns.IDRULE.ordinal()].setValue(transfer.getRule());
-        allFields[Columns.BLOCKSZ.ordinal()].setValue(transfer.getBlockSize());
-        allFields[Columns.ORIGINALNAME.ordinal()].setValue(transfer.getOriginalName());
-        allFields[Columns.FILEINFO.ordinal()].setValue(transfer.getFileInfo());
-        allFields[Columns.TRANSFERINFO.ordinal()].setValue(transfer.getTransferInfo());
-        allFields[Columns.MODETRANS.ordinal()].setValue(transfer.getTransferMode());
-        allFields[Columns.STARTTRANS.ordinal()].setValue(transfer.getStart());
-        transfer.setStop(new Timestamp(System.currentTimeMillis()));
-        allFields[Columns.STOPTRANS.ordinal()].setValue(transfer.getStop());
-        allFields[Columns.INFOSTATUS.ordinal()].setValue(transfer.getInfoStatus().getCode());
-        allFields[Columns.UPDATEDINFO.ordinal()].setValue(transfer.getUpdatedInfo());
-        allFields[Columns.OWNERREQ.ordinal()].setValue(transfer.getOwnerRequest());
-        allFields[Columns.REQUESTER.ordinal()].setValue(transfer.getRequester());
-        allFields[Columns.REQUESTED.ordinal()].setValue(transfer.getRequested());
-        allFields[Columns.SPECIALID.ordinal()].setValue(transfer.getId());
-    }
-
-    @Override
-    protected void setFromArray() throws WaarpDatabaseSqlException {
-        transfer.setGlobalStep(Transfer.TASKSTEP.valueOf(
-                (Integer) allFields[Columns.GLOBALSTEP.ordinal()].getValue()));
-        transfer.setLastGlobalStep(Transfer.TASKSTEP.valueOf(
-                (Integer) allFields[Columns.GLOBALLASTSTEP.ordinal()].getValue()));
-        transfer.setStep((Integer) allFields[Columns.STEP.ordinal()].getValue());
-        transfer.setRank((Integer) allFields[Columns.RANK.ordinal()].getValue());
-        transfer.setStepStatus(ErrorCode.getFromCode((String) allFields[Columns.STEPSTATUS
-                .ordinal()].getValue()));
-        transfer.setRetrieveMode((Boolean) allFields[Columns.RETRIEVEMODE.ordinal()]
-                .getValue());
-        transfer.setFilename((String) allFields[Columns.FILENAME.ordinal()].getValue());
-        transfer.setIsMoved((Boolean) allFields[Columns.ISMOVED.ordinal()].getValue());
-        transfer.setRule((String) allFields[Columns.IDRULE.ordinal()].getValue());
-        transfer.setBlockSize((Integer) allFields[Columns.BLOCKSZ.ordinal()].getValue());
-        transfer.setOriginalName((String) allFields[Columns.ORIGINALNAME.ordinal()]
-                .getValue());
-        transfer.setFileInfo((String) allFields[Columns.FILEINFO.ordinal()]
-                .getValue());
-        transfer.setTransferInfo((String) allFields[Columns.TRANSFERINFO.ordinal()]
-                .getValue());
-        transfer.setTransferMode((Integer) allFields[Columns.MODETRANS.ordinal()].getValue());
-        transfer.setStart((Timestamp) allFields[Columns.STARTTRANS.ordinal()].getValue());
-        transfer.setStop((Timestamp) allFields[Columns.STOPTRANS.ordinal()].getValue());
-        transfer.setInfoStatus(ErrorCode.getFromCode((String) allFields[Columns.INFOSTATUS
-                .ordinal()].getValue()));
-        transfer.setUpdatedInfo(org.waarp.openr66.pojo.UpdatedInfo
-                .valueOf((Integer) allFields[Columns.UPDATEDINFO.ordinal()].getValue()));
-        transfer.setOwnerRequest((String) allFields[Columns.OWNERREQ.ordinal()]
-                .getValue());
-        transfer.setRequester((String) allFields[Columns.REQUESTER.ordinal()]
-                .getValue());
-        transfer.setRequested((String) allFields[Columns.REQUESTED.ordinal()]
-                .getValue());
-        transfer.setId((Long) allFields[Columns.SPECIALID.ordinal()].getValue());
-        originalSize = getOriginalSizeTransferMap();
-    }
-
     /**
-     *
-     * @return The Where condition on Primary Key
+     * Internal Logger
      */
-    protected String getWherePrimaryKey() {
-        return primaryKey[0].getColumn() + " = ? AND " +
-                primaryKey[1].getColumn() + " = ? AND " +
-                primaryKey[2].getColumn() + " = ? AND " +
-                primaryKey[3].getColumn() + " = ? ";
-    }
-
+    private static final WaarpLogger logger = WaarpLoggerFactory
+            .getLogger(DbTaskRunner.class);
     /**
-     * Set the primary Key as current value
+     * HashTable in case of lack of database using LRU mode with
+     * 20 000 items maximum (< 200 MB?) for 180s
      */
-    protected void setPrimaryKey() {
-        primaryKey[0].setValue(transfer.getOwnerRequest());
-        primaryKey[1].setValue(transfer.getRequester());
-        primaryKey[2].setValue(transfer.getRequested());
-        primaryKey[3].setValue(transfer.getId());
-    }
-
-
+    private static SynchronizedLruCache<Long, DbTaskRunner> dbR66TaskHashMap;
     /**
-     * @param session
-     * @param requestPacket
-     * @return The associated requested Host Id
+     * Nested transfer for integration purposes
      */
-    public static String getRequested(R66Session session,
-                                      RequestPacket requestPacket) {
-        if (requestPacket.isToValidate()) {
-            // the request is initiated and sent by the requester
-            try {
-                return Configuration.configuration.getHostId(session.getAuth()
-                        .isSsl());
-            } catch (OpenR66ProtocolNoSslException e) {
-                return Configuration.configuration.getHOST_ID();
-            }
-        } else {
-            // the request is sent after acknowledge by the requested
-            return session.getAuth().getUser();
-        }
-    }
-
-    /**
-     * @param session
-     * @param requestPacket
-     * @return The associated requester Host Id
-     */
-    public static String getRequester(R66Session session,
-                                      RequestPacket requestPacket) {
-        if (requestPacket.isToValidate()) {
-            return session.getAuth().getUser();
-        } else {
-            try {
-                return Configuration.configuration.getHostId(session.getAuth()
-                        .isSsl());
-            } catch (OpenR66ProtocolNoSslException e) {
-                return Configuration.configuration.getHOST_ID();
-            }
-        }
-    }
-
-    public void checkThroughMode() {
-        isRecvThrough = RequestPacket.isRecvThroughMode(
-                transfer.getTransferMode(), isSelfRequested());
-        isSendThrough = RequestPacket.isSendThroughMode(
-                transfer.getTransferMode(), isSelfRequested());
-
-        if (localChannelReference != null) {
-            if (localChannelReference.isRecvThroughMode()) {
-                isRecvThrough = true;
-            }
-            if (localChannelReference.isSendThroughMode()) {
-                isSendThrough = true;
-            }
-            if (isRecvThrough && !localChannelReference.isRecvThroughMode()) {
-                // Cannot be a RecvThrough
-                isRecvThrough = false;
-            }
-            if (isSendThrough && !localChannelReference.isSendThroughMode()) {
-                isSendThrough = false;
-            }
-        }
-        logger.debug("DbTask " + transfer.getTransferMode()
-                + " isRecvThrough: " + isRecvThrough
-                + " isSendThrough: " + isSendThrough);
-    }
-
+    private Transfer transfer;
+    // Values
+    private DbRule rule;
+    private R66Session session;
+    private volatile boolean continueTransfer = true;
+    private boolean rescheduledTransfer = false;
+    private LocalChannelReference localChannelReference = null;
+    private boolean isRecvThrough = false;
+    private boolean isSendThrough = false;
+    private long originalSize = -1;
     public DbTaskRunner(Transfer transfer) {
         super();
         this.transfer = transfer;
     }
-
     /**
      * Constructor for submission (no transfer session), from database. It is created, so with a new
      * specialId if necessary
@@ -536,14 +230,14 @@ public class DbTaskRunner extends AbstractDbData {
 
         if (startTime != null) {
             transfer = new Transfer(requested, rule.getIdRule(),
-                    requestPacket.getMode(), isSender, requestPacket.getFilename(),
-                    requestPacket.getFileInformation(),
-                    requestPacket.getBlocksize(), startTime);
+                                    requestPacket.getMode(), isSender, requestPacket.getFilename(),
+                                    requestPacket.getFileInformation(),
+                                    requestPacket.getBlocksize(), startTime);
         } else {
             transfer = new Transfer(requested, rule.getIdRule(),
-                    requestPacket.getMode(), isSender, requestPacket.getFilename(),
-                    requestPacket.getFileInformation(),
-                    requestPacket.getBlocksize());
+                                    requestPacket.getMode(), isSender, requestPacket.getFilename(),
+                                    requestPacket.getFileInformation(),
+                                    requestPacket.getBlocksize());
         }
 
         // Usefull ?
@@ -554,7 +248,7 @@ public class DbTaskRunner extends AbstractDbData {
         setOriginalSizeTransferMap(originalSize);
         // itself but according to SSL
         transfer.setRequester(Configuration.configuration.getHostId(dbSession,
-                requested));
+                                                                    requested));
 
         // Retrieve rule
         this.rule = new DbRule(getRuleId());
@@ -580,7 +274,7 @@ public class DbTaskRunner extends AbstractDbData {
      * @throws WaarpDatabaseException
      */
     public DbTaskRunner(R66Session session, DbRule rule,
-            boolean isSender, RequestPacket requestPacket)
+                        boolean isSender, RequestPacket requestPacket)
             throws WaarpDatabaseException {
         super();
         this.session = session;
@@ -588,9 +282,9 @@ public class DbTaskRunner extends AbstractDbData {
         this.rule = rule;
 
         transfer = new Transfer(getRequested(session, requestPacket),
-                rule.getIdRule(), requestPacket.getMode(), isSender,
-                requestPacket.getFilename(), requestPacket.getFileInformation(),
-                requestPacket.getBlocksize());
+                                rule.getIdRule(), requestPacket.getMode(), isSender,
+                                requestPacket.getFilename(), requestPacket.getFileInformation(),
+                                requestPacket.getBlocksize());
         transfer.setRequester(getRequester(session, requestPacket));
         transfer.setRank(requestPacket.getRank());
 
@@ -601,6 +295,7 @@ public class DbTaskRunner extends AbstractDbData {
         insert();
         requestPacket.setSpecialId(transfer.getId());
     }
+    // ALL TABLE SHOULD IMPLEMENT THIS
 
     /**
      * Constructor from a request with a valid Special Id so loaded from database
@@ -613,7 +308,7 @@ public class DbTaskRunner extends AbstractDbData {
      * @throws WaarpDatabaseException
      */
     public DbTaskRunner(R66Session session, DbRule rule,
-            long id, String requester, String requested)
+                        long id, String requester, String requested)
             throws WaarpDatabaseException {
         super();
         this.session = session;
@@ -621,7 +316,7 @@ public class DbTaskRunner extends AbstractDbData {
         try {
             transferAccess = DAOFactory.getInstance().getTransferDAO();
             transfer = transferAccess.select(id, requester, requested,
-                    Configuration.configuration.getHOST_ID());
+                                             Configuration.configuration.getHOST_ID());
         } catch (DAOException e) {
             throw new WaarpDatabaseException(e);
         } finally {
@@ -656,7 +351,7 @@ public class DbTaskRunner extends AbstractDbData {
         try {
             transferAccess = DAOFactory.getInstance().getTransferDAO();
             transfer = transferAccess.select(id, requester, requested,
-                    Configuration.configuration.getHOST_ID());
+                                             Configuration.configuration.getHOST_ID());
         } catch (DAOException e) {
             throw new WaarpDatabaseException(e);
         } finally {
@@ -697,142 +392,6 @@ public class DbTaskRunner extends AbstractDbData {
         setFromJson(source, false);
     }
 
-    @Override
-    public void setFromJson(ObjectNode source, boolean ignorePrimaryKey) throws WaarpDatabaseSqlException {
-        if (transfer == null) {
-            transfer = new Transfer();
-        }
-        for (Columns column : Columns.values()) {
-            if (column == Columns.UPDATEDINFO) {
-                continue;
-            }
-            JsonNode item = source.get(column.name());
-            if (item != null && !item.isMissingNode() && !item.isNull()) {
-                switch (column) {
-                    case BLOCKSZ:
-                        transfer.setBlockSize(item.asInt());
-                        break;
-                    case FILEINFO:
-                        transfer.setFileInfo(item.asText());
-                        break;
-                    case FILENAME:
-                        transfer.setFilename(item.asText());
-                        break;
-                    case GLOBALLASTSTEP:
-                        transfer.setLastGlobalStep(
-                                Transfer.TASKSTEP.valueOf(item.asInt()));
-                        break;
-                    case GLOBALSTEP:
-                        transfer.setGlobalStep(
-                                Transfer.TASKSTEP.valueOf(item.asInt()));
-                        break;
-                    case IDRULE:
-                        transfer.setRule(item.asText());
-                        break;
-                    case INFOSTATUS:
-                        transfer.setInfoStatus(
-                                ErrorCode.getFromCode(item.asText()));
-                        break;
-                    case ISMOVED:
-                        transfer.setIsMoved(item.asBoolean());
-                        break;
-                    case MODETRANS:
-                        transfer.setTransferMode(item.asInt());
-                        break;
-                    case ORIGINALNAME:
-                        transfer.setOriginalName(item.asText());
-                        break;
-                    case OWNERREQ:
-                        String owner = item.asText();
-                        if (owner == null || owner.isEmpty()) {
-                            owner = Configuration.configuration.getHOST_ID();
-                        }
-                        transfer.setOwnerRequest(owner);
-                        break;
-                    case RANK:
-                        transfer.setRank(item.asInt());
-                        break;
-                    case REQUESTED:
-                        transfer.setRequested(item.asText());
-                        break;
-                    case REQUESTER:
-                        transfer.setRequester(item.asText());
-                        break;
-                    case RETRIEVEMODE:
-                        transfer.setRetrieveMode(item.asBoolean());
-                        break;
-                    case SPECIALID:
-                        transfer.setId(item.asLong());
-                        break;
-                    case STARTTRANS:
-                        long start = item.asLong();
-                        if (start == 0) {
-                            start = System.currentTimeMillis();
-                        }
-                        transfer.setStart(new Timestamp(start));
-                        break;
-                    case STEP:
-                        transfer.setStep(source.path(Columns.STEP.name()).asInt());
-                        break;
-                    case STEPSTATUS:
-                        transfer.setStepStatus(
-                                ErrorCode.getFromCode(item.asText()));
-                        break;
-                    case STOPTRANS:
-                         long stop = item.asLong();
-                        if (stop == 0) {
-                            stop = System.currentTimeMillis();
-                        }
-                        transfer.setStop(new Timestamp(stop));
-                        break;
-                    case TRANSFERINFO:
-                        transfer.setTransferInfo(item.asText());
-                        break;
-                    case UPDATEDINFO:
-                        // ignore
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        JsonNode node = source.path(JSON_RESCHEDULE);
-        if (!node.isMissingNode() || !node.isNull()) {
-            rescheduledTransfer = node.asBoolean(false);
-        }
-        node = source.path(JSON_THROUGHMODE);
-        if (!node.isMissingNode() || !node.isNull()) {
-            if (RequestPacket.isRecvMode(transfer.getTransferMode())) {
-                isRecvThrough = node.asBoolean();
-            } else {
-                isSendThrough = node.asBoolean();
-            }
-        }
-        node = source.path(JSON_ORIGINALSIZE);
-        if (!node.isMissingNode() || !node.isNull()) {
-            originalSize = node.asLong(getOriginalSizeTransferMap());
-        }
-        isSaved = false;
-        try {
-            this.rule = new DbRule(getRuleId());
-        } catch (WaarpDatabaseException e) {
-            // ignore
-            this.rule = null;
-        }
-        if (transfer.getFilename() == null || transfer.getFilename().isEmpty()) {
-            throw new WaarpDatabaseSqlException("Cannot create a transfer without filename");
-        } else if (transfer.getRule() == null || transfer.getRule().isEmpty()) {
-            throw new WaarpDatabaseSqlException("Cannot create a transfer without rule");
-        } else if (transfer.getOwnerRequest() == null || transfer.getOwnerRequest().isEmpty()) {
-            throw new WaarpDatabaseSqlException("Cannot create a transfer without owner");
-        } else if (transfer.getRequester() == null || transfer.getRequester().isEmpty()) {
-            throw new WaarpDatabaseSqlException("Cannot create a transfer without requester");
-        } else if (transfer.getRequested() == null || transfer.getRequested().isEmpty()) {
-            throw new WaarpDatabaseSqlException("Cannot create a transfer without requested");
-        }
-        checkThroughMode();
-    }
-
     /**
      * Constructor to initiate a request with a valid previous Special Id so loaded from database.
      *
@@ -849,8 +408,8 @@ public class DbTaskRunner extends AbstractDbData {
         try {
             transferAccess = DAOFactory.getInstance().getTransferDAO();
             transfer = transferAccess.select(id,
-                    Configuration.configuration.getHOST_ID(), requested,
-                    Configuration.configuration.getHOST_ID());
+                                             Configuration.configuration.getHOST_ID(), requested,
+                                             Configuration.configuration.getHOST_ID());
         } catch (DAOException e) {
             throw new WaarpDatabaseException(e);
         } finally {
@@ -861,37 +420,96 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
+     * Private constructor for Commander only
+     *
+     * @param dbSession
+     */
+    private DbTaskRunner() {
+        super();
+        session = null;
+        rule = null;
+    }
+
+    /**
+     * Create the LRU cache
+     *
+     * @param limit
+     *            limit of number of entries in the cache
+     * @param ttl
+     *            time to leave used
+     */
+    public static void createLruCache(int limit, long ttl) {
+        dbR66TaskHashMap = new SynchronizedLruCache<Long, DbTaskRunner>(limit, ttl);
+    }
+
+    public static String hashStatus() {
+        return "DbTaskRunner: [dbR66TaskHashMap: " + dbR66TaskHashMap.size() + "] ";
+    }
+
+    /**
+     * To enable clear of oldest entries in the cache
+     *
+     * @return the number of elements removed
+     */
+    public static int clearCache() {
+        return dbR66TaskHashMap.forceClearOldest();
+    }
+
+    /**
+     * To update the TTL for the cache (to 10xTIMEOUT)
+     *
+     * @param ttl
+     */
+    public static void updateLruCacheTimeout(long ttl) {
+        dbR66TaskHashMap.setNewTtl(ttl);
+    }
+
+    /**
+     * @param session
+     * @param requestPacket
+     * @return The associated requested Host Id
+     */
+    public static String getRequested(R66Session session,
+                                      RequestPacket requestPacket) {
+        if (requestPacket.isToValidate()) {
+            // the request is initiated and sent by the requester
+            try {
+                return Configuration.configuration.getHostId(session.getAuth()
+                                                                    .isSsl());
+            } catch (OpenR66ProtocolNoSslException e) {
+                return Configuration.configuration.getHOST_ID();
+            }
+        } else {
+            // the request is sent after acknowledge by the requested
+            return session.getAuth().getUser();
+        }
+    }
+
+    /**
+     * @param session
+     * @param requestPacket
+     * @return The associated requester Host Id
+     */
+    public static String getRequester(R66Session session,
+                                      RequestPacket requestPacket) {
+        if (requestPacket.isToValidate()) {
+            return session.getAuth().getUser();
+        } else {
+            try {
+                return Configuration.configuration.getHostId(session.getAuth()
+                                                                    .isSsl());
+            } catch (OpenR66ProtocolNoSslException e) {
+                return Configuration.configuration.getHOST_ID();
+            }
+        }
+    }
+
+    /**
      *
      * @return the condition to limit access to the row concerned by the Host
      */
     private static String getLimitWhereCondition() {
         return " " + Columns.OWNERREQ + " = '" + Configuration.configuration.getHOST_ID() + "' ";
-    }
-
-    /**
-     * Create a Special Id for NoDb client
-     */
-    private void createNoDbSpecialId() {
-        transfer.setId(new LongUuid().getLong());
-        setPrimaryKey();
-        /*synchronized (clientNoDbSpecialIdLast) {
-        	// New SpecialId is not possible with No Database Model
-        	specialId = System.currentTimeMillis();
-        	if (clientNoDbSpecialIdLast.get() >= specialId) {
-        		specialId = clientNoDbSpecialIdLast.incrementAndGet();
-        	} else {
-        		clientNoDbSpecialIdLast.set(specialId);
-        	}
-        	setPrimaryKey();
-        	return;
-        }*/
-    }
-
-    /**
-     * Remove a Spcieal Id for NoDb Client
-     */
-    private final void removeNoDbSpecialId() {
-        removeNoDbSpecialId(transfer.getId());
     }
 
     /**
@@ -910,238 +528,6 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public static final void updateUsed(long specialId) {
         dbR66TaskHashMap.updateTtl(specialId);
-    }
-
-    @Override
-    public void delete() throws WaarpDatabaseException {
-        TransferDAO transferAccess = null;
-        try {
-            transferAccess = DAOFactory.getInstance().getTransferDAO();
-            transferAccess.delete(transfer);
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (transferAccess != null) {
-                transferAccess.close();
-            }
-        }
-    }
-
-    private void addNoDb() {
-        /*
-        DbTaskRunner runner = new DbTaskRunner();
-        this.setToArray();
-        DbValue[] temp = runner.allFields;
-        runner.allFields = this.allFields;
-        try {
-            runner.setFromArray();
-        } catch (WaarpDatabaseSqlException e) {
-        }
-        runner.allFields = temp;
-        runner.setToArray();
-        runner.isRecvThrough = this.isRecvThrough;
-        runner.isSendThrough = this.isSendThrough;
-        runner.rule = this.rule;
-        runner.isSaved = true;
-        */
-        CommanderNoDb.todoList.add(this);
-    }
-
-    @Override
-    public void insert() throws WaarpDatabaseException {
-        TransferDAO transferAccess = null;
-        try {
-            transferAccess = DAOFactory.getInstance().getTransferDAO();
-            transferAccess.insert(transfer);
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (transferAccess != null) {
-                transferAccess.close();
-            }
-        }
-    }
-
-    /**
-     * As insert but with the ability to change the SpecialId
-     *
-     * @throws WaarpDatabaseException
-     */
-    public void create() throws WaarpDatabaseException {
-        insert();
-    }
-
-    @Override
-    public boolean exist() throws WaarpDatabaseException {
-        TransferDAO transferAccess = null;
-        try {
-            transferAccess = DAOFactory.getInstance().getTransferDAO();
-            return transferAccess.exist(transfer.getId(),
-                    transfer.getRequester(), transfer.getRequested(),
-                    Configuration.configuration.getHOST_ID());
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (transferAccess != null) {
-                transferAccess.close();
-            }
-        }
-    }
-
-    /**
-     * Shall be called to ensure that item is really available in database
-     *
-     * @return True iff the element exists in a database (and reloaded then from Database)
-     * @throws WaarpDatabaseException
-     */
-    public boolean checkFromDbForSubmit() throws WaarpDatabaseException {
-        if (exist()) {
-            select();
-            this.rule = new DbRule(getRuleId());
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void select() throws WaarpDatabaseException {
-        TransferDAO transferAccess = null;
-        try {
-            transferAccess = DAOFactory.getInstance().getTransferDAO();
-            transfer = transferAccess.select(transfer.getId(),
-                    transfer.getRequester(), transfer.getRequested(),
-                    Configuration.configuration.getHOST_ID());
-        } catch (DAOException e) {
-            throw new WaarpDatabaseNoConnectionException(e);
-        } finally {
-            if (transferAccess != null) {
-                transferAccess.close();
-            }
-        }
-        if (transfer == null) {
-            throw new WaarpDatabaseNoConnectionException("No Transfer found");
-        }
-        this.rule = new DbRule(getRuleId());
-        checkThroughMode();
-    }
-
-    @Override
-    public void update() throws WaarpDatabaseException {
-        // SNMP notification
-        if (transfer.getUpdatedInfo().equals(UpdatedInfo.INERROR) ||
-                transfer.getUpdatedInfo().equals(UpdatedInfo.INTERRUPTED)) {
-            if (Configuration.configuration.getR66Mib() != null) {
-                Configuration.configuration.getR66Mib().notifyInfoTask(
-                        "Task is " + transfer.getUpdatedInfo().name(), this);
-            }
-        } else {
-            if (transfer.getGlobalStep() != Transfer.TASKSTEP.TRANSFERTASK ||
-                    (transfer.getGlobalStep() == Transfer.TASKSTEP.TRANSFERTASK &&
-                    (transfer.getRank() % 100 == 0))) {
-                if (Configuration.configuration.getR66Mib() != null) {
-                    Configuration.configuration.getR66Mib().notifyTask(
-                            "Task is currently " + transfer.getUpdatedInfo().name(), this);
-                }
-            }
-        }
-        // FIX SelfRequest
-        if (isSelfRequest()) {
-            if (RequestPacket.isCompatibleMode(transfer.getTransferMode(),
-                    transfer.getRetrieveMode() ?
-                            RequestPacket.TRANSFERMODE.RECVMODE.ordinal() :
-                            RequestPacket.TRANSFERMODE.SENDMODE.ordinal())) {
-                optimizedUpdate();
-            }
-        } else {
-            optimizedUpdate();
-        }
-    }
-
-    /**
-     * Update Runner using special PreparedStatement
-     *
-     * @throws WaarpDatabaseException
-     */
-    protected void optimizedUpdate() throws WaarpDatabaseException {
-        TransferDAO transferAccess = null;
-        try {
-            transferAccess = DAOFactory.getInstance().getTransferDAO();
-            transferAccess.update(transfer);
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (transferAccess != null) {
-                transferAccess.close();
-            }
-        }
-    }
-
-    public void clean() {
-    }
-
-    /**
-     * Special method used to force insert in case of SelfSubmit
-     *
-     * @throws WaarpDatabaseException
-     */
-    public boolean specialSubmit() throws WaarpDatabaseException {
-        insert();
-        return false;
-    }
-
-    /**
-     * Partial set from another runner (infostatus, rank, status, step, stop, filename,
-     * globallastep, globalstep, isFileMoved)
-     *
-     * @param runner
-     */
-    public void setFrom(DbTaskRunner runner) {
-        if (runner != null) {
-            this.transfer.setInfoStatus(runner.getErrorInfo());
-            this.transfer.setRank(runner.getRank());
-            this.transfer.setStepStatus(runner.getStatus());
-            this.transfer.setStep(runner.getStep());
-            this.transfer.setStop(runner.getStop());
-            this.transfer.setFilename(runner.getFilename());
-            this.transfer.setGlobalStep(runner.transfer.getGlobalStep());
-            this.transfer.setLastGlobalStep(runner.transfer.getLastGlobalStep());
-            this.transfer.setIsMoved(runner.isFileMoved());
-        }
-    }
-
-    public boolean isRecvThrough() {
-        return isRecvThrough;
-    }
-
-    public boolean isSendThrough() {
-        return isSendThrough;
-    }
-
-    /**
-     * Private constructor for Commander only
-     *
-     * @param dbSession
-     */
-    private DbTaskRunner() {
-        super();
-        session = null;
-        rule = null;
-    }
-
-    /**
-     * Set a localChannelReference
-     *
-     * @param localChannelReference
-     */
-    public void setLocalChannelReference(LocalChannelReference localChannelReference) {
-        this.localChannelReference = localChannelReference;
-    }
-
-    /**
-     * @return the localChannelReference
-     */
-    public LocalChannelReference getLocalChannelReference() {
-        return localChannelReference;
     }
 
     /**
@@ -1163,7 +549,7 @@ public class DbTaskRunner extends AbstractDbData {
                 dbTaskRunner.rule = new DbRule(dbTaskRunner.getRuleId());
             } catch (WaarpDatabaseException e) {
                 throw new WaarpDatabaseSqlException("Rule cannot be found for DbTaskRunner: " + dbTaskRunner.asJson(),
-                        e);
+                                                    e);
             }
         }
         dbTaskRunner.checkThroughMode();
@@ -1199,8 +585,6 @@ public class DbTaskRunner extends AbstractDbData {
         return dbTaskRunner;
     }
 
-
-
     /**
      * @param session
      * @param status
@@ -1216,7 +600,7 @@ public class DbTaskRunner extends AbstractDbData {
         String request = "SELECT " + selectAllFields + " FROM " + table;
         if (status != null) {
             request += " WHERE " + Columns.STEPSTATUS.name() + " = '" +
-                    status.getCode() + "' AND " + getLimitWhereCondition();
+                       status.getCode() + "' AND " + getLimitWhereCondition();
         } else {
             request += " WHERE " + getLimitWhereCondition();
         }
@@ -1237,15 +621,16 @@ public class DbTaskRunner extends AbstractDbData {
      * @throws WaarpDatabaseSqlException
      */
     public static DbPreparedStatement getStepPrepareStatement(DbSession session,
-                                                              TASKSTEP globalstep, int limit) throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                                                              TASKSTEP globalstep, int limit)
+            throws WaarpDatabaseNoConnectionException,
+                   WaarpDatabaseSqlException {
         String request = "SELECT " + selectAllFields + " FROM " + table;
         if (globalstep != null) {
             request += " WHERE (" + Columns.GLOBALSTEP.name() + " = " +
-                    globalstep.ordinal();
+                       globalstep.ordinal();
             if (globalstep == TASKSTEP.ERRORTASK) {
                 request += " OR " + Columns.UPDATEDINFO.name() + " = " +
-                        UpdatedInfo.INERROR.ordinal() + ") AND ";
+                           UpdatedInfo.INERROR.ordinal() + ") AND ";
             } else {
                 request += ") AND ";
             }
@@ -1257,7 +642,6 @@ public class DbTaskRunner extends AbstractDbData {
         request = session.getAdmin().getDbModel().limitRequest(selectAllFields, request, limit);
         return new DbPreparedStatement(session, request);
     }
-
 
     /**
      *
@@ -1286,14 +670,15 @@ public class DbTaskRunner extends AbstractDbData {
             String rule,
             String req, boolean pending, boolean transfer, boolean error,
             boolean done, boolean all) throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                                              WaarpDatabaseSqlException {
         String request = srcrequest;
         if (startid == null && stopid == null &&
-                start == null && stop == null && rule == null && req == null && all) {
+            start == null && stop == null && rule == null && req == null && all) {
             // finish
             if (limit > 0) {
                 request = preparedStatement.getDbSession().getAdmin().getDbModel().limitRequest(selectAllFields,
-                        request + orderby, limit);
+                                                                                                request + orderby,
+                                                                                                limit);
             } else {
                 request = request + orderby;
             }
@@ -1305,7 +690,7 @@ public class DbTaskRunner extends AbstractDbData {
         boolean hasCondition = false;
         if (start != null & stop != null) {
             scondition.append(Columns.STARTTRANS.name()).append(" >= ? AND ")
-                    .append(Columns.STARTTRANS.name()).append(" <= ? ");
+                      .append(Columns.STARTTRANS.name()).append(" <= ? ");
             hasCondition = true;
         } else if (start != null) {
             scondition.append(Columns.STARTTRANS.name()).append(" >= ? ");
@@ -1341,8 +726,8 @@ public class DbTaskRunner extends AbstractDbData {
             }
             hasCondition = true;
             scondition.append("( ").append(Columns.REQUESTED.name()).append(" LIKE '%")
-                    .append(req).append("%' OR ").append(Columns.REQUESTER.name())
-                    .append(" LIKE '%").append(req).append("%' )");
+                      .append(req).append("%' OR ").append(Columns.REQUESTER.name())
+                      .append(" LIKE '%").append(req).append("%' )");
         }
         if (!all) {
             if (hasCondition) {
@@ -1360,7 +745,7 @@ public class DbTaskRunner extends AbstractDbData {
                     scondition.append(" OR ");
                 }
                 scondition.append("( ").append(Columns.UPDATEDINFO.name()).append(" = ")
-                        .append(UpdatedInfo.RUNNING.ordinal()).append(" )");
+                          .append(UpdatedInfo.RUNNING.ordinal()).append(" )");
                 hasone = true;
             }
             if (error) {
@@ -1368,10 +753,10 @@ public class DbTaskRunner extends AbstractDbData {
                     scondition.append(" OR ");
                 }
                 scondition.append(Columns.GLOBALSTEP.name()).append(" = ").append(TASKSTEP.ERRORTASK.ordinal())
-                        .append(" OR ").append(Columns.UPDATEDINFO.name()).append(" = ")
-                        .append(UpdatedInfo.INERROR.ordinal())
-                        .append(" OR ").append(Columns.UPDATEDINFO.name()).append(" = ")
-                        .append(UpdatedInfo.INTERRUPTED.ordinal());
+                          .append(" OR ").append(Columns.UPDATEDINFO.name()).append(" = ")
+                          .append(UpdatedInfo.INERROR.ordinal())
+                          .append(" OR ").append(Columns.UPDATEDINFO.name()).append(" = ")
+                          .append(UpdatedInfo.INTERRUPTED.ordinal());
                 hasone = true;
             }
             if (done) {
@@ -1379,8 +764,8 @@ public class DbTaskRunner extends AbstractDbData {
                     scondition.append(" OR ");
                 }
                 scondition.append(Columns.GLOBALSTEP.name()).append(" = ").append(TASKSTEP.ALLDONETASK.ordinal())
-                        .append(" OR ").append(Columns.UPDATEDINFO.name())
-                        .append(" = ").append(UpdatedInfo.DONE.ordinal());
+                          .append(" OR ").append(Columns.UPDATEDINFO.name())
+                          .append(" = ").append(UpdatedInfo.DONE.ordinal());
                 hasone = true;
             }
             if (!hasone) {
@@ -1392,7 +777,7 @@ public class DbTaskRunner extends AbstractDbData {
             scondition.insert(0, request).append(orderby);
             request = scondition.toString();
             request = preparedStatement.getDbSession().getAdmin().getDbModel().limitRequest(selectAllFields,
-                    request, limit);
+                                                                                            request, limit);
         } else {
             scondition.insert(0, request).append(orderby);
             request = scondition.toString();
@@ -1402,18 +787,18 @@ public class DbTaskRunner extends AbstractDbData {
         try {
             if (start != null & stop != null) {
                 preparedStatement.getPreparedStatement().setTimestamp(rank,
-                        start);
+                                                                      start);
                 rank++;
                 preparedStatement.getPreparedStatement().setTimestamp(rank,
-                        stop);
+                                                                      stop);
                 rank++;
             } else if (start != null) {
                 preparedStatement.getPreparedStatement().setTimestamp(rank,
-                        start);
+                                                                      start);
                 rank++;
             } else if (stop != null) {
                 preparedStatement.getPreparedStatement().setTimestamp(rank,
-                        stop);
+                                                                      stop);
                 rank++;
             }
             if (startid != null) {
@@ -1424,7 +809,7 @@ public class DbTaskRunner extends AbstractDbData {
                     // ignore then
                 }
                 preparedStatement.getPreparedStatement().setLong(rank,
-                        value);
+                                                                 value);
                 rank++;
             }
             if (stopid != null) {
@@ -1435,7 +820,7 @@ public class DbTaskRunner extends AbstractDbData {
                     // ignore then
                 }
                 preparedStatement.getPreparedStatement().setLong(rank,
-                        value);
+                                                                 value);
                 rank++;
             }
         } catch (SQLException e) {
@@ -1470,10 +855,10 @@ public class DbTaskRunner extends AbstractDbData {
             Timestamp start, Timestamp stop, String rule,
             String req, boolean pending, boolean transfer, boolean error,
             boolean done, boolean all) throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                                              WaarpDatabaseSqlException {
         return getFilterPrepareStatement(session, limit, orderBySpecialId, startid, stopid, start, stop, rule, req,
-                pending, transfer, error, done, all,
-                null);
+                                         pending, transfer, error, done, all,
+                                         null);
     }
 
     /**
@@ -1502,12 +887,12 @@ public class DbTaskRunner extends AbstractDbData {
             Timestamp start, Timestamp stop, String rule,
             String req, boolean pending, boolean transfer, boolean error,
             boolean done, boolean all, String owner) throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                                                            WaarpDatabaseSqlException {
         DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
         String request = "SELECT " + selectAllFields + " FROM " + table;
         String orderby = "";
         if (startid == null && stopid == null &&
-                start == null && stop == null && rule == null && req == null && all) {
+            start == null && stop == null && rule == null && req == null && all) {
             if (owner == null || owner.isEmpty()) {
                 orderby = " WHERE " + getLimitWhereCondition();
             } else if (!owner.equals("*")) {
@@ -1526,8 +911,8 @@ public class DbTaskRunner extends AbstractDbData {
             orderby += " ORDER BY " + Columns.STARTTRANS.name() + " DESC ";
         }
         return getFilterCondition(preparedStatement, request, limit, orderby,
-                startid, stopid, start, stop, rule,
-                req, pending, transfer, error, done, all);
+                                  startid, stopid, start, stop, rule,
+                                  req, pending, transfer, error, done, all);
     }
 
     /**
@@ -1545,11 +930,11 @@ public class DbTaskRunner extends AbstractDbData {
             throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
         List<Filter> filters = new ArrayList<Filter>(3);
         filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD, "=",
-                org.waarp.openr66.pojo.UpdatedInfo.fromLegacy(info).ordinal()));
+                               org.waarp.openr66.pojo.UpdatedInfo.fromLegacy(info).ordinal()));
         filters.add(new Filter(DBTransferDAO.TRANSFER_START_FIELD, "=",
-                new Timestamp(System.currentTimeMillis())));
+                               new Timestamp(System.currentTimeMillis())));
         filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD, "=",
-                Configuration.configuration.getHOST_ID()));
+                               Configuration.configuration.getHOST_ID()));
         TransferDAO transferAccess = null;
         List<Transfer> transfers;
         try {
@@ -1585,9 +970,9 @@ public class DbTaskRunner extends AbstractDbData {
     public static DbPreparedStatement getCountInfoPrepareStatement(DbSession session)
             throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
         String request = "SELECT COUNT(" + Columns.SPECIALID.name() +
-                ") FROM " + table + " WHERE " +
-                Columns.STARTTRANS.name() + " >= ? AND " + getLimitWhereCondition() +
-                " AND " + Columns.UPDATEDINFO.name() + " = ? ";
+                         ") FROM " + table + " WHERE " +
+                         Columns.STARTTRANS.name() + " >= ? AND " + getLimitWhereCondition() +
+                         " AND " + Columns.UPDATEDINFO.name() + " = ? ";
         DbPreparedStatement pstt = new DbPreparedStatement(session, request);
         session.addLongTermPreparedStatement(pstt);
         return pstt;
@@ -1627,16 +1012,17 @@ public class DbTaskRunner extends AbstractDbData {
      * @throws WaarpDatabaseSqlException
      */
     public static DbPreparedStatement getCountStepPrepareStatement(DbSession session,
-                                                                   TASKSTEP globalstep) throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                                                                   TASKSTEP globalstep)
+            throws WaarpDatabaseNoConnectionException,
+                   WaarpDatabaseSqlException {
         String request = "SELECT COUNT(" + Columns.SPECIALID.name() + ") FROM " + table;
         if (globalstep != null) {
             request += " WHERE " + Columns.GLOBALSTEP.name() + " = " +
-                    globalstep.ordinal() + " AND ";
+                       globalstep.ordinal() + " AND ";
             request += Columns.STARTTRANS.name() + " >= ? AND " + getLimitWhereCondition();
         } else {
             request += " WHERE " + Columns.STARTTRANS.name() + " >= ? AND "
-                    + getLimitWhereCondition();
+                       + getLimitWhereCondition();
         }
         DbPreparedStatement prep = new DbPreparedStatement(session, request);
         session.addLongTermPreparedStatement(prep);
@@ -1701,7 +1087,7 @@ public class DbTaskRunner extends AbstractDbData {
         String request = "SELECT COUNT(" + Columns.SPECIALID.name() + ") FROM " + table;
         if (status != null) {
             request += " WHERE " + Columns.STEPSTATUS.name() + " = '" +
-                    status.getCode() + "' AND " + getLimitWhereCondition();
+                       status.getCode() + "' AND " + getLimitWhereCondition();
         } else {
             request += " WHERE " + getLimitWhereCondition();
         }
@@ -1736,7 +1122,7 @@ public class DbTaskRunner extends AbstractDbData {
         }
         if (from != null & sfrom != null) {
             request += " WHERE ((" + requesterd + " = '" +
-                    from + "' OR " + requesterd + " = '" + sfrom + "') ";
+                       from + "' OR " + requesterd + " = '" + sfrom + "') ";
         } else if (from != null) {
             request += " WHERE (" + requesterd + " = '" + from + "' ";
         } else {
@@ -1776,7 +1162,7 @@ public class DbTaskRunner extends AbstractDbData {
         }
         if (from != null & sfrom != null) {
             request += " WHERE ((" + requesterd + " = '" +
-                    from + "' OR " + requesterd + " = '" + sfrom + "') ";
+                       from + "' OR " + requesterd + " = '" + sfrom + "') ";
         } else if (from != null) {
             request += " WHERE (" + requesterd + " = '" + from + "' ";
         } else {
@@ -1859,8 +1245,8 @@ public class DbTaskRunner extends AbstractDbData {
         String request = "SELECT " + selectAllFields + " FROM " + table;
         if (start != null & stop != null) {
             request += " WHERE " + Columns.STARTTRANS.name() + " >= ? AND " +
-                    Columns.STARTTRANS.name() + " <= ? AND " + getLimitWhereCondition() +
-                    " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
+                       Columns.STARTTRANS.name() + " <= ? AND " + getLimitWhereCondition() +
+                       " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
             preparedStatement.createPrepareStatement(request);
             try {
                 preparedStatement.getPreparedStatement().setTimestamp(1, start);
@@ -1871,8 +1257,8 @@ public class DbTaskRunner extends AbstractDbData {
             }
         } else if (start != null) {
             request += " WHERE " + Columns.STARTTRANS.name() +
-                    " >= ? AND " + getLimitWhereCondition() +
-                    " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
+                       " >= ? AND " + getLimitWhereCondition() +
+                       " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
             preparedStatement.createPrepareStatement(request);
             try {
                 preparedStatement.getPreparedStatement().setTimestamp(1, start);
@@ -1882,8 +1268,8 @@ public class DbTaskRunner extends AbstractDbData {
             }
         } else if (stop != null) {
             request += " WHERE " + Columns.STARTTRANS.name() +
-                    " <= ? AND " + getLimitWhereCondition() +
-                    " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
+                       " <= ? AND " + getLimitWhereCondition() +
+                       " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
             preparedStatement.createPrepareStatement(request);
             try {
                 preparedStatement.getPreparedStatement().setTimestamp(1, stop);
@@ -1893,11 +1279,12 @@ public class DbTaskRunner extends AbstractDbData {
             }
         } else {
             request += " WHERE " + getLimitWhereCondition() +
-                    " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
+                       " ORDER BY " + Columns.SPECIALID.name() + " DESC ";
             preparedStatement.createPrepareStatement(request);
         }
         return preparedStatement;
     }
+
     /**
      * purge in same interval all runners with globallaststep as ALLDONETASK or UpdatedInfo as Done
      *
@@ -1913,13 +1300,13 @@ public class DbTaskRunner extends AbstractDbData {
             throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
         DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
         String request = "DELETE FROM " + table + " WHERE (" +
-                Columns.GLOBALLASTSTEP + " = " + TASKSTEP.ALLDONETASK.ordinal() + " OR " +
-                Columns.UPDATEDINFO + " = " + UpdatedInfo.DONE.ordinal() +
-                ") AND " + getLimitWhereCondition();
+                         Columns.GLOBALLASTSTEP + " = " + TASKSTEP.ALLDONETASK.ordinal() + " OR " +
+                         Columns.UPDATEDINFO + " = " + UpdatedInfo.DONE.ordinal() +
+                         ") AND " + getLimitWhereCondition();
         try {
             if (start != null & stop != null) {
                 request += " AND " + Columns.STARTTRANS.name() + " >= ? AND " +
-                        Columns.STOPTRANS.name() + " <= ? ";
+                           Columns.STOPTRANS.name() + " <= ? ";
                 preparedStatement.createPrepareStatement(request);
                 try {
                     preparedStatement.getPreparedStatement().setTimestamp(1, start);
@@ -1980,34 +1367,34 @@ public class DbTaskRunner extends AbstractDbData {
             Timestamp start, Timestamp stop, String rule,
             String req, boolean pending, boolean transfer, boolean error,
             boolean done, boolean all) throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException {
+                                              WaarpDatabaseSqlException {
         DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
         String request = "DELETE FROM " + table;
         String orderby;
         if (startid == null && stopid == null && start == null && stop == null &&
-                rule == null && req == null && all) {
+            rule == null && req == null && all) {
             orderby = " WHERE (" +
-                    Columns.GLOBALLASTSTEP + " = " + TASKSTEP.ALLDONETASK.ordinal() + " OR " +
-                    Columns.UPDATEDINFO + " = " + UpdatedInfo.DONE.ordinal() +
-                    ") AND " + getLimitWhereCondition();
+                      Columns.GLOBALLASTSTEP + " = " + TASKSTEP.ALLDONETASK.ordinal() + " OR " +
+                      Columns.UPDATEDINFO + " = " + UpdatedInfo.DONE.ordinal() +
+                      ") AND " + getLimitWhereCondition();
         } else {
             if (all) {
                 orderby = " AND (" +
-                        Columns.GLOBALLASTSTEP + " = " + TASKSTEP.ALLDONETASK.ordinal() + " OR " +
-                        Columns.UPDATEDINFO + " = " + UpdatedInfo.DONE.ordinal() + " OR " +
-                        Columns.UPDATEDINFO + " = " + UpdatedInfo.INERROR.ordinal() +
-                        ") AND " + getLimitWhereCondition();
+                          Columns.GLOBALLASTSTEP + " = " + TASKSTEP.ALLDONETASK.ordinal() + " OR " +
+                          Columns.UPDATEDINFO + " = " + UpdatedInfo.DONE.ordinal() + " OR " +
+                          Columns.UPDATEDINFO + " = " + UpdatedInfo.INERROR.ordinal() +
+                          ") AND " + getLimitWhereCondition();
             } else {
                 orderby = " AND " +
-                        Columns.UPDATEDINFO + " <> " + UpdatedInfo.RUNNING.ordinal() +
-                        " AND " + getLimitWhereCondition();// limit by field
+                          Columns.UPDATEDINFO + " <> " + UpdatedInfo.RUNNING.ordinal() +
+                          " AND " + getLimitWhereCondition();// limit by field
             }
         }
         int nb = 0;
         try {
             preparedStatement = getFilterCondition(preparedStatement, request, 0,
-                    orderby, startid, stopid, start, stop, rule,
-                    req, pending, transfer, error, done, all);
+                                                   orderby, startid, stopid, start, stop, rule,
+                                                   req, pending, transfer, error, done, all);
             nb = preparedStatement.executeUpdate();
             logger.info("Purge " + nb + " from " + request);
         } finally {
@@ -2030,13 +1417,13 @@ public class DbTaskRunner extends AbstractDbData {
             throws WaarpDatabaseNoConnectionException {
         // Change RUNNING and INTERRUPTED to TOSUBMIT since they should be ready
         String request = "UPDATE " + table + " SET " +
-                Columns.UPDATEDINFO.name() + "=" +
-                AbstractDbData.UpdatedInfo.TOSUBMIT.ordinal() +
-                " WHERE (" + Columns.UPDATEDINFO.name() + " = " +
-                AbstractDbData.UpdatedInfo.RUNNING.ordinal() +
-                " OR " + Columns.UPDATEDINFO.name() + " = " +
-                AbstractDbData.UpdatedInfo.INTERRUPTED.ordinal() + ") AND " +
-                getLimitWhereCondition();
+                         Columns.UPDATEDINFO.name() + "=" +
+                         AbstractDbData.UpdatedInfo.TOSUBMIT.ordinal() +
+                         " WHERE (" + Columns.UPDATEDINFO.name() + " = " +
+                         AbstractDbData.UpdatedInfo.RUNNING.ordinal() +
+                         " OR " + Columns.UPDATEDINFO.name() + " = " +
+                         AbstractDbData.UpdatedInfo.INTERRUPTED.ordinal() + ") AND " +
+                         getLimitWhereCondition();
         DbPreparedStatement initial = new DbPreparedStatement(session);
         try {
             initial.createPrepareStatement(request);
@@ -2066,15 +1453,15 @@ public class DbTaskRunner extends AbstractDbData {
         // status = CompleteOk
         List<Filter> filters = new ArrayList<Filter>();
         filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                "<>",  UpdatedInfo.DONE.ordinal()));
+                               "<>", UpdatedInfo.DONE.ordinal()));
         filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                ">",  UpdatedInfo.UNKNOWN.ordinal()));
+                               ">", UpdatedInfo.UNKNOWN.ordinal()));
         filters.add(new Filter(DBTransferDAO.GLOBAL_LAST_STEP_FIELD,
-                "=",  Transfer.TASKSTEP.ALLDONETASK.ordinal()));
+                               "=", Transfer.TASKSTEP.ALLDONETASK.ordinal()));
         filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                ">",  ErrorCode.CompleteOk.getCode()));
+                               ">", ErrorCode.CompleteOk.getCode()));
         filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                ">",  Configuration.configuration.getHOST_ID()));
+                               ">", Configuration.configuration.getHOST_ID()));
 
         TransferDAO transferAccess = null;
         try {
@@ -2092,6 +1479,951 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
+     *
+     * @return the header for a table of runners in Html format
+     */
+    public static String headerHtml() {
+        return "<td>SpecialId</td><td>Rule</td><td>Filename</td><td>Info"
+               + "</td><td>Step (LastStep)</td><td>Action</td><td>Status"
+               + "</td><td>Internal</t><td>Transfer Rank</td><td>BlockSize</td><td>isMoved"
+               + "</td><td>Requester</td><td>Requested"
+               + "</td><td>Start</td><td>Stop</td><td>Bandwidth (Mbits)</td><td>Free Space(MB)</td>";
+    }
+
+    /**
+     * Construct a new Element with value
+     *
+     * @param name
+     * @param value
+     * @return the new Element
+     */
+    private static Element newElement(String name, String value) {
+        Element node = new DefaultElement(name);
+        if (value != null) {
+            node.addText(value);
+        }
+        return node;
+    }
+
+    /**
+     * Need to call 'setToArray' before
+     *
+     * @param runner
+     * @return The Element representing the given Runner
+     * @throws WaarpDatabaseSqlException
+     */
+    private static Element getElementFromRunner(DbTaskRunner runner)
+            throws WaarpDatabaseSqlException {
+        Element root = new DefaultElement(XMLRUNNER);
+        for (DbValue value : runner.allFields) {
+            if (value.getColumn().equals(Columns.UPDATEDINFO.name()) ||
+                value.getColumn().equals(Columns.TRANSFERINFO.name())) {
+                continue;
+            }
+            root.add(newElement(value.getColumn().toLowerCase(),
+                                value.getValueAsString()));
+        }
+        return root;
+    }
+
+    /**
+     * Set the given runner from the root element of the runner itself (XMLRUNNER but not
+     * XMLRUNNERS). Need to call 'setFromArray' after.
+     *
+     * @param runner
+     * @param root
+     * @throws WaarpDatabaseSqlException
+     */
+    private static void setRunnerFromElement(DbTaskRunner runner, Element root)
+            throws WaarpDatabaseSqlException {
+        for (DbValue value : runner.allFields) {
+            if (value.getColumn().equals(Columns.UPDATEDINFO.name()) ||
+                value.getColumn().equals(Columns.TRANSFERINFO.name())) {
+                continue;
+            }
+            Element elt = (Element) root.selectSingleNode(value.getColumn().toLowerCase());
+            if (elt != null) {
+                String newValue = elt.getText();
+                value.setValueFromString(newValue);
+            }
+        }
+        runner.allFields[Columns.TRANSFERINFO.ordinal()].setValue("{}");
+    }
+
+    /**
+     * Write the selected TaskRunners from PrepareStatement to a XMLWriter
+     *
+     * @param preparedStatement
+     *            ready to be executed
+     * @param xmlWriter
+     * @return the NbAndSpecialId for the number of transfer and higher rank found
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static NbAndSpecialId writeXML(DbPreparedStatement preparedStatement, XMLWriter xmlWriter)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
+                   OpenR66ProtocolBusinessException {
+        Element root = new DefaultElement(XMLRUNNERS);
+        NbAndSpecialId nbAndSpecialId = new NbAndSpecialId();
+        try {
+            xmlWriter.writeOpen(root);
+            Element node;
+            while (preparedStatement.getNext()) {
+                DbTaskRunner runner = DbTaskRunner
+                        .getFromStatement(preparedStatement);
+                if (nbAndSpecialId.higherSpecialId < runner.getSpecialId()) {
+                    nbAndSpecialId.higherSpecialId = runner.getSpecialId();
+                }
+                node = DbTaskRunner.getElementFromRunner(runner);
+                xmlWriter.write(node);
+                xmlWriter.flush();
+                nbAndSpecialId.nb++;
+            }
+            xmlWriter.writeClose(root);
+        } catch (IOException e) {
+            logger.error("Cannot write XML file", e);
+            throw new OpenR66ProtocolBusinessException("Cannot write file: " + e.getMessage());
+        }
+        return nbAndSpecialId;
+    }
+
+    /**
+     * Write selected TaskRunners to a Json String
+     *
+     * @param preparedStatement
+     * @return the associated Json String
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static String getJson(DbPreparedStatement preparedStatement, int limit)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
+                   OpenR66ProtocolBusinessException {
+        ArrayNode arrayNode = JsonHandler.createArrayNode();
+        try {
+            preparedStatement.executeQuery();
+            LocalTransaction localTransaction = Configuration.configuration.getLocalTransaction();
+            int nb = 0;
+            while (preparedStatement.getNext()) {
+                DbTaskRunner runner = DbTaskRunner
+                        .getFromStatement(preparedStatement);
+                ObjectNode node = runner.getJson();
+                node.put(Columns.SPECIALID.name(), Long.toString(runner.getSpecialId()));
+                if (localTransaction == null) {
+                    node.put("Running", false);
+                } else {
+                    node.put("Running", localTransaction.contained(runner.getKey()));
+                }
+                arrayNode.add(node);
+                nb++;
+                if (nb >= limit) {
+                    break;
+                }
+            }
+        } finally {
+            preparedStatement.realClose();
+        }
+        return WaarpStringUtils.cleanJsonForHtml(arrayNode.toString().replaceAll("(\\\"\\{)([^}]+)(\\}\\\")", "{$2}")
+                                                          .replaceAll("([^\\\\])(\\\\\")([a-zA-Z_0-9]+)(\\\\\")",
+                                                                      "$1\"$3\""));
+    }
+
+    /**
+     * Write selected TaskRunners to an XML file using an XMLWriter
+     *
+     * @param preparedStatement
+     * @param filename
+     * @return the NbAndSpecialId for the number of transfer and higher rank found
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static NbAndSpecialId writeXMLWriter(DbPreparedStatement preparedStatement,
+                                                String filename)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
+                   OpenR66ProtocolBusinessException {
+        NbAndSpecialId nbAndSpecialId = null;
+        OutputStream outputStream = null;
+        XMLWriter xmlWriter = null;
+        boolean isOk = false;
+        try {
+            outputStream = new FileOutputStream(filename);
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            format.setEncoding(WaarpStringUtils.UTF_8);
+            xmlWriter = new XMLWriter(outputStream, format);
+            preparedStatement.executeQuery();
+            nbAndSpecialId = writeXML(preparedStatement, xmlWriter);
+            isOk = true;
+        } catch (FileNotFoundException e) {
+            logger.error("Cannot write XML file", e);
+            throw new OpenR66ProtocolBusinessException("File not found");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Cannot write XML file", e);
+            throw new OpenR66ProtocolBusinessException("Unsupported Encoding");
+        } finally {
+            if (xmlWriter != null) {
+                try {
+                    xmlWriter.endDocument();
+                    xmlWriter.flush();
+                    xmlWriter.close();
+                } catch (SAXException e) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e2) {
+                    }
+                    File file = new File(filename);
+                    file.delete();
+                    logger.error("Cannot write XML file", e);
+                    throw new OpenR66ProtocolBusinessException("Unsupported Encoding");
+                } catch (IOException e) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e2) {
+                    }
+                    File file = new File(filename);
+                    file.delete();
+                    logger.error("Cannot write XML file", e);
+                    throw new OpenR66ProtocolBusinessException("Unsupported Encoding");
+                }
+                if (!isOk && outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                    }
+                    File file = new File(filename);
+                    file.delete();
+                }
+            } else if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                }
+                File file = new File(filename);
+                file.delete();
+            }
+        }
+        return nbAndSpecialId;
+    }
+
+    /**
+     * Write all TaskRunners to an XML file using an XMLWriter
+     *
+     * @param filename
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static void writeXMLWriter(String filename)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
+                   OpenR66ProtocolBusinessException {
+        String request = "SELECT " + DbTaskRunner.selectAllFields + " FROM " +
+                         DbTaskRunner.table + " WHERE " + getLimitWhereCondition();
+        DbPreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = new DbPreparedStatement(
+                    DbConstant.admin.getSession());
+            preparedStatement.createPrepareStatement(request);
+            writeXMLWriter(preparedStatement, filename);
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.realClose();
+            }
+        }
+    }
+
+    /**
+     * @return the DbValue associated with this table
+     */
+    public static DbValue[] getAllType() {
+        DbTaskRunner item = new DbTaskRunner();
+        return item.allFields;
+    }
+
+    /**
+     * Set the given runner from the root element of the runner itself (XMLRUNNER but not
+     * XMLRUNNERS). Need to call 'setFromArray' after.
+     *
+     * @param runner
+     * @param root
+     */
+    private static void setRunnerFromElementNoException(DbTaskRunner runner, Element root) {
+        for (DbValue value : runner.allFields) {
+            if (value.getColumn().equals(Columns.UPDATEDINFO.name()) ||
+                value.getColumn().equals(Columns.TRANSFERINFO.name())) {
+                continue;
+            }
+            Element elt = (Element) root.selectSingleNode(value.getColumn().toLowerCase());
+            if (elt != null) {
+                String newValue = elt.getText();
+                try {
+                    value.setValueFromString(newValue);
+                } catch (WaarpDatabaseSqlException e) {
+                    // ignore
+                }
+            }
+        }
+        runner.allFields[Columns.TRANSFERINFO.ordinal()].setValue("{}");
+    }
+
+    /**
+     * Reload a to submitted runner from a remote partner's log (so reversing isSender should be true)
+     *
+     * @param xml
+     * @param reverse
+     * @return the TaskRunner from the XML source element
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static DbTaskRunner fromStringXml(String xml, boolean reverse) throws OpenR66ProtocolBusinessException {
+        Document document;
+        try {
+            document = DocumentHelper.parseText(xml);
+        } catch (DocumentException e1) {
+            logger.warn("Cant parse XML", e1);
+            throw new OpenR66ProtocolBusinessException("Cannot parse the XML input");
+        }
+        DbTaskRunner runner = new DbTaskRunner();
+        setRunnerFromElementNoException(runner, document.getRootElement());
+        try {
+            runner.setFromArray();
+        } catch (WaarpDatabaseSqlException e) {
+            logger.error("Cannot read XML", e);
+            throw new OpenR66ProtocolBusinessException("Cannot read XML: " + e.getMessage());
+        }
+        runner.transfer.setOwnerRequest(Configuration.configuration.getHOST_ID());
+        if (reverse) {
+            runner.setSender(!runner.isSender());
+            if (runner.isSender()) {
+                runner.setFilename(runner.getOriginalFilename());
+            }
+        }
+        // Void keep stop
+        Timestamp stop = runner.getStop();
+        runner.setToArray();
+        runner.setStop(stop);
+        runner.allFields[Columns.STOPTRANS.ordinal()].setValue(stop);
+        return runner;
+    }
+
+    /**
+     * Method to load several DbTaskRunner from File logs.
+     *
+     * @param logsFile
+     *            File containing logs from export function
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static void loadXml(File logsFile) throws OpenR66ProtocolBusinessException {
+        if (!logsFile.canRead()) {
+            throw new OpenR66ProtocolBusinessException("XML file cannot be read");
+        }
+        SAXReader reader = new SAXReader();
+        Document document;
+        try {
+            document = reader.read(logsFile);
+        } catch (DocumentException e) {
+            throw new OpenR66ProtocolBusinessException(
+                    "XML file cannot be read as an XML file", e);
+        }
+        @SuppressWarnings("unchecked")
+        List<Element> elts = document.selectNodes("/" + XMLRUNNERS + "/" + XMLRUNNER);
+        boolean error = false;
+        Exception one = null;
+        for (Element element : elts) {
+            DbTaskRunner runnerlog = new DbTaskRunner();
+            try {
+                setRunnerFromElement(runnerlog, element);
+                runnerlog.setFromArray();
+                runnerlog.insertOrUpdateForLogsImport();
+            } catch (WaarpDatabaseSqlException e) {
+                error = true;
+                one = e;
+            } catch (WaarpDatabaseException e) {
+                error = true;
+                one = e;
+            }
+        }
+        if (error) {
+            throw new OpenR66ProtocolBusinessException(
+                    "Backend XML file is not conform to the model", one);
+        }
+    }
+
+    /**
+     * Helper
+     *
+     * @param request
+     * @return isSender according to request
+     */
+    public static boolean getSenderByRequestPacket(RequestPacket request) {
+        if (request.isToValidate()) {
+            return RequestPacket.isRecvMode(request.getMode());
+        }
+        return !RequestPacket.isRecvMode(request.getMode());
+    }
+
+    @Override
+    protected void initObject() {
+        // empty transfer for initObject
+        transfer = new Transfer();
+        primaryKey = new DbValue[] {
+                new DbValue(transfer.getOwnerRequest(), Columns.OWNERREQ.name()),
+                new DbValue(transfer.getRequester(), Columns.REQUESTER.name()),
+                new DbValue(transfer.getRequested(), Columns.REQUESTED.name()),
+                new DbValue(transfer.getId(), Columns.SPECIALID.name())
+        };
+        otherFields = new DbValue[] {
+                // GLOBALSTEP, GLOBALLASTSTEP, STEP, RANK, STEPSTATUS, RETRIEVEMODE,
+                // FILENAME, ISMOVED, IDRULE,
+                // BLOCKSZ, ORIGINALNAME, FILEINFO, MODETRANS,
+                // STARTTRANS, STOPTRANS
+                // INFOSTATUS, UPDATEDINFO
+                new DbValue(transfer.getGlobalStep().ordinal(), Columns.GLOBALSTEP.name()),
+                new DbValue(transfer.getLastGlobalStep().ordinal(), Columns.GLOBALLASTSTEP.name()),
+                new DbValue(transfer.getStep(), Columns.STEP.name()),
+                new DbValue(transfer.getRank(), Columns.RANK.name()),
+                new DbValue(ErrorCode.Unknown.getCode(), Columns.STEPSTATUS.name()), // status.getCode()
+                new DbValue(transfer.getRetrieveMode(), Columns.RETRIEVEMODE.name()),
+                new DbValue(transfer.getFilename(), Columns.FILENAME.name()),
+                new DbValue(transfer.getIsMoved(), Columns.ISMOVED.name()),
+                new DbValue(transfer.getRule(), Columns.IDRULE.name()),
+                new DbValue(transfer.getBlockSize(), Columns.BLOCKSZ.name()),
+                new DbValue(transfer.getOriginalName(), Columns.ORIGINALNAME.name()),
+                new DbValue(transfer.getFileInfo(), Columns.FILEINFO.name(), true),
+                new DbValue(transfer.getTransferInfo(), Columns.TRANSFERINFO.name(), true),
+                new DbValue(transfer.getTransferMode(), Columns.MODETRANS.name()),
+                new DbValue(transfer.getStart(), Columns.STARTTRANS.name()),
+                new DbValue(transfer.getStop(), Columns.STOPTRANS.name()),
+                new DbValue(ErrorCode.Unknown.getCode(), Columns.INFOSTATUS.name()),// infostatus.getCode()
+                new DbValue(transfer.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name())
+        };
+
+        allFields = new DbValue[] {
+                otherFields[0], otherFields[1], otherFields[2], otherFields[3],
+                otherFields[4], otherFields[5], otherFields[6], otherFields[7],
+                otherFields[8], otherFields[9], otherFields[10], otherFields[11],
+                otherFields[12], otherFields[13], otherFields[14], otherFields[15],
+                otherFields[16], otherFields[17],
+                primaryKey[0], primaryKey[1], primaryKey[2], primaryKey[3]
+        };
+    }
+
+    @Override
+    protected String getSelectAllFields() {
+        return selectAllFields;
+    }
+
+    @Override
+    protected String getTable() {
+        return table;
+    }
+
+    @Override
+    protected String getInsertAllValues() {
+        return insertAllValues;
+    }
+
+    @Override
+    protected String getUpdateAllFields() {
+        return updateAllFields;
+    }
+
+    @Override
+    protected void setToArray() {
+        allFields[Columns.GLOBALSTEP.ordinal()].setValue(transfer.getGlobalStep());
+        allFields[Columns.GLOBALLASTSTEP.ordinal()].setValue(transfer.getLastGlobalStep());
+        allFields[Columns.STEP.ordinal()].setValue(transfer.getStep());
+        allFields[Columns.RANK.ordinal()].setValue(transfer.getRank());
+        allFields[Columns.STEPSTATUS.ordinal()].setValue(transfer.getStepStatus().getCode());
+        allFields[Columns.RETRIEVEMODE.ordinal()].setValue(transfer.getRetrieveMode());
+        allFields[Columns.FILENAME.ordinal()].setValue(transfer.getFilename());
+        allFields[Columns.ISMOVED.ordinal()].setValue(transfer.getIsMoved());
+        allFields[Columns.IDRULE.ordinal()].setValue(transfer.getRule());
+        allFields[Columns.BLOCKSZ.ordinal()].setValue(transfer.getBlockSize());
+        allFields[Columns.ORIGINALNAME.ordinal()].setValue(transfer.getOriginalName());
+        allFields[Columns.FILEINFO.ordinal()].setValue(transfer.getFileInfo());
+        allFields[Columns.TRANSFERINFO.ordinal()].setValue(transfer.getTransferInfo());
+        allFields[Columns.MODETRANS.ordinal()].setValue(transfer.getTransferMode());
+        allFields[Columns.STARTTRANS.ordinal()].setValue(transfer.getStart());
+        transfer.setStop(new Timestamp(System.currentTimeMillis()));
+        allFields[Columns.STOPTRANS.ordinal()].setValue(transfer.getStop());
+        allFields[Columns.INFOSTATUS.ordinal()].setValue(transfer.getInfoStatus().getCode());
+        allFields[Columns.UPDATEDINFO.ordinal()].setValue(transfer.getUpdatedInfo());
+        allFields[Columns.OWNERREQ.ordinal()].setValue(transfer.getOwnerRequest());
+        allFields[Columns.REQUESTER.ordinal()].setValue(transfer.getRequester());
+        allFields[Columns.REQUESTED.ordinal()].setValue(transfer.getRequested());
+        allFields[Columns.SPECIALID.ordinal()].setValue(transfer.getId());
+    }
+
+    @Override
+    protected void setFromArray() throws WaarpDatabaseSqlException {
+        transfer.setGlobalStep(Transfer.TASKSTEP.valueOf(
+                (Integer) allFields[Columns.GLOBALSTEP.ordinal()].getValue()));
+        transfer.setLastGlobalStep(Transfer.TASKSTEP.valueOf(
+                (Integer) allFields[Columns.GLOBALLASTSTEP.ordinal()].getValue()));
+        transfer.setStep((Integer) allFields[Columns.STEP.ordinal()].getValue());
+        transfer.setRank((Integer) allFields[Columns.RANK.ordinal()].getValue());
+        transfer.setStepStatus(ErrorCode.getFromCode((String) allFields[Columns.STEPSTATUS
+                .ordinal()].getValue()));
+        transfer.setRetrieveMode((Boolean) allFields[Columns.RETRIEVEMODE.ordinal()]
+                .getValue());
+        transfer.setFilename((String) allFields[Columns.FILENAME.ordinal()].getValue());
+        transfer.setIsMoved((Boolean) allFields[Columns.ISMOVED.ordinal()].getValue());
+        transfer.setRule((String) allFields[Columns.IDRULE.ordinal()].getValue());
+        transfer.setBlockSize((Integer) allFields[Columns.BLOCKSZ.ordinal()].getValue());
+        transfer.setOriginalName((String) allFields[Columns.ORIGINALNAME.ordinal()]
+                .getValue());
+        transfer.setFileInfo((String) allFields[Columns.FILEINFO.ordinal()]
+                .getValue());
+        transfer.setTransferInfo((String) allFields[Columns.TRANSFERINFO.ordinal()]
+                .getValue());
+        transfer.setTransferMode((Integer) allFields[Columns.MODETRANS.ordinal()].getValue());
+        transfer.setStart((Timestamp) allFields[Columns.STARTTRANS.ordinal()].getValue());
+        transfer.setStop((Timestamp) allFields[Columns.STOPTRANS.ordinal()].getValue());
+        transfer.setInfoStatus(ErrorCode.getFromCode((String) allFields[Columns.INFOSTATUS
+                .ordinal()].getValue()));
+        transfer.setUpdatedInfo(org.waarp.openr66.pojo.UpdatedInfo
+                                        .valueOf((Integer) allFields[Columns.UPDATEDINFO.ordinal()].getValue()));
+        transfer.setOwnerRequest((String) allFields[Columns.OWNERREQ.ordinal()]
+                .getValue());
+        transfer.setRequester((String) allFields[Columns.REQUESTER.ordinal()]
+                .getValue());
+        transfer.setRequested((String) allFields[Columns.REQUESTED.ordinal()]
+                .getValue());
+        transfer.setId((Long) allFields[Columns.SPECIALID.ordinal()].getValue());
+        originalSize = getOriginalSizeTransferMap();
+    }
+
+    /**
+     *
+     * @return The Where condition on Primary Key
+     */
+    protected String getWherePrimaryKey() {
+        return primaryKey[0].getColumn() + " = ? AND " +
+               primaryKey[1].getColumn() + " = ? AND " +
+               primaryKey[2].getColumn() + " = ? AND " +
+               primaryKey[3].getColumn() + " = ? ";
+    }
+
+    /**
+     * Set the primary Key as current value
+     */
+    protected void setPrimaryKey() {
+        primaryKey[0].setValue(transfer.getOwnerRequest());
+        primaryKey[1].setValue(transfer.getRequester());
+        primaryKey[2].setValue(transfer.getRequested());
+        primaryKey[3].setValue(transfer.getId());
+    }
+
+    public void checkThroughMode() {
+        isRecvThrough = RequestPacket.isRecvThroughMode(
+                transfer.getTransferMode(), isSelfRequested());
+        isSendThrough = RequestPacket.isSendThroughMode(
+                transfer.getTransferMode(), isSelfRequested());
+
+        if (localChannelReference != null) {
+            if (localChannelReference.isRecvThroughMode()) {
+                isRecvThrough = true;
+            }
+            if (localChannelReference.isSendThroughMode()) {
+                isSendThrough = true;
+            }
+            if (isRecvThrough && !localChannelReference.isRecvThroughMode()) {
+                // Cannot be a RecvThrough
+                isRecvThrough = false;
+            }
+            if (isSendThrough && !localChannelReference.isSendThroughMode()) {
+                isSendThrough = false;
+            }
+        }
+        logger.debug("DbTask " + transfer.getTransferMode()
+                     + " isRecvThrough: " + isRecvThrough
+                     + " isSendThrough: " + isSendThrough);
+    }
+
+    @Override
+    public void setFromJson(ObjectNode source, boolean ignorePrimaryKey) throws WaarpDatabaseSqlException {
+        if (transfer == null) {
+            transfer = new Transfer();
+        }
+        for (Columns column : Columns.values()) {
+            if (column == Columns.UPDATEDINFO) {
+                continue;
+            }
+            JsonNode item = source.get(column.name());
+            if (item != null && !item.isMissingNode() && !item.isNull()) {
+                switch (column) {
+                case BLOCKSZ:
+                    transfer.setBlockSize(item.asInt());
+                    break;
+                case FILEINFO:
+                    transfer.setFileInfo(item.asText());
+                    break;
+                case FILENAME:
+                    transfer.setFilename(item.asText());
+                    break;
+                case GLOBALLASTSTEP:
+                    transfer.setLastGlobalStep(
+                            Transfer.TASKSTEP.valueOf(item.asInt()));
+                    break;
+                case GLOBALSTEP:
+                    transfer.setGlobalStep(
+                            Transfer.TASKSTEP.valueOf(item.asInt()));
+                    break;
+                case IDRULE:
+                    transfer.setRule(item.asText());
+                    break;
+                case INFOSTATUS:
+                    transfer.setInfoStatus(
+                            ErrorCode.getFromCode(item.asText()));
+                    break;
+                case ISMOVED:
+                    transfer.setIsMoved(item.asBoolean());
+                    break;
+                case MODETRANS:
+                    transfer.setTransferMode(item.asInt());
+                    break;
+                case ORIGINALNAME:
+                    transfer.setOriginalName(item.asText());
+                    break;
+                case OWNERREQ:
+                    String owner = item.asText();
+                    if (owner == null || owner.isEmpty()) {
+                        owner = Configuration.configuration.getHOST_ID();
+                    }
+                    transfer.setOwnerRequest(owner);
+                    break;
+                case RANK:
+                    transfer.setRank(item.asInt());
+                    break;
+                case REQUESTED:
+                    transfer.setRequested(item.asText());
+                    break;
+                case REQUESTER:
+                    transfer.setRequester(item.asText());
+                    break;
+                case RETRIEVEMODE:
+                    transfer.setRetrieveMode(item.asBoolean());
+                    break;
+                case SPECIALID:
+                    transfer.setId(item.asLong());
+                    break;
+                case STARTTRANS:
+                    long start = item.asLong();
+                    if (start == 0) {
+                        start = System.currentTimeMillis();
+                    }
+                    transfer.setStart(new Timestamp(start));
+                    break;
+                case STEP:
+                    transfer.setStep(source.path(Columns.STEP.name()).asInt());
+                    break;
+                case STEPSTATUS:
+                    transfer.setStepStatus(
+                            ErrorCode.getFromCode(item.asText()));
+                    break;
+                case STOPTRANS:
+                    long stop = item.asLong();
+                    if (stop == 0) {
+                        stop = System.currentTimeMillis();
+                    }
+                    transfer.setStop(new Timestamp(stop));
+                    break;
+                case TRANSFERINFO:
+                    transfer.setTransferInfo(item.asText());
+                    break;
+                case UPDATEDINFO:
+                    // ignore
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        JsonNode node = source.path(JSON_RESCHEDULE);
+        if (!node.isMissingNode() || !node.isNull()) {
+            rescheduledTransfer = node.asBoolean(false);
+        }
+        node = source.path(JSON_THROUGHMODE);
+        if (!node.isMissingNode() || !node.isNull()) {
+            if (RequestPacket.isRecvMode(transfer.getTransferMode())) {
+                isRecvThrough = node.asBoolean();
+            } else {
+                isSendThrough = node.asBoolean();
+            }
+        }
+        node = source.path(JSON_ORIGINALSIZE);
+        if (!node.isMissingNode() || !node.isNull()) {
+            originalSize = node.asLong(getOriginalSizeTransferMap());
+        }
+        isSaved = false;
+        try {
+            this.rule = new DbRule(getRuleId());
+        } catch (WaarpDatabaseException e) {
+            // ignore
+            this.rule = null;
+        }
+        if (transfer.getFilename() == null || transfer.getFilename().isEmpty()) {
+            throw new WaarpDatabaseSqlException("Cannot create a transfer without filename");
+        } else if (transfer.getRule() == null || transfer.getRule().isEmpty()) {
+            throw new WaarpDatabaseSqlException("Cannot create a transfer without rule");
+        } else if (transfer.getOwnerRequest() == null || transfer.getOwnerRequest().isEmpty()) {
+            throw new WaarpDatabaseSqlException("Cannot create a transfer without owner");
+        } else if (transfer.getRequester() == null || transfer.getRequester().isEmpty()) {
+            throw new WaarpDatabaseSqlException("Cannot create a transfer without requester");
+        } else if (transfer.getRequested() == null || transfer.getRequested().isEmpty()) {
+            throw new WaarpDatabaseSqlException("Cannot create a transfer without requested");
+        }
+        checkThroughMode();
+    }
+
+    /**
+     * Create a Special Id for NoDb client
+     */
+    private void createNoDbSpecialId() {
+        transfer.setId(new LongUuid().getLong());
+        setPrimaryKey();
+        /*synchronized (clientNoDbSpecialIdLast) {
+        	// New SpecialId is not possible with No Database Model
+        	specialId = System.currentTimeMillis();
+        	if (clientNoDbSpecialIdLast.get() >= specialId) {
+        		specialId = clientNoDbSpecialIdLast.incrementAndGet();
+        	} else {
+        		clientNoDbSpecialIdLast.set(specialId);
+        	}
+        	setPrimaryKey();
+        	return;
+        }*/
+    }
+
+    /**
+     * Remove a Spcieal Id for NoDb Client
+     */
+    private final void removeNoDbSpecialId() {
+        removeNoDbSpecialId(transfer.getId());
+    }
+
+    @Override
+    public void delete() throws WaarpDatabaseException {
+        TransferDAO transferAccess = null;
+        try {
+            transferAccess = DAOFactory.getInstance().getTransferDAO();
+            transferAccess.delete(transfer);
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (transferAccess != null) {
+                transferAccess.close();
+            }
+        }
+    }
+
+    private void addNoDb() {
+        /*
+        DbTaskRunner runner = new DbTaskRunner();
+        this.setToArray();
+        DbValue[] temp = runner.allFields;
+        runner.allFields = this.allFields;
+        try {
+            runner.setFromArray();
+        } catch (WaarpDatabaseSqlException e) {
+        }
+        runner.allFields = temp;
+        runner.setToArray();
+        runner.isRecvThrough = this.isRecvThrough;
+        runner.isSendThrough = this.isSendThrough;
+        runner.rule = this.rule;
+        runner.isSaved = true;
+        */
+        CommanderNoDb.todoList.add(this);
+    }
+
+    @Override
+    public void insert() throws WaarpDatabaseException {
+        TransferDAO transferAccess = null;
+        try {
+            transferAccess = DAOFactory.getInstance().getTransferDAO();
+            transferAccess.insert(transfer);
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (transferAccess != null) {
+                transferAccess.close();
+            }
+        }
+    }
+
+    /**
+     * As insert but with the ability to change the SpecialId
+     *
+     * @throws WaarpDatabaseException
+     */
+    public void create() throws WaarpDatabaseException {
+        insert();
+    }
+
+    @Override
+    public boolean exist() throws WaarpDatabaseException {
+        TransferDAO transferAccess = null;
+        try {
+            transferAccess = DAOFactory.getInstance().getTransferDAO();
+            return transferAccess.exist(transfer.getId(),
+                                        transfer.getRequester(), transfer.getRequested(),
+                                        Configuration.configuration.getHOST_ID());
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (transferAccess != null) {
+                transferAccess.close();
+            }
+        }
+    }
+
+    /**
+     * Shall be called to ensure that item is really available in database
+     *
+     * @return True iff the element exists in a database (and reloaded then from Database)
+     * @throws WaarpDatabaseException
+     */
+    public boolean checkFromDbForSubmit() throws WaarpDatabaseException {
+        if (exist()) {
+            select();
+            this.rule = new DbRule(getRuleId());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void select() throws WaarpDatabaseException {
+        TransferDAO transferAccess = null;
+        try {
+            transferAccess = DAOFactory.getInstance().getTransferDAO();
+            transfer = transferAccess.select(transfer.getId(),
+                                             transfer.getRequester(), transfer.getRequested(),
+                                             Configuration.configuration.getHOST_ID());
+        } catch (DAOException e) {
+            throw new WaarpDatabaseNoConnectionException(e);
+        } finally {
+            if (transferAccess != null) {
+                transferAccess.close();
+            }
+        }
+        if (transfer == null) {
+            throw new WaarpDatabaseNoConnectionException("No Transfer found");
+        }
+        this.rule = new DbRule(getRuleId());
+        checkThroughMode();
+    }
+
+    @Override
+    public void update() throws WaarpDatabaseException {
+        // SNMP notification
+        if (transfer.getUpdatedInfo().equals(UpdatedInfo.INERROR) ||
+            transfer.getUpdatedInfo().equals(UpdatedInfo.INTERRUPTED)) {
+            if (Configuration.configuration.getR66Mib() != null) {
+                Configuration.configuration.getR66Mib().notifyInfoTask(
+                        "Task is " + transfer.getUpdatedInfo().name(), this);
+            }
+        } else {
+            if (transfer.getGlobalStep() != Transfer.TASKSTEP.TRANSFERTASK ||
+                (transfer.getGlobalStep() == Transfer.TASKSTEP.TRANSFERTASK &&
+                 (transfer.getRank() % 100 == 0))) {
+                if (Configuration.configuration.getR66Mib() != null) {
+                    Configuration.configuration.getR66Mib().notifyTask(
+                            "Task is currently " + transfer.getUpdatedInfo().name(), this);
+                }
+            }
+        }
+        // FIX SelfRequest
+        if (isSelfRequest()) {
+            if (RequestPacket.isCompatibleMode(transfer.getTransferMode(),
+                                               transfer.getRetrieveMode()?
+                                                       RequestPacket.TRANSFERMODE.RECVMODE.ordinal() :
+                                                       RequestPacket.TRANSFERMODE.SENDMODE.ordinal())) {
+                optimizedUpdate();
+            }
+        } else {
+            optimizedUpdate();
+        }
+    }
+
+    /**
+     * Update Runner using special PreparedStatement
+     *
+     * @throws WaarpDatabaseException
+     */
+    protected void optimizedUpdate() throws WaarpDatabaseException {
+        TransferDAO transferAccess = null;
+        try {
+            transferAccess = DAOFactory.getInstance().getTransferDAO();
+            transferAccess.update(transfer);
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (transferAccess != null) {
+                transferAccess.close();
+            }
+        }
+    }
+
+    public void clean() {
+    }
+
+    /**
+     * Special method used to force insert in case of SelfSubmit
+     *
+     * @throws WaarpDatabaseException
+     */
+    public boolean specialSubmit() throws WaarpDatabaseException {
+        insert();
+        return false;
+    }
+
+    /**
+     * Partial set from another runner (infostatus, rank, status, step, stop, filename,
+     * globallastep, globalstep, isFileMoved)
+     *
+     * @param runner
+     */
+    public void setFrom(DbTaskRunner runner) {
+        if (runner != null) {
+            this.transfer.setInfoStatus(runner.getErrorInfo());
+            this.transfer.setRank(runner.getRank());
+            this.transfer.setStepStatus(runner.getStatus());
+            this.transfer.setStep(runner.getStep());
+            this.transfer.setStop(runner.getStop());
+            this.transfer.setFilename(runner.getFilename());
+            this.transfer.setGlobalStep(runner.transfer.getGlobalStep());
+            this.transfer.setLastGlobalStep(runner.transfer.getLastGlobalStep());
+            this.transfer.setIsMoved(runner.isFileMoved());
+        }
+    }
+
+    public boolean isRecvThrough() {
+        return isRecvThrough;
+    }
+
+    public boolean isSendThrough() {
+        return isSendThrough;
+    }
+
+    /**
+     * @return the localChannelReference
+     */
+    public LocalChannelReference getLocalChannelReference() {
+        return localChannelReference;
+    }
+
+    /**
+     * Set a localChannelReference
+     *
+     * @param localChannelReference
+     */
+    public void setLocalChannelReference(LocalChannelReference localChannelReference) {
+        this.localChannelReference = localChannelReference;
+    }
+
+    /**
      * Reset the runner (ready to be run again)
      *
      * @return True if OK, False if already finished
@@ -2101,32 +2433,32 @@ public class DbTaskRunner extends AbstractDbData {
         if (this.getStatus() != ErrorCode.CompleteOk) {
             // restart
             switch (TASKSTEP.values()[this.getGloballaststep()]) {
-                case PRETASK:
-                    // restart
-                    this.setPreTask();
-                    this.setExecutionStatus(ErrorCode.InitOk);
-                    break;
-                case TRANSFERTASK:
-                    // continue
-                    int newrank = this.getRank();
-                    this.setTransferTask(newrank);
-                    this.setExecutionStatus(ErrorCode.PreProcessingOk);
-                    break;
-                case POSTTASK:
-                    // restart
-                    this.setPostTask();
-                    this.setExecutionStatus(ErrorCode.TransferOk);
-                    break;
-                case ALLDONETASK:
-                    break;
-                case ERRORTASK:
-                    break;
-                case NOTASK:
-                    setInitialTask();
-                    this.setExecutionStatus(ErrorCode.Unknown);
-                    break;
-                default:
-                    break;
+            case PRETASK:
+                // restart
+                this.setPreTask();
+                this.setExecutionStatus(ErrorCode.InitOk);
+                break;
+            case TRANSFERTASK:
+                // continue
+                int newrank = this.getRank();
+                this.setTransferTask(newrank);
+                this.setExecutionStatus(ErrorCode.PreProcessingOk);
+                break;
+            case POSTTASK:
+                // restart
+                this.setPostTask();
+                this.setExecutionStatus(ErrorCode.TransferOk);
+                break;
+            case ALLDONETASK:
+                break;
+            case ERRORTASK:
+                break;
+            case NOTASK:
+                setInitialTask();
+                this.setExecutionStatus(ErrorCode.Unknown);
+                break;
+            default:
+                break;
             }
             this.changeUpdatedInfo(UpdatedInfo.UNKNOWN);
             this.setErrorExecutionStatus(transfer.getStepStatus());
@@ -2145,7 +2477,7 @@ public class DbTaskRunner extends AbstractDbData {
             int newrank = this.getRank();
             if (newrank > 0) {
                 logger.debug("Decrease Rank Restart of -" + Configuration.getRANKRESTART() +
-                        " from " + newrank);
+                             " from " + newrank);
                 newrank -= Configuration.getRANKRESTART();
                 if (newrank <= 0) {
                     newrank = 1;
@@ -2170,8 +2502,10 @@ public class DbTaskRunner extends AbstractDbData {
         // Restart if not Requested
         if (submit) {
             if (isSelfRequested()
-                    && ((transfer.getLastGlobalStep() != Transfer.TASKSTEP.ALLDONETASK)
-                    || (transfer.getLastGlobalStep() != Transfer.TASKSTEP.ERRORTASK)));
+                && ((transfer.getLastGlobalStep() != Transfer.TASKSTEP.ALLDONETASK)
+                    || (transfer.getLastGlobalStep() != Transfer.TASKSTEP.ERRORTASK))) {
+                ;
+            }
             {
                 return false;
             }
@@ -2181,7 +2515,7 @@ public class DbTaskRunner extends AbstractDbData {
             // if not submit and transfertask and receiver AND not requester
             // If requester and receiver => rank is already decreased when request is sent
             if ((!submit) && (transfer.getGlobalStep() == Transfer.TASKSTEP.TRANSFERTASK)
-                    && (!transfer.getRetrieveMode()) && (this.isSelfRequested())) {
+                && (!transfer.getRetrieveMode()) && (this.isSelfRequested())) {
                 logger.debug("Will try to restart transfer {}", this);
                 this.restartRank();
                 logger.debug("New restart for transfer is {}", this);
@@ -2211,13 +2545,13 @@ public class DbTaskRunner extends AbstractDbData {
         if (!isFinished()) {
             reset();
             switch (code) {
-                case CanceledTransfer:
-                case StoppedTransfer:
-                case RemoteShutdown:
-                    this.changeUpdatedInfo(UpdatedInfo.INERROR);
-                    break;
-                default:
-                    this.changeUpdatedInfo(UpdatedInfo.INTERRUPTED);
+            case CanceledTransfer:
+            case StoppedTransfer:
+            case RemoteShutdown:
+                this.changeUpdatedInfo(UpdatedInfo.INERROR);
+                break;
+            default:
+                this.changeUpdatedInfo(UpdatedInfo.INTERRUPTED);
             }
             try {
                 update();
@@ -2293,26 +2627,12 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
-     * @param filename the filename to set
-     */
-    public void setFilename(String filename) {
-        transfer.setFilename(filename);
-    }
-
-    /**
      * @param newFilename the new Filename to set
      * @param isFileMoved the isFileMoved to set
      */
     public void setFileMoved(String newFilename, boolean isFileMoved) {
         transfer.setIsMoved(isFileMoved);
         transfer.setFilename(newFilename);
-    }
-
-    /**
-     * @param originalFilename the originalFilename to set
-     */
-    public void setOriginalFilename(String originalFilename) {
-        transfer.setOriginalName(originalFilename);
     }
 
     /**
@@ -2346,6 +2666,15 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
+     * Utility for "self request" mode only
+     *
+     * @param sender
+     */
+    public void setSender(boolean sender) {
+        transfer.setRetrieveMode(sender);
+    }
+
+    /**
      * @return the isFileMoved
      */
     public boolean isFileMoved() {
@@ -2367,6 +2696,13 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
+     * @param filename the filename to set
+     */
+    public void setFilename(String filename) {
+        transfer.setFilename(filename);
+    }
+
+    /**
      * @return the originalFilename
      */
     public String getOriginalFilename() {
@@ -2374,10 +2710,26 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
+     * @param originalFilename the originalFilename to set
+     */
+    public void setOriginalFilename(String originalFilename) {
+        transfer.setOriginalName(originalFilename);
+    }
+
+    /**
      * @return the fileInformation
      */
     public String getFileInformation() {
         return transfer.getFileInfo();
+    }
+
+    /**
+     * Set a new File information for this transfer
+     *
+     * @param newFileInformation
+     */
+    public void setFileInformation(String newFileInformation) {
+        transfer.setFileInfo(newFileInformation);
     }
 
     /**
@@ -2399,15 +2751,6 @@ public class DbTaskRunner extends AbstractDbData {
 
     /**
      *
-     * @param size the new size value to set in TransferMap
-     */
-    private void setOriginalSizeTransferMap(long size) {
-        Map<String, Object> map = getTransferMap();
-        map.put(JSON_ORIGINALSIZE, size);
-        setTransferMap(map);
-    }
-    /**
-     *
      * @return the size set in TransferMap
      */
     private long getOriginalSizeTransferMap() {
@@ -2421,13 +2764,15 @@ public class DbTaskRunner extends AbstractDbData {
             return (Integer) size;
         }
     }
+
     /**
-     * Set a new File information for this transfer
      *
-     * @param newFileInformation
+     * @param size the new size value to set in TransferMap
      */
-    public void setFileInformation(String newFileInformation) {
-       transfer.setFileInfo(newFileInformation);
+    private void setOriginalSizeTransferMap(long size) {
+        Map<String, Object> map = getTransferMap();
+        map.put(JSON_ORIGINALSIZE, size);
+        setTransferMap(map);
     }
 
     public String getTransferInfo() {
@@ -2495,7 +2840,6 @@ public class DbTaskRunner extends AbstractDbData {
         return transfer.getLastGlobalStep().toLegacy();
     }
 
-
     /**
      * @return the globallaststep
      */
@@ -2508,7 +2852,7 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public boolean ready() {
         return transfer.getGlobalStep() != Transfer.TASKSTEP.NOTASK
-                && transfer.getGlobalStep() != Transfer.TASKSTEP.PRETASK;
+               && transfer.getGlobalStep() != Transfer.TASKSTEP.PRETASK;
     }
 
     /**
@@ -2547,7 +2891,7 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public boolean isPreTaskStarting() {
         if (transfer.getLastGlobalStep() == Transfer.TASKSTEP.PRETASK ||
-                transfer.getLastGlobalStep() == Transfer.TASKSTEP.NOTASK) {
+            transfer.getLastGlobalStep() == Transfer.TASKSTEP.NOTASK) {
             return (transfer.getStep() - 1 <= 0);
         }
         return false;
@@ -2654,10 +2998,10 @@ public class DbTaskRunner extends AbstractDbData {
             continueTransfer = false;
             ErrorCode infostatus = transfer.getInfoStatus();
             if (infostatus == ErrorCode.InitOk ||
-                    infostatus == ErrorCode.PostProcessingOk ||
-                    infostatus == ErrorCode.PreProcessingOk ||
-                    infostatus == ErrorCode.Running ||
-                    infostatus == ErrorCode.TransferOk) {
+                infostatus == ErrorCode.PostProcessingOk ||
+                infostatus == ErrorCode.PreProcessingOk ||
+                infostatus == ErrorCode.Running ||
+                infostatus == ErrorCode.TransferOk) {
                 transfer.setInfoStatus(code);
             }
             if (!transfer.getUpdatedInfo().equals(UpdatedInfo.INTERRUPTED)) {
@@ -2676,7 +3020,6 @@ public class DbTaskRunner extends AbstractDbData {
         return continueTransfer;
     }
 
-
     /**
      * Run the task from the given task information (from rule)
      *
@@ -2688,10 +3031,10 @@ public class DbTaskRunner extends AbstractDbData {
     private R66Future runNextTask(String[][] tasks)
             throws OpenR66RunnerEndTasksException, OpenR66RunnerErrorException {
         logger.debug((session == null) + ":"
-                + (session == null ? "norunner" : (this.session.getRunner() == null)) + ":"
-                + this.toLogRunStep() + ":" + getStep() + ":" + (tasks == null ? "null" : tasks.length)
-                + " Sender: " + isSender() + " " + this.rule.printTasks(isSender(),
-                        getGlobalStep()));
+                     + (session == null? "norunner" : (this.session.getRunner() == null)) + ":"
+                     + this.toLogRunStep() + ":" + getStep() + ":" + (tasks == null? "null" : tasks.length)
+                     + " Sender: " + isSender() + " " + this.rule.printTasks(isSender(),
+                                                                             getGlobalStep()));
         if (tasks == null) {
             throw new OpenR66RunnerEndTasksException("No tasks!");
         }
@@ -2709,7 +3052,7 @@ public class DbTaskRunner extends AbstractDbData {
         this.session = tempSession;
         if (this.session.getLocalChannelReference().getCurrentCode() == ErrorCode.Unknown) {
             this.session.getLocalChannelReference().setErrorMessage(getErrorInfo().getMesg(),
-                    getErrorInfo());
+                                                                    getErrorInfo());
         }
         if (tasks.length <= getStep()) {
             throw new OpenR66RunnerEndTasksException();
@@ -2758,7 +3101,7 @@ public class DbTaskRunner extends AbstractDbData {
      * @throws OpenR66RunnerEndTasksException
      */
     private R66Future runNext() throws OpenR66RunnerErrorException,
-            OpenR66RunnerEndTasksException {
+                                       OpenR66RunnerEndTasksException {
         if (rule == null) {
             if (getRuleId() != null) {
                 try {
@@ -2772,51 +3115,51 @@ public class DbTaskRunner extends AbstractDbData {
             }
         }
         logger.debug(this.toLogRunStep() + " Sender: " + isSender() + " "
-                + this.rule.printTasks(isSender(), getGlobalStep()));
+                     + this.rule.printTasks(isSender(), getGlobalStep()));
         switch (getGlobalStep()) {
-            case PRETASK:
-                try {
-                    if (isSender()) {
-                        return runNextTask(rule.getSpreTasksArray());
-                    } else {
-                        return runNextTask(rule.getRpreTasksArray());
-                    }
-                } catch (OpenR66RunnerEndTasksException e) {
-                    if (getStatus() == ErrorCode.Running) {
-                        setExecutionStatus(ErrorCode.PreProcessingOk);
-                        setErrorExecutionStatus(ErrorCode.PreProcessingOk);
-                    }
-                    throw e;
+        case PRETASK:
+            try {
+                if (isSender()) {
+                    return runNextTask(rule.getSpreTasksArray());
+                } else {
+                    return runNextTask(rule.getRpreTasksArray());
                 }
-            case POSTTASK:
-                try {
-                    if (isSender()) {
-                        return runNextTask(rule.getSpostTasksArray());
-                    } else {
-                        return runNextTask(rule.getRpostTasksArray());
-                    }
-                } catch (OpenR66RunnerEndTasksException e) {
-                    if (getStatus() == ErrorCode.Running) {
-                        setExecutionStatus(ErrorCode.PostProcessingOk);
-                        setErrorExecutionStatus(ErrorCode.PostProcessingOk);
-                    }
-                    throw e;
+            } catch (OpenR66RunnerEndTasksException e) {
+                if (getStatus() == ErrorCode.Running) {
+                    setExecutionStatus(ErrorCode.PreProcessingOk);
+                    setErrorExecutionStatus(ErrorCode.PreProcessingOk);
                 }
-            case ERRORTASK:
-                try {
-                    if (isSender()) {
-                        return runNextTask(rule.getSerrorTasksArray());
-                    } else {
-                        return runNextTask(rule.getRerrorTasksArray());
-                    }
-                } catch (OpenR66RunnerEndTasksException e) {
-                    if (getStatus() == ErrorCode.Running) {
-                        setExecutionStatus(getErrorInfo());
-                    }
-                    throw e;
+                throw e;
+            }
+        case POSTTASK:
+            try {
+                if (isSender()) {
+                    return runNextTask(rule.getSpostTasksArray());
+                } else {
+                    return runNextTask(rule.getRpostTasksArray());
                 }
-            default:
-                throw new OpenR66RunnerErrorException("Global Step unknown");
+            } catch (OpenR66RunnerEndTasksException e) {
+                if (getStatus() == ErrorCode.Running) {
+                    setExecutionStatus(ErrorCode.PostProcessingOk);
+                    setErrorExecutionStatus(ErrorCode.PostProcessingOk);
+                }
+                throw e;
+            }
+        case ERRORTASK:
+            try {
+                if (isSender()) {
+                    return runNextTask(rule.getSerrorTasksArray());
+                } else {
+                    return runNextTask(rule.getRerrorTasksArray());
+                }
+            } catch (OpenR66RunnerEndTasksException e) {
+                if (getStatus() == ErrorCode.Running) {
+                    setExecutionStatus(getErrorInfo());
+                }
+                throw e;
+            }
+        default:
+            throw new OpenR66RunnerErrorException("Global Step unknown");
         }
     }
 
@@ -2828,8 +3171,8 @@ public class DbTaskRunner extends AbstractDbData {
     public void run() throws OpenR66RunnerErrorException {
         R66Future future;
         logger.debug(this.toLogRunStep() + " Status: " + getStatus()
-                + " Sender: " + isSender()
-                + " " + this.rule.printTasks(isSender(), getGlobalStep()));
+                     + " Sender: " + isSender()
+                     + " " + this.rule.printTasks(isSender(), getGlobalStep()));
         if (getStatus() != ErrorCode.Running) {
             throw new OpenR66RunnerErrorException(
                     "Current global STEP not ready to run: " + this.toString());
@@ -2846,7 +3189,7 @@ public class DbTaskRunner extends AbstractDbData {
                 setErrorExecutionStatus(ErrorCode.ExternalOp);
                 this.saveStatus();
                 throw new OpenR66RunnerErrorException("Runner is in error: " +
-                        e.getMessage(), e);
+                                                      e.getMessage(), e);
             }
             if ((!future.isDone()) || future.isFailed()) {
                 R66Result result = future.getResult();
@@ -2859,10 +3202,10 @@ public class DbTaskRunner extends AbstractDbData {
                 logger.info("Future is failed: " + getErrorInfo().getMesg());
                 if (future.getCause() != null) {
                     throw new OpenR66RunnerErrorException("Runner is failed: " +
-                            future.getCause().getMessage(), future.getCause());
+                                                          future.getCause().getMessage(), future.getCause());
                 } else {
                     throw new OpenR66RunnerErrorException("Runner is failed: " +
-                            getErrorInfo().getMesg());
+                                                          getErrorInfo().getMesg());
                 }
             }
             transfer.setStep(getStep() + 1);
@@ -2906,11 +3249,11 @@ public class DbTaskRunner extends AbstractDbData {
                 // in case of error
                 R66Result error =
                         new R66Result(this.session, finalValue.isAnswered(),
-                                ErrorCode.FinalOp, this);
+                                      ErrorCode.FinalOp, this);
                 if (!isRecvThrough()) {
                     if (getGlobalStep() == TASKSTEP.TRANSFERTASK ||
-                            (getGlobalStep() == TASKSTEP.POSTTASK
-                                    && poststep == 0)) {
+                        (getGlobalStep() == TASKSTEP.POSTTASK
+                         && poststep == 0)) {
                         // Result file moves
                         String finalpath = R66Dir.getFinalUniqueFilename(file);
                         logger.debug("Will move file {}", finalpath);
@@ -2919,7 +3262,7 @@ public class DbTaskRunner extends AbstractDbData {
                                 OpenR66ProtocolSystemException e = new OpenR66ProtocolSystemException(
                                         "Cannot move file to final position");
                                 R66Result result = new R66Result(e, session, false,
-                                        ErrorCode.FinalOp, this);
+                                                                 ErrorCode.FinalOp, this);
                                 result.setFile(file);
                                 result.setRunner(this);
                                 if (localChannelReference != null) {
@@ -2930,7 +3273,7 @@ public class DbTaskRunner extends AbstractDbData {
                             }
                         } catch (OpenR66ProtocolSystemException e) {
                             R66Result result = new R66Result(e, session, false,
-                                    ErrorCode.FinalOp, this);
+                                                             ErrorCode.FinalOp, this);
                             result.setFile(file);
                             result.setRunner(this);
                             if (localChannelReference != null) {
@@ -2965,7 +3308,8 @@ public class DbTaskRunner extends AbstractDbData {
                             try {
                                 if (!FilesystemBasedDigest.getHex(
                                         FilesystemBasedDigest.getHash(file.getTrueFile(), true,
-                                                Configuration.configuration.getDigest())).equals(hash)) {
+                                                                      Configuration.configuration.getDigest()))
+                                                          .equals(hash)) {
                                     // KO
                                     R66Result result = new R66Result(
                                             new OpenR66RunnerErrorException("Bad final digest on receive operation"),
@@ -3006,7 +3350,7 @@ public class DbTaskRunner extends AbstractDbData {
                         // error
                         R66Result error =
                                 new R66Result(this.session, finalValue.isAnswered(),
-                                        ErrorCode.FileNotFound, this);
+                                              ErrorCode.FileNotFound, this);
                         this.setErrorExecutionStatus(ErrorCode.FileNotFound);
                         errorTransfer(error, file, localChannelReference);
                         return;
@@ -3015,7 +3359,7 @@ public class DbTaskRunner extends AbstractDbData {
                     // error
                     R66Result error =
                             new R66Result(this.session, finalValue.isAnswered(),
-                                    ErrorCode.FileNotFound, this);
+                                          ErrorCode.FileNotFound, this);
                     this.setErrorExecutionStatus(ErrorCode.FileNotFound);
                     errorTransfer(error, file, localChannelReference);
                     return;
@@ -3025,7 +3369,7 @@ public class DbTaskRunner extends AbstractDbData {
                 this.run();
             } catch (OpenR66RunnerErrorException e1) {
                 R66Result result = new R66Result(e1, this.session, false,
-                        ErrorCode.ExternalOp, this);
+                                                 ErrorCode.ExternalOp, this);
                 result.setFile(file);
                 result.setRunner(this);
                 this.changeUpdatedInfo(UpdatedInfo.INERROR);
@@ -3040,13 +3384,13 @@ public class DbTaskRunner extends AbstractDbData {
             /*
              * Done later on after EndRequest this.setAllDone(); this.saveStatus();
              */
-            logger.info("Transfer done on {} at RANK {}", file != null ? file : "no file", getRank());
+            logger.info("Transfer done on {} at RANK {}", file != null? file : "no file", getRank());
             if (localChannelReference != null) {
                 localChannelReference.validateEndTransfer(finalValue);
             }
         } else {
             logger.debug("ContinueTransfer: " + continueTransfer + " status:" + status + ":"
-                    + finalValue);
+                         + finalValue);
             /*
              * if (!continueTransfer) { // already setup return; }
              */
@@ -3090,8 +3434,8 @@ public class DbTaskRunner extends AbstractDbData {
             finalValue.setAnswered(true);
         }
         logger.debug("status: " + getStatus() + " wasNotError:"
-                + (getGlobalStep() != TASKSTEP.ERRORTASK) +
-                ":" + finalValue);
+                     + (getGlobalStep() != TASKSTEP.ERRORTASK) +
+                     ":" + finalValue);
         if (getGlobalStep() != TASKSTEP.ERRORTASK) {
             // errorstep was not already executed
             // real error
@@ -3100,11 +3444,11 @@ public class DbTaskRunner extends AbstractDbData {
             if (!finalValue.isAnswered()) {
                 localChannelReference.sessionNewState(R66FiniteDualStates.ERROR);
                 ErrorPacket errorPacket = new ErrorPacket(finalValue
-                        .getMessage(),
-                        finalValue.getCode().getCode(), ErrorPacket.FORWARDCLOSECODE);
+                                                                  .getMessage(),
+                                                          finalValue.getCode().getCode(), ErrorPacket.FORWARDCLOSECODE);
                 try {
                     ChannelUtils.writeAbstractLocalPacket(localChannelReference,
-                            errorPacket, true);
+                                                          errorPacket, true);
                     finalValue.setAnswered(true);
                 } catch (OpenR66ProtocolPacketException e1) {
                     // should not be
@@ -3225,68 +3569,56 @@ public class DbTaskRunner extends AbstractDbData {
 
     @Override
     public String toString() {
-        return "Run: '" + (rule != null ? rule.toString() : getRuleId()) + "' Filename: '" +
-                getFilename() + "', STEP: '" + getGlobalStep() + "(" +
-                getLastGlobalStep() + "):" + getStep() + ":" +
-                getStatus().getMesg() + "', TransferRank: " + getRank() +
-                ", Blocksize: " + getBlocksize() +
-                ", SpecialId: " + getSpecialId() + ", isSender: " + isSender() +
-                ", isMoved: " + isFileMoved() + ", Mode: '" + getMode() +
-                "', Requester: '" + getRequester() + "', Requested: '" +
-                getRequested() + "', Start: '" + getStart() + "', Stop: '" + getStop() +
-                "', Internal: '" + getUpdatedInfo().name() +
-                ":" + getErrorInfo().getMesg() + "', OriginalSize: " + originalSize +
-                ", Fileinfo: '" + getFileInformation() + "', Transferinfo: '" + getTransferInfo() + "'";
+        return "Run: '" + (rule != null? rule.toString() : getRuleId()) + "' Filename: '" +
+               getFilename() + "', STEP: '" + getGlobalStep() + "(" +
+               getLastGlobalStep() + "):" + getStep() + ":" +
+               getStatus().getMesg() + "', TransferRank: " + getRank() +
+               ", Blocksize: " + getBlocksize() +
+               ", SpecialId: " + getSpecialId() + ", isSender: " + isSender() +
+               ", isMoved: " + isFileMoved() + ", Mode: '" + getMode() +
+               "', Requester: '" + getRequester() + "', Requested: '" +
+               getRequested() + "', Start: '" + getStart() + "', Stop: '" + getStop() +
+               "', Internal: '" + getUpdatedInfo().name() +
+               ":" + getErrorInfo().getMesg() + "', OriginalSize: " + originalSize +
+               ", Fileinfo: '" + getFileInformation() + "', Transferinfo: '" + getTransferInfo() + "'";
     }
 
     public String toLogRunStep() {
         return "Run: " + getRuleId() + " on " +
-                getFilename() + " STEP: " + getGlobalStep() + "(" +
-                getLastGlobalStep() + "):" + getStep() + ":" +
-                getStatus().getMesg();
+               getFilename() + " STEP: " + getGlobalStep() + "(" +
+               getLastGlobalStep() + "):" + getStep() + ":" +
+               getStatus().getMesg();
     }
 
     public String toShortNoHtmlString(String newline) {
         return "{Run: '" + getRuleId() + "', Filename: '" + getFilename() + "',"
-                + newline + " STEP: '" + getGlobalStep() + "(" +
-                getLastGlobalStep() + "):" + getStep() + ":" +
-                getStatus().getMesg() + "'," + newline + " TransferRank: " + getRank()
-                + ", Blocksize: " + getBlocksize() + ", SpecialId: " +
-                getSpecialId() + ", isSender: '" + isSender() + "', isMoved: '" +
-                isFileMoved() + "', Mode: '" + TRANSFERMODE.values()[getMode()] +
-                newline + "', Requester: '" + getRequester() + "', Requested: '" +
-                getRequested() + "', Start: '" + getStart() + "', Stop: '" + getStop() + "'," +
-                newline + " Internal: '" + getUpdatedInfo().name() +
-                ":" + getErrorInfo().getMesg() + "', OriginalSize: " + originalSize + "," +
-                newline + " Fileinfo: '" + getFileInformation() + "', Transferinfo: '" + getTransferInfo() + "'}";
+               + newline + " STEP: '" + getGlobalStep() + "(" +
+               getLastGlobalStep() + "):" + getStep() + ":" +
+               getStatus().getMesg() + "'," + newline + " TransferRank: " + getRank()
+               + ", Blocksize: " + getBlocksize() + ", SpecialId: " +
+               getSpecialId() + ", isSender: '" + isSender() + "', isMoved: '" +
+               isFileMoved() + "', Mode: '" + TRANSFERMODE.values()[getMode()] +
+               newline + "', Requester: '" + getRequester() + "', Requested: '" +
+               getRequested() + "', Start: '" + getStart() + "', Stop: '" + getStop() + "'," +
+               newline + " Internal: '" + getUpdatedInfo().name() +
+               ":" + getErrorInfo().getMesg() + "', OriginalSize: " + originalSize + "," +
+               newline + " Fileinfo: '" + getFileInformation() + "', Transferinfo: '" + getTransferInfo() + "'}";
     }
 
     public String toShortString() {
         return "<RULE>" + getRuleId() + "</RULE><ID>" + getSpecialId() + "</ID><FILE>" +
-                getFilename() + "</FILE>     <STEP>" + getGlobalStep() +
-                "(" + getLastGlobalStep() + "):" + getStep() + ":" +
-                getStatus().getMesg() + "</STEP><RANK>" + getRank() + "</RANK><BLOCKSIZE>" + getBlocksize() +
-                "</BLOCKSIZE>     <SENDER>" +
-                isSender() + "</SENDER><MOVED>" + isFileMoved() + "</MOVED><MODE>" +
-                TRANSFERMODE.values()[getMode()] + "</MODE>     <REQR>" +
-                getRequester() + "</REQR><REQD>" + getRequested() +
-                "</REQD>     <START>" + getStart() + "</START><STOP>" + getStop() +
-                "</STOP>     <INTERNAL>" + getUpdatedInfo().name()
-                + " : " + getErrorInfo().getMesg() + "</INTERNAL><ORIGINALSIZE>" + originalSize
-                + "</ORIGINALSIZE>     <FILEINFO>" +
-                getFileInformation() + "</FILEINFO> <TRANSFERINFO>" + getTransferInfo() + "</TRANSFERINFO>";
-    }
-
-    /**
-     *
-     * @return the header for a table of runners in Html format
-     */
-    public static String headerHtml() {
-        return "<td>SpecialId</td><td>Rule</td><td>Filename</td><td>Info"
-                + "</td><td>Step (LastStep)</td><td>Action</td><td>Status"
-                + "</td><td>Internal</t><td>Transfer Rank</td><td>BlockSize</td><td>isMoved"
-                + "</td><td>Requester</td><td>Requested"
-                + "</td><td>Start</td><td>Stop</td><td>Bandwidth (Mbits)</td><td>Free Space(MB)</td>";
+               getFilename() + "</FILE>     <STEP>" + getGlobalStep() +
+               "(" + getLastGlobalStep() + "):" + getStep() + ":" +
+               getStatus().getMesg() + "</STEP><RANK>" + getRank() + "</RANK><BLOCKSIZE>" + getBlocksize() +
+               "</BLOCKSIZE>     <SENDER>" +
+               isSender() + "</SENDER><MOVED>" + isFileMoved() + "</MOVED><MODE>" +
+               TRANSFERMODE.values()[getMode()] + "</MODE>     <REQR>" +
+               getRequester() + "</REQR><REQD>" + getRequested() +
+               "</REQD>     <START>" + getStart() + "</START><STOP>" + getStop() +
+               "</STOP>     <INTERNAL>" + getUpdatedInfo().name()
+               + " : " + getErrorInfo().getMesg() + "</INTERNAL><ORIGINALSIZE>" + originalSize
+               + "</ORIGINALSIZE>     <FILEINFO>" +
+               getFileInformation() + "</FILEINFO> <TRANSFERINFO>" + getTransferInfo() + "</TRANSFERINFO>";
     }
 
     /**
@@ -3295,7 +3627,7 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public long freespaceMB(R66Session session) {
         if (getLastGlobalStep() == TASKSTEP.ALLDONETASK ||
-                getLastGlobalStep() == TASKSTEP.POSTTASK) {
+            getLastGlobalStep() == TASKSTEP.POSTTASK) {
             // All finished or Post task
             return freespace(session, false) / 0x100000L;
         } else {
@@ -3313,7 +3645,7 @@ public class DbTaskRunner extends AbstractDbData {
         long freespace = -1;
         DbRule rule = null;
         try {
-            rule = (this.rule != null) ? this.rule : new DbRule(getRuleId());
+            rule = (this.rule != null)? this.rule : new DbRule(getRuleId());
         } catch (WaarpDatabaseException e) {
         }
         if (this.rule == null) {
@@ -3347,7 +3679,7 @@ public class DbTaskRunner extends AbstractDbData {
 
     @SuppressWarnings("unused")
     private String bandwidth() {
-        double drank = (getRank() <= 0 ? 1 : getRank());
+        double drank = (getRank() <= 0? 1 : getRank());
         double dblocksize = getBlocksize() * 8;
         double size = drank * dblocksize;
         double time = (getStop().getTime() + 1 - getStart().getTime());
@@ -3356,7 +3688,7 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     private String bandwidthMB() {
-        double drank = (getRank() <= 0 ? 1 : getRank());
+        double drank = (getRank() <= 0? 1 : getRank());
         double dblocksize = getBlocksize();
         double size = drank * dblocksize;
         double time = (getStop().getTime() + 1 - getStart().getTime());
@@ -3367,26 +3699,26 @@ public class DbTaskRunner extends AbstractDbData {
     private String getHtmlColor() {
         String color;
         switch (getGlobalStep()) {
-            case NOTASK:
-                color = "Orange";
-                break;
-            case PRETASK:
-                color = "Yellow";
-                break;
-            case TRANSFERTASK:
-                color = "LightGreen";
-                break;
-            case POSTTASK:
-                color = "Turquoise";
-                break;
-            case ERRORTASK:
-                color = "Red";
-                break;
-            case ALLDONETASK:
-                color = "Cyan";
-                break;
-            default:
-                color = "";
+        case NOTASK:
+            color = "Orange";
+            break;
+        case PRETASK:
+            color = "Yellow";
+            break;
+        case TRANSFERTASK:
+            color = "LightGreen";
+            break;
+        case POSTTASK:
+            color = "Turquoise";
+            break;
+        case ERRORTASK:
+            color = "Red";
+            break;
+        case ALLDONETASK:
+            color = "Cyan";
+            break;
+        default:
+            color = "";
         }
         return color;
     }
@@ -3394,29 +3726,29 @@ public class DbTaskRunner extends AbstractDbData {
     private String getInfoHtmlColor() {
         String color;
         switch (getUpdatedInfo()) {
-            case DONE:
-                color = "Cyan";
-                break;
-            case INERROR:
-                color = "Red";
-                break;
-            case INTERRUPTED:
-                color = "Orange";
-                break;
-            case NOTUPDATED:
-                color = "Yellow";
-                break;
-            case RUNNING:
-                color = "LightGreen";
-                break;
-            case TOSUBMIT:
-                color = "Turquoise";
-                break;
-            case UNKNOWN:
-                color = "Turquoise";
-                break;
-            default:
-                color = "";
+        case DONE:
+            color = "Cyan";
+            break;
+        case INERROR:
+            color = "Red";
+            break;
+        case INTERRUPTED:
+            color = "Orange";
+            break;
+        case NOTUPDATED:
+            color = "Yellow";
+            break;
+        case RUNNING:
+            color = "LightGreen";
+            break;
+        case TOSUBMIT:
+            color = "Turquoise";
+            break;
+        case UNKNOWN:
+            color = "Turquoise";
+            break;
+        default:
+            color = "";
         }
         return color;
     }
@@ -3432,42 +3764,42 @@ public class DbTaskRunner extends AbstractDbData {
         String color = getHtmlColor();
         String updcolor = getInfoHtmlColor();
         return "<td>" +
-                getSpecialId() +
-                "</td><td>" +
-                (rule != null ? rule.toShortString() : getRuleId()) +
-                "</td><td>" +
-                getFilename() +
-                "</td><td>" + getFileInformation() + "[" + getTransferInfo() + "]" +
-                "</td><td bgcolor=\"" +
-                color +
-                "\">" +
-                getGlobalStep() +
-                " (" +
-                getGloballaststep() +
-                ")</td><td>" +
-                getStep() +
-                "</td><td>" +
-                getStatus().getMesg() + " <b>" + running +
-                "</b></td><td bgcolor=\"" +
-                updcolor + "\">" +
-                getUpdatedInfo().name() + " : " + getErrorInfo().getMesg() +
-                "</td><td>" +
-                getRank() +
-                "</td><td>" +
-                getBlocksize() +
-                "</td><td>" +
-                isFileMoved() +
-                "</td><td>" +
-                getRequester() +
-                "</td><td>" +
-                getRequested() +
-                "</td><td>" +
-                getStart() +
-                "</td><td>" +
-                getStop() +
-                "</td><td>" +
-                bandwidthMB() + "</td>" + "<td>" +
-                freespace + "</td>";
+               getSpecialId() +
+               "</td><td>" +
+               (rule != null? rule.toShortString() : getRuleId()) +
+               "</td><td>" +
+               getFilename() +
+               "</td><td>" + getFileInformation() + "[" + getTransferInfo() + "]" +
+               "</td><td bgcolor=\"" +
+               color +
+               "\">" +
+               getGlobalStep() +
+               " (" +
+               getGloballaststep() +
+               ")</td><td>" +
+               getStep() +
+               "</td><td>" +
+               getStatus().getMesg() + " <b>" + running +
+               "</b></td><td bgcolor=\"" +
+               updcolor + "\">" +
+               getUpdatedInfo().name() + " : " + getErrorInfo().getMesg() +
+               "</td><td>" +
+               getRank() +
+               "</td><td>" +
+               getBlocksize() +
+               "</td><td>" +
+               isFileMoved() +
+               "</td><td>" +
+               getRequester() +
+               "</td><td>" +
+               getRequested() +
+               "</td><td>" +
+               getStart() +
+               "</td><td>" +
+               getStop() +
+               "</td><td>" +
+               bandwidthMB() + "</td>" + "<td>" +
+               freespace + "</td>";
     }
 
     /**
@@ -3481,19 +3813,19 @@ public class DbTaskRunner extends AbstractDbData {
         long freespace = freespaceMB(session);
         StringBuilder builder = new StringBuilder(body);
         WaarpStringUtils.replaceAll(builder, "XXXSpecIdXXX", Long.toString(getSpecialId()));
-        WaarpStringUtils.replace(builder, "XXXRulXXX", (rule != null ? rule.toShortString()
+        WaarpStringUtils.replace(builder, "XXXRulXXX", (rule != null? rule.toShortString()
                 : getRuleId()));
         WaarpStringUtils.replace(builder, "XXXFileXXX", getFilename());
         WaarpStringUtils.replace(builder, "XXXInfoXXX", getFileInformation());
         WaarpStringUtils.replace(builder, "XXXTransXXX", transfer.getFileInfo());
         WaarpStringUtils.replace(builder, "XXXStepXXX", getGlobalStep() + " (" +
-                getGloballaststep() + ")");
+                                                        getGloballaststep() + ")");
         WaarpStringUtils.replace(builder, "XXXCOLXXX", getHtmlColor());
         WaarpStringUtils.replace(builder, "XXXActXXX", Integer.toString(getStep()));
         WaarpStringUtils.replace(builder, "XXXStatXXX", transfer.getStepStatus().getMesg());
         WaarpStringUtils.replace(builder, "XXXRunningXXX", running);
         WaarpStringUtils.replace(builder, "XXXInternXXX", getUpdatedInfo().name() +
-                " : " + getErrorInfo().getMesg());
+                                                          " : " + getErrorInfo().getMesg());
         WaarpStringUtils.replace(builder, "XXXUPDCOLXXX", getInfoHtmlColor());
         WaarpStringUtils.replace(builder, "XXXBloXXX", Integer.toString(getRank()));
         WaarpStringUtils.replace(builder, "XXXisSendXXX", Boolean.toString(isSender()));
@@ -3514,7 +3846,7 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public boolean isSelfRequested() {
         if (transfer.getRequested().equals(Configuration.configuration.getHOST_ID()) ||
-                transfer.getRequested().equals(Configuration.configuration.getHOST_SSLID())) {
+            transfer.getRequested().equals(Configuration.configuration.getHOST_SSLID())) {
             // check if not calling itself
             return (!transfer.getRequester().equals(Configuration.configuration.getHOST_ID()) &&
                     !transfer.getRequester().equals(Configuration.configuration.getHOST_SSLID()));
@@ -3528,7 +3860,7 @@ public class DbTaskRunner extends AbstractDbData {
     public boolean shallIgnoreSave() {
         return (isSelfRequest() &&
                 ((isSender() && getRule().isSendMode()) ||
-                        (!isSender() && getRule().isRecvMode())));
+                 (!isSender() && getRule().isRecvMode())));
     }
 
     /**
@@ -3536,7 +3868,7 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public boolean isSelfRequest() {
         return ((transfer.getRequested().equals(Configuration.configuration.getHOST_ID())
-                    || transfer.getRequested().equals(Configuration.configuration.getHOST_SSLID()))
+                 || transfer.getRequested().equals(Configuration.configuration.getHOST_SSLID()))
                 && (transfer.getRequester().equals(Configuration.configuration.getHOST_ID())
                     || transfer.getRequester().equals(Configuration.configuration.getHOST_SSLID())));
     }
@@ -3576,7 +3908,9 @@ public class DbTaskRunner extends AbstractDbData {
         return transfer.getStop();
     }
 
-    public void setStop(Timestamp stop) {transfer.setStop(stop);}
+    public void setStop(Timestamp stop) {
+        transfer.setStop(stop);
+    }
 
     /**
      *
@@ -3585,15 +3919,15 @@ public class DbTaskRunner extends AbstractDbData {
     public RequestPacket getRequest() {
         String sep = null;
         if (transfer.getRequested().equals(Configuration.configuration.getHOST_ID()) ||
-                transfer.getRequested().equals(Configuration.configuration.getHOST_SSLID())) {
+            transfer.getRequested().equals(Configuration.configuration.getHOST_SSLID())) {
             sep = PartnerConfiguration.getSeparator(transfer.getRequester());
         } else {
             sep = PartnerConfiguration.getSeparator(transfer.getRequested());
         }
         return new RequestPacket(transfer.getRule(), transfer.getTransferMode(),
-                transfer.getOriginalName(), transfer.getBlockSize(),
-                transfer.getRank(), transfer.getId(), transfer.getFileInfo(),
-                originalSize, sep);
+                                 transfer.getOriginalName(), transfer.getBlockSize(),
+                                 transfer.getRank(), transfer.getId(), transfer.getFileInfo(),
+                                 originalSize, sep);
     }
 
     /**
@@ -3603,259 +3937,17 @@ public class DbTaskRunner extends AbstractDbData {
      */
     public String getKey() {
         return transfer.getRequested() + " " + transfer.getRequester() + " "
-                + transfer.getId();
+               + transfer.getId();
     }
 
-    /**
-     * Construct a new Element with value
-     *
-     * @param name
-     * @param value
-     * @return the new Element
-     */
-    private static Element newElement(String name, String value) {
-        Element node = new DefaultElement(name);
-        if (value != null) {
-            node.addText(value);
-        }
-        return node;
-    }
-
-    /**
-     * Need to call 'setToArray' before
-     *
-     * @param runner
-     * @return The Element representing the given Runner
-     * @throws WaarpDatabaseSqlException
-     */
-    private static Element getElementFromRunner(DbTaskRunner runner)
-            throws WaarpDatabaseSqlException {
-        Element root = new DefaultElement(XMLRUNNER);
-        for (DbValue value : runner.allFields) {
-            if (value.getColumn().equals(Columns.UPDATEDINFO.name()) ||
-                    value.getColumn().equals(Columns.TRANSFERINFO.name())) {
-                continue;
-            }
-            root.add(newElement(value.getColumn().toLowerCase(),
-                    value.getValueAsString()));
-        }
-        return root;
-    }
-
-    /**
-     * Set the given runner from the root element of the runner itself (XMLRUNNER but not
-     * XMLRUNNERS). Need to call 'setFromArray' after.
-     *
-     * @param runner
-     * @param root
-     * @throws WaarpDatabaseSqlException
-     */
-    private static void setRunnerFromElement(DbTaskRunner runner, Element root)
-            throws WaarpDatabaseSqlException {
-        for (DbValue value : runner.allFields) {
-            if (value.getColumn().equals(Columns.UPDATEDINFO.name()) ||
-                    value.getColumn().equals(Columns.TRANSFERINFO.name())) {
-                continue;
-            }
-            Element elt = (Element) root.selectSingleNode(value.getColumn().toLowerCase());
-            if (elt != null) {
-                String newValue = elt.getText();
-                value.setValueFromString(newValue);
-            }
-        }
-        runner.allFields[Columns.TRANSFERINFO.ordinal()].setValue("{}");
-    }
-
-
-    /**
-     * Write the selected TaskRunners from PrepareStatement to a XMLWriter
-     *
-     * @param preparedStatement
-     *            ready to be executed
-     * @param xmlWriter
-     * @return the NbAndSpecialId for the number of transfer and higher rank found
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static NbAndSpecialId writeXML(DbPreparedStatement preparedStatement, XMLWriter xmlWriter)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolBusinessException {
-        Element root = new DefaultElement(XMLRUNNERS);
-        NbAndSpecialId nbAndSpecialId = new NbAndSpecialId();
-        try {
-            xmlWriter.writeOpen(root);
-            Element node;
-            while (preparedStatement.getNext()) {
-                DbTaskRunner runner = DbTaskRunner
-                        .getFromStatement(preparedStatement);
-                if (nbAndSpecialId.higherSpecialId < runner.getSpecialId()) {
-                    nbAndSpecialId.higherSpecialId = runner.getSpecialId();
-                }
-                node = DbTaskRunner.getElementFromRunner(runner);
-                xmlWriter.write(node);
-                xmlWriter.flush();
-                nbAndSpecialId.nb++;
-            }
-            xmlWriter.writeClose(root);
-        } catch (IOException e) {
-            logger.error("Cannot write XML file", e);
-            throw new OpenR66ProtocolBusinessException("Cannot write file: " + e.getMessage());
-        }
-        return nbAndSpecialId;
-    }
-
-
-    /**
-     * Write selected TaskRunners to a Json String
-     *
-     * @param preparedStatement
-     * @return the associated Json String
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static String getJson(DbPreparedStatement preparedStatement, int limit)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolBusinessException {
-        ArrayNode arrayNode = JsonHandler.createArrayNode();
-        try {
-            preparedStatement.executeQuery();
-            LocalTransaction localTransaction = Configuration.configuration.getLocalTransaction();
-            int nb = 0;
-            while (preparedStatement.getNext()) {
-                DbTaskRunner runner = DbTaskRunner
-                        .getFromStatement(preparedStatement);
-                ObjectNode node = runner.getJson();
-                node.put(Columns.SPECIALID.name(), Long.toString(runner.getSpecialId()));
-                if (localTransaction == null) {
-                    node.put("Running", false);
-                } else {
-                    node.put("Running", localTransaction.contained(runner.getKey()));
-                }
-                arrayNode.add(node);
-                nb++;
-                if (nb >= limit) {
-                    break;
-                }
-            }
-        } finally {
-            preparedStatement.realClose();
-        }
-        return WaarpStringUtils.cleanJsonForHtml(arrayNode.toString().replaceAll("(\\\"\\{)([^}]+)(\\}\\\")", "{$2}")
-                .replaceAll("([^\\\\])(\\\\\")([a-zA-Z_0-9]+)(\\\\\")", "$1\"$3\""));
-    }
-
-    /**
-     * Write selected TaskRunners to an XML file using an XMLWriter
-     *
-     * @param preparedStatement
-     * @param filename
-     * @return the NbAndSpecialId for the number of transfer and higher rank found
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static NbAndSpecialId writeXMLWriter(DbPreparedStatement preparedStatement,
-                                                String filename)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolBusinessException {
-        NbAndSpecialId nbAndSpecialId = null;
-        OutputStream outputStream = null;
-        XMLWriter xmlWriter = null;
-        boolean isOk = false;
-        try {
-            outputStream = new FileOutputStream(filename);
-            OutputFormat format = OutputFormat.createPrettyPrint();
-            format.setEncoding(WaarpStringUtils.UTF_8);
-            xmlWriter = new XMLWriter(outputStream, format);
-            preparedStatement.executeQuery();
-            nbAndSpecialId = writeXML(preparedStatement, xmlWriter);
-            isOk = true;
-        } catch (FileNotFoundException e) {
-            logger.error("Cannot write XML file", e);
-            throw new OpenR66ProtocolBusinessException("File not found");
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Cannot write XML file", e);
-            throw new OpenR66ProtocolBusinessException("Unsupported Encoding");
-        } finally {
-            if (xmlWriter != null) {
-                try {
-                    xmlWriter.endDocument();
-                    xmlWriter.flush();
-                    xmlWriter.close();
-                } catch (SAXException e) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e2) {
-                    }
-                    File file = new File(filename);
-                    file.delete();
-                    logger.error("Cannot write XML file", e);
-                    throw new OpenR66ProtocolBusinessException("Unsupported Encoding");
-                } catch (IOException e) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e2) {
-                    }
-                    File file = new File(filename);
-                    file.delete();
-                    logger.error("Cannot write XML file", e);
-                    throw new OpenR66ProtocolBusinessException("Unsupported Encoding");
-                }
-                if (!isOk && outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                    }
-                    File file = new File(filename);
-                    file.delete();
-                }
-            } else if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                }
-                File file = new File(filename);
-                file.delete();
-            }
-        }
-        return nbAndSpecialId;
-    }
-
-    /**
-     * Write all TaskRunners to an XML file using an XMLWriter
-     *
-     * @param filename
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static void writeXMLWriter(String filename)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolBusinessException {
-        String request = "SELECT " + DbTaskRunner.selectAllFields + " FROM " +
-                DbTaskRunner.table + " WHERE " + getLimitWhereCondition();
-        DbPreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = new DbPreparedStatement(
-                    DbConstant.admin.getSession());
-            preparedStatement.createPrepareStatement(request);
-            writeXMLWriter(preparedStatement, filename);
-        } finally {
-            if (preparedStatement != null) {
-                preparedStatement.realClose();
-            }
-        }
-    }
     /**
      * @return the backend XML filename for the current TaskRunner in NoDb Client mode
      */
     public String backendXmlFilename() {
         return Configuration.configuration.getBaseDirectory() +
-                Configuration.configuration.getArchivePath() + R66Dir.SEPARATOR
-                + transfer.getRequester() + "_" + transfer.getRequested() + "_"
-                + transfer.getId() + XMLEXTENSION;
+               Configuration.configuration.getArchivePath() + R66Dir.SEPARATOR
+               + transfer.getRequester() + "_" + transfer.getRequested() + "_"
+               + transfer.getId() + XMLEXTENSION;
     }
 
     /**
@@ -3899,79 +3991,6 @@ public class DbTaskRunner extends AbstractDbData {
             node.put("Running", localTransaction.contained(getKey()));
         }
         return WaarpStringUtils.cleanJsonForHtml(JsonHandler.writeAsString(node));
-    }
-
-    /**
-     * @return the DbValue associated with this table
-     */
-    public static DbValue[] getAllType() {
-        DbTaskRunner item = new DbTaskRunner();
-        return item.allFields;
-    }
-
-    /**
-     * Set the given runner from the root element of the runner itself (XMLRUNNER but not
-     * XMLRUNNERS). Need to call 'setFromArray' after.
-     *
-     * @param runner
-     * @param root
-     */
-    private static void setRunnerFromElementNoException(DbTaskRunner runner, Element root) {
-        for (DbValue value : runner.allFields) {
-            if (value.getColumn().equals(Columns.UPDATEDINFO.name()) ||
-                    value.getColumn().equals(Columns.TRANSFERINFO.name())) {
-                continue;
-            }
-            Element elt = (Element) root.selectSingleNode(value.getColumn().toLowerCase());
-            if (elt != null) {
-                String newValue = elt.getText();
-                try {
-                    value.setValueFromString(newValue);
-                } catch (WaarpDatabaseSqlException e) {
-                    // ignore
-                }
-            }
-        }
-        runner.allFields[Columns.TRANSFERINFO.ordinal()].setValue("{}");
-    }
-
-    /**
-     * Reload a to submitted runner from a remote partner's log (so reversing isSender should be true)
-     *
-     * @param xml
-     * @param reverse
-     * @return the TaskRunner from the XML source element
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static DbTaskRunner fromStringXml(String xml, boolean reverse) throws OpenR66ProtocolBusinessException {
-        Document document;
-        try {
-            document = DocumentHelper.parseText(xml);
-        } catch (DocumentException e1) {
-            logger.warn("Cant parse XML", e1);
-            throw new OpenR66ProtocolBusinessException("Cannot parse the XML input");
-        }
-        DbTaskRunner runner = new DbTaskRunner();
-        setRunnerFromElementNoException(runner, document.getRootElement());
-        try {
-            runner.setFromArray();
-        } catch (WaarpDatabaseSqlException e) {
-            logger.error("Cannot read XML", e);
-            throw new OpenR66ProtocolBusinessException("Cannot read XML: " + e.getMessage());
-        }
-        runner.transfer.setOwnerRequest(Configuration.configuration.getHOST_ID());
-        if (reverse) {
-            runner.setSender(!runner.isSender());
-            if (runner.isSender()) {
-                runner.setFilename(runner.getOriginalFilename());
-            }
-        }
-        // Void keep stop
-        Timestamp stop = runner.getStop();
-        runner.setToArray();
-        runner.setStop(stop);
-        runner.allFields[Columns.STOPTRANS.ordinal()].setValue(stop);
-        return runner;
     }
 
     /**
@@ -4102,49 +4121,6 @@ public class DbTaskRunner extends AbstractDbData {
     }
 
     /**
-     * Method to load several DbTaskRunner from File logs.
-     *
-     * @param logsFile
-     *            File containing logs from export function
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static void loadXml(File logsFile) throws OpenR66ProtocolBusinessException {
-        if (!logsFile.canRead()) {
-            throw new OpenR66ProtocolBusinessException("XML file cannot be read");
-        }
-        SAXReader reader = new SAXReader();
-        Document document;
-        try {
-            document = reader.read(logsFile);
-        } catch (DocumentException e) {
-            throw new OpenR66ProtocolBusinessException(
-                    "XML file cannot be read as an XML file", e);
-        }
-        @SuppressWarnings("unchecked")
-        List<Element> elts = document.selectNodes("/" + XMLRUNNERS + "/" + XMLRUNNER);
-        boolean error = false;
-        Exception one = null;
-        for (Element element : elts) {
-            DbTaskRunner runnerlog = new DbTaskRunner();
-            try {
-                setRunnerFromElement(runnerlog, element);
-                runnerlog.setFromArray();
-                runnerlog.insertOrUpdateForLogsImport();
-            } catch (WaarpDatabaseSqlException e) {
-                error = true;
-                one = e;
-            } catch (WaarpDatabaseException e) {
-                error = true;
-                one = e;
-            }
-        }
-        if (error) {
-            throw new OpenR66ProtocolBusinessException(
-                    "Backend XML file is not conform to the model", one);
-        }
-    }
-
-    /**
      *
      * @return True if the backend XML for NoDb client is available for this TaskRunner
      */
@@ -4161,29 +4137,6 @@ public class DbTaskRunner extends AbstractDbData {
         File file = new File(backendXmlFilename());
         file.delete();
     }
-
-    /**
-     * Utility for "self request" mode only
-     *
-     * @param sender
-     */
-    public void setSender(boolean sender) {
-        transfer.setRetrieveMode(sender);
-    }
-
-    /**
-     * Helper
-     *
-     * @param request
-     * @return isSender according to request
-     */
-    public static boolean getSenderByRequestPacket(RequestPacket request) {
-        if (request.isToValidate()) {
-            return RequestPacket.isRecvMode(request.getMode());
-        }
-        return !RequestPacket.isRecvMode(request.getMode());
-    }
-
 
     /**
      * Utility for "self request"
@@ -4235,6 +4188,38 @@ public class DbTaskRunner extends AbstractDbData {
             R66File file = new R66File(session, session.getDir(), this.getFilename(), false);
             return file.getTrueFile().getAbsolutePath();
         }
+    }
+
+    public static enum Columns {
+        GLOBALSTEP,
+        GLOBALLASTSTEP,
+        STEP,
+        RANK,
+        STEPSTATUS,
+        RETRIEVEMODE,
+        FILENAME,
+        ISMOVED,
+        IDRULE,
+        BLOCKSZ,
+        ORIGINALNAME,
+        FILEINFO,
+        TRANSFERINFO,
+        MODETRANS,
+        STARTTRANS,
+        STOPTRANS,
+        INFOSTATUS,
+        UPDATEDINFO,
+        OWNERREQ,
+        REQUESTER,
+        REQUESTED,
+        SPECIALID;
+    }
+
+    /**
+     * GlobalStep Bounds
+     */
+    public static enum TASKSTEP {
+        NOTASK, PRETASK, TRANSFERTASK, POSTTASK, ALLDONETASK, ERRORTASK;
     }
 
 }

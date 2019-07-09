@@ -1,7 +1,6 @@
 package org.waarp.openr66.dao.xml;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.waarp.common.logging.WaarpLogger;
@@ -15,17 +14,18 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class XMLHostDAO implements HostDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLHostDAO.class);
 
     public static final String HOSTID_FIELD = "hostid";
     public static final String ADDRESS_FIELD = "address";
@@ -36,9 +36,9 @@ public class XMLHostDAO implements HostDAO {
     public static final String IS_PROXIFIED_FIELD = "isproxified";
     public static final String HOSTKEY_FIELD = "key";
     public static final String ADMINROLE_FIELD = "adminrole";
-
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLHostDAO.class);
     private static final String XML_SELECT = "/authent/entry[hostid=$hostid]";
-    private static final String XML_GET_ALL= "/authent/entry";
+    private static final String XML_GET_ALL = "/authent/entry";
 
     private File file;
 
@@ -46,7 +46,8 @@ public class XMLHostDAO implements HostDAO {
         this.file = new File(filePath);
     }
 
-    public void close() {}
+    public void close() {
+    }
 
     public void delete(Host host) throws DAOException {
         throw new DAOException("Operation not supported on XML DAO");
@@ -67,7 +68,7 @@ public class XMLHostDAO implements HostDAO {
             XPath xPath = XPathFactory.newInstance().newXPath();
             XPathExpression xpe = xPath.compile(XML_GET_ALL);
             NodeList listNode = (NodeList) xpe.evaluate(document,
-                    XPathConstants.NODESET);
+                                                        XPathConstants.NODESET);
             // Iterate through all found nodes
             List<Host> res = new ArrayList<Host>(listNode.getLength());
             for (int i = 0; i < listNode.getLength(); i++) {
@@ -101,7 +102,7 @@ public class XMLHostDAO implements HostDAO {
             xPath.setXPathVariableResolver(resolver);
             XPathExpression xpe = xPath.compile(XML_SELECT);
             // Query will return "" if nothing is found
-            return(!"".equals(xpe.evaluate(document)));
+            return (!"".equals(xpe.evaluate(document)));
         } catch (SAXException e) {
             throw new DAOException(e);
         } catch (XPathExpressionException e) {
@@ -138,7 +139,7 @@ public class XMLHostDAO implements HostDAO {
             // Retrieve node and instantiate object
             Node node = (Node) xpe.evaluate(document, XPathConstants.NODE);
             if (node != null) {
-                 return getFromNode(node);
+                return getFromNode(node);
             }
             return null;
         } catch (SAXException e) {
@@ -186,22 +187,22 @@ public class XMLHostDAO implements HostDAO {
     private Node getNode(Document doc, Host host) {
         Node res = doc.createElement("entry");
         res.appendChild(XMLUtils.createNode(doc, HOSTID_FIELD,
-                host.getHostid()));
+                                            host.getHostid()));
         res.appendChild(XMLUtils.createNode(doc, ADDRESS_FIELD,
-                host.getAddress()));
+                                            host.getAddress()));
         res.appendChild(XMLUtils.createNode(doc, PORT_FIELD,
-                Integer.toString(host.getPort())));
+                                            Integer.toString(host.getPort())));
         res.appendChild(XMLUtils.createNode(doc, IS_SSL_FIELD,
-                Boolean.toString(host.isSSL())));
+                                            Boolean.toString(host.isSSL())));
         res.appendChild(XMLUtils.createNode(doc, IS_CLIENT_FIELD,
-                Boolean.toString(host.isClient())));
+                                            Boolean.toString(host.isClient())));
         res.appendChild(XMLUtils.createNode(doc, IS_PROXIFIED_FIELD,
-                Boolean.toString(host.isProxified())));
+                                            Boolean.toString(host.isProxified())));
         res.appendChild(XMLUtils.createNode(doc, ADMINROLE_FIELD,
-                Boolean.toString(host.isAdmin())));
+                                            Boolean.toString(host.isAdmin())));
         try {
             res.appendChild(XMLUtils.createNode(doc, HOSTKEY_FIELD,
-                    new String(host.getHostkey(), "UTF-8")));
+                                                new String(host.getHostkey(), "UTF-8")));
         } catch (UnsupportedEncodingException e) {
             logger.error("Unsupported charset ! Should not happened");
         }

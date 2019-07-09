@@ -1,12 +1,12 @@
 /*
  * Copyright 2009 Red Hat, Inc.
- * 
+ *
  * Red Hat licenses this file to you under the Apache License, version 2.0 (the
  * "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,10 +15,8 @@
  */
 package org.waarp.openr66.protocol.http.rest.client;
 
-import java.net.ConnectException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.charset.UnsupportedCharsetException;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -31,7 +29,6 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
-
 import org.waarp.common.crypto.ssl.WaarpSslUtility;
 import org.waarp.common.json.JsonHandler;
 import org.waarp.common.logging.WaarpLogger;
@@ -39,20 +36,21 @@ import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.utility.WaarpStringUtils;
 import org.waarp.gateway.kernel.exception.HttpIncorrectRequestException;
 import org.waarp.gateway.kernel.exception.HttpInvalidAuthenticationException;
-import org.waarp.gateway.kernel.rest.RestArgument;
 import org.waarp.gateway.kernel.rest.DataModelRestMethodHandler.COMMAND_TYPE;
+import org.waarp.gateway.kernel.rest.RestArgument;
 import org.waarp.gateway.kernel.rest.client.HttpRestClientSimpleResponseHandler;
 import org.waarp.gateway.kernel.rest.client.RestFuture;
 import org.waarp.openr66.protocol.http.rest.handler.HttpRestAbstractR66Handler.ACTIONS_TYPE;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.ConnectException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.charset.UnsupportedCharsetException;
 
 /**
  * Rest client response handler.
- * 
+ * <p>
  * Note: by default, no connection are closed except in case of error or if in HTTP 1.0 or explicitly to be closed.
- * 
+ *
  * @author Frederic Bregier
  */
 public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInboundHandler<HttpObject> {
@@ -60,9 +58,8 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(HttpRestR66ClientResponseHandler.class);
-
-    private ByteBuf cumulativeBody = null;
     protected JsonNode jsonObject = null;
+    private ByteBuf cumulativeBody = null;
 
     protected void addContent(FullHttpResponse response) throws HttpIncorrectRequestException {
         ByteBuf content = response.content();
@@ -87,8 +84,9 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
 
     /**
      * Setting the RestArgument to the RestFuture and validating RestFuture.
-     * 
+     *
      * @param channel
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected void actionFromResponse(Channel channel) throws HttpInvalidAuthenticationException {
@@ -100,31 +98,31 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
         RestFuture restFuture = channel.attr(HttpRestClientSimpleResponseHandler.RESTARGUMENT).get();
         restFuture.setRestArgument(ra);
         switch (ra.getMethod()) {
-            case CONNECT:
-                break;
-            case DELETE:
-                includeValidation = delete(channel, ra);
-                break;
-            case GET:
-                includeValidation = get(channel, ra);
-                break;
-            case HEAD:
-                break;
-            case OPTIONS:
-                includeValidation = options(channel, ra);
-                break;
-            case PATCH:
-                break;
-            case POST:
-                includeValidation = post(channel, ra);
-                break;
-            case PUT:
-                includeValidation = put(channel, ra);
-                break;
-            case TRACE:
-                break;
-            default:
-                break;
+        case CONNECT:
+            break;
+        case DELETE:
+            includeValidation = delete(channel, ra);
+            break;
+        case GET:
+            includeValidation = get(channel, ra);
+            break;
+        case HEAD:
+            break;
+        case OPTIONS:
+            includeValidation = options(channel, ra);
+            break;
+        case PATCH:
+            break;
+        case POST:
+            includeValidation = post(channel, ra);
+            break;
+        case PUT:
+            includeValidation = put(channel, ra);
+            break;
+        case TRACE:
+            break;
+        default:
+            break;
         }
         if (!includeValidation) {
             // finalize the future
@@ -134,11 +132,13 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
 
     /**
      * Method calls when a action REST command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
      * @param act
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean action(Channel channel, RestArgument ra, ACTIONS_TYPE act)
@@ -146,40 +146,48 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
 
     /**
      * Method calls when a REST Get command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterDbGet(Channel channel, RestArgument ra) throws HttpInvalidAuthenticationException;
 
     /**
      * Method calls when a REST Post command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterDbPost(Channel channel, RestArgument ra) throws HttpInvalidAuthenticationException;
 
     /**
      * Method calls when a REST Put command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterDbPut(Channel channel, RestArgument ra) throws HttpInvalidAuthenticationException;
 
     /**
      * Method calls when a REST Delete command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterDbDelete(Channel channel, RestArgument ra)
@@ -187,10 +195,12 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
 
     /**
      * Method calls when a REST GetMultiple command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterDbGetMultiple(Channel channel, RestArgument ra)
@@ -198,10 +208,12 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
 
     /**
      * Method calls when a REST Options command is raised as answer
-     * 
+     *
      * @param channel
      * @param ra
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterDbOptions(Channel channel, RestArgument ra)
@@ -209,11 +221,12 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
 
     /**
      * Method calls when a REST command is in error
-     * 
+     *
      * @param channel
-     * @param ra
-     *            (might be null)
+     * @param ra (might be null)
+     *
      * @return if validation is done (or suppose to be)
+     *
      * @throws HttpInvalidAuthenticationException
      */
     protected abstract boolean afterError(Channel channel, RestArgument ra) throws HttpInvalidAuthenticationException;
@@ -312,7 +325,7 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
             HttpResponse response = (HttpResponse) msg;
             HttpResponseStatus status = response.status();
             logger.debug(HttpHeaderNames.REFERER + ": " + response.headers().get(HttpHeaderNames.REFERER)
-                    + " STATUS: " + status);
+                         + " STATUS: " + status);
             if (response.status().code() != 200) {
                 if (response instanceof FullHttpResponse) {
                     addContent((FullHttpResponse) response);
@@ -323,7 +336,7 @@ public abstract class HttpRestR66ClientResponseHandler extends SimpleChannelInbo
                     RestFuture restFuture = ctx.channel().attr(HttpRestClientSimpleResponseHandler.RESTARGUMENT).get();
                     restFuture.setRestArgument(ra);
                     logger.error("Error: " + response.status().code() + " " + response.status().reasonPhrase() + "\n"
-                            + ra.prettyPrint());
+                                 + ra.prettyPrint());
                 } else {
                     logger.error("Error: " + response.status().code() + " " + response.status().reasonPhrase());
                 }

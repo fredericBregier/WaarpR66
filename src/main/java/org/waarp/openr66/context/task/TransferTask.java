@@ -1,29 +1,22 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.commons.exec.CommandLine;
-
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.openr66.client.SubmitTransfer;
@@ -34,18 +27,23 @@ import org.waarp.openr66.database.data.DbTaskRunner;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Transfer task:<br>
- * 
+ *
  * Result of arguments will be as r66send command.<br>
  * Format is like r66send command in any order except "-info" which should be the last item, and "-copyinfo"
  * will copy at first place the original transfer information as the new one, while still having the possibility to add new informations through "-info":<br>
  * "-file filepath -to requestedHost -rule rule [-md5] [-start yyyyMMddHHmmss or -delay (delay or +delay)] [-copyinfo] [-info information]" <br>
  * <br>
  * INFO is the only one field that can contains blank character.<br>
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TransferTask extends AbstractExecTask {
     /**
@@ -61,14 +59,14 @@ public class TransferTask extends AbstractExecTask {
      * @param session
      */
     public TransferTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                        R66Session session) {
         super(TaskType.TRANSFER, delay, argRule, argTransfer, session);
     }
 
     @Override
     public void run() {
         logger.info("Transfer with " + argRule + ":" + argTransfer + " and {}",
-                session);
+                    session);
         String finalname = applyTransferSubstitutions(argRule);
 
         finalname = finalname.replaceAll("#([A-Z]+)#", "\\${$1}");
@@ -136,7 +134,7 @@ public class TransferTask extends AbstractExecTask {
                 try {
                     if (args[i].charAt(0) == '+') {
                         timestart = new Timestamp(System.currentTimeMillis() +
-                                Long.parseLong(args[i].substring(1)));
+                                                  Long.parseLong(args[i].substring(1)));
                     } else {
                         timestart = new Timestamp(Long.parseLong(args[i]));
                     }
@@ -155,15 +153,16 @@ public class TransferTask extends AbstractExecTask {
         }
         R66Future future = new R66Future(true);
         SubmitTransfer transaction = new SubmitTransfer(future,
-                requested, filepath, rule, finalInformation, isMD5, blocksize, DbConstant.ILLEGALVALUE,
-                timestart);
+                                                        requested, filepath, rule, finalInformation, isMD5, blocksize,
+                                                        DbConstant.ILLEGALVALUE,
+                                                        timestart);
         transaction.run();
         future.awaitUninterruptibly();
         futureCompletion.setResult(future.getResult());
         DbTaskRunner runner = future.getResult().getRunner();
         if (future.isSuccess()) {
             logger.info("Prepare transfer in     SUCCESS     " + runner.toShortString() +
-                    "     <REMOTE>" + requested + "</REMOTE>");
+                        "     <REMOTE>" + requested + "</REMOTE>");
             futureCompletion.setSuccess();
         } else {
             if (runner != null) {
@@ -173,7 +172,7 @@ public class TransferTask extends AbstractExecTask {
                     futureCompletion.setFailure(future.getCause());
                 }
                 logger.error("Prepare transfer in     FAILURE      " + runner.toShortString() +
-                        "     <REMOTE>" + requested + "</REMOTE>", future.getCause());
+                             "     <REMOTE>" + requested + "</REMOTE>", future.getCause());
             } else {
                 if (future.getCause() == null) {
                     futureCompletion.cancel();
@@ -181,7 +180,7 @@ public class TransferTask extends AbstractExecTask {
                     futureCompletion.setFailure(future.getCause());
                 }
                 logger.error("Prepare transfer in     FAILURE without any runner back",
-                        future.getCause());
+                             future.getCause());
             }
         }
     }

@@ -1,23 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.utils;
-
-import java.util.concurrent.TimeUnit;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,11 +23,13 @@ import io.netty.util.TimerTask;
 import org.waarp.common.crypto.ssl.WaarpSslUtility;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * TimerTask to Close a Channel in the future
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class ChannelCloseTimer implements TimerTask {
 
@@ -46,16 +45,9 @@ public class ChannelCloseTimer implements TimerTask {
         this.future = future;
     }
 
-    public void run(Timeout timeout) throws Exception {
-        if (this.future != null) {
-            this.future.awaitUninterruptibly(Configuration.configuration.getTIMEOUTCON());
-        }
-        WaarpSslUtility.closingSslChannel(channel);
-    }
-
     /**
      * Close in the future this channel
-     * 
+     *
      * @param channel
      */
     public static void closeFutureChannel(Channel channel) {
@@ -66,7 +58,7 @@ public class ChannelCloseTimer implements TimerTask {
 
     /**
      * Close in the future this channel
-     * 
+     *
      * @param channel
      * @param future
      *            future to wait in addition to other constraints
@@ -75,5 +67,12 @@ public class ChannelCloseTimer implements TimerTask {
         Configuration.configuration.getTimerClose().newTimeout(
                 new ChannelCloseTimer(channel, future),
                 Configuration.WAITFORNETOP * 2, TimeUnit.MILLISECONDS);
+    }
+
+    public void run(Timeout timeout) throws Exception {
+        if (this.future != null) {
+            this.future.awaitUninterruptibly(Configuration.configuration.getTIMEOUTCON());
+        }
+        WaarpSslUtility.closingSslChannel(channel);
     }
 }

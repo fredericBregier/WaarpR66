@@ -28,16 +28,20 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Locale;
 
-import static javax.ws.rs.core.HttpHeaders.ACCEPT_LANGUAGE;
+import static javax.ws.rs.core.HttpHeaders.*;
 
 
-/** A series of utility methods shared by all handlers of the RESTv2 API. */
+/**
+ * A series of utility methods shared by all handlers of the RESTv2 API.
+ */
 public final class RestUtils {
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private RestUtils() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
 
@@ -46,8 +50,9 @@ public final class RestUtils {
     /**
      * Returns the language of the given request.
      *
-     * @param request   the HTTP request
-     * @return          the request's language
+     * @param request the HTTP request
+     *
+     * @return the request's language
      */
     public static Locale getLocale(HttpRequest request) {
         String langHead = request.headers().get(ACCEPT_LANGUAGE);
@@ -70,15 +75,16 @@ public final class RestUtils {
     /**
      * Converts a String into its' corresponding boolean value.
      *
-     * @param string    the String to convert
-     * @return          the corresponding boolean value
-     * @throws IllegalArgumentException If the String does not represent
-     *                                  a valid boolean value.
+     * @param string the String to convert
+     *
+     * @return the corresponding boolean value
+     *
+     * @throws IllegalArgumentException If the String does not represent a valid boolean value.
      */
     public static boolean stringToBoolean(String string) {
-        if("true".equalsIgnoreCase(string)) {
+        if ("true".equalsIgnoreCase(string)) {
             return true;
-        } else if("false".equalsIgnoreCase(string)) {
+        } else if ("false".equalsIgnoreCase(string)) {
             return false;
         } else {
             throw new IllegalArgumentException();

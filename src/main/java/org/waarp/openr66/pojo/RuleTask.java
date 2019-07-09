@@ -5,10 +5,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.XTASK;
-import static org.waarp.openr66.database.data.DbRule.TASK_DELAY;
-import static org.waarp.openr66.database.data.DbRule.TASK_PATH;
-import static org.waarp.openr66.database.data.DbRule.TASK_TYPE;
+import static org.waarp.openr66.configuration.RuleFileBasedConfiguration.*;
+import static org.waarp.openr66.database.data.DbRule.*;
 
 /**
  * RuleTask data object
@@ -27,7 +25,8 @@ public class RuleTask {
     private int delay;
 
     @SuppressWarnings("unused")
-    public RuleTask() {}
+    public RuleTask() {
+    }
 
     public RuleTask(String type, String path, int delay) {
         this.type = type;

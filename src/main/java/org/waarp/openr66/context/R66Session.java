@@ -1,26 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context;
-
-import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.HashMap;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.database.data.AbstractDbData.UpdatedInfo;
@@ -43,6 +37,11 @@ import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
 import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 import org.waarp.openr66.protocol.utils.FileUtils;
 
+import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.HashMap;
+
 /**
  * The global object session in OpenR66, a session by local channel
  *
@@ -55,7 +54,23 @@ public class R66Session implements SessionInterface {
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(R66Session.class);
-
+    /**
+     * Authentication
+     */
+    private final R66Auth auth;
+    /**
+     * Current directory
+     */
+    private final R66Dir dir;
+    /**
+     * Current Restart information
+     */
+    private final R66Restart restart;
+    /**
+     * The Finite Machine State
+     */
+    private final MachineState<R66FiniteDualStates> state;
+    private final HashMap<String, R66Dir> dirsFromSession = new HashMap<String, R66Dir>();
     /**
      * Block size used during file transfer
      */
@@ -65,10 +80,6 @@ public class R66Session implements SessionInterface {
      */
     private LocalChannelReference localChannelReference;
     /**
-     * Authentication
-     */
-    private final R66Auth auth;
-    /**
      * Remote Address
      */
     private SocketAddress raddress;
@@ -76,11 +87,6 @@ public class R66Session implements SessionInterface {
      * Local Address
      */
     private SocketAddress laddress;
-
-    /**
-     * Current directory
-     */
-    private final R66Dir dir;
     /**
      * Current file
      */
@@ -93,23 +99,11 @@ public class R66Session implements SessionInterface {
      * Used to prevent deny of service
      */
     private volatile int numOfError = 0;
-
-    /**
-     * Current Restart information
-     */
-    private final R66Restart restart;
-
     /**
      * DbTaskRunner
      */
     private DbTaskRunner runner = null;
-
     private String status = "NoStatus";
-
-    /**
-     * The Finite Machine State
-     */
-    private final MachineState<R66FiniteDualStates> state;
     /**
      * Business Object if used
      */
@@ -118,8 +112,6 @@ public class R66Session implements SessionInterface {
      * Extended protocol or not
      */
     private boolean extendedProtocol = Configuration.configuration.isExtendedProtocol();
-
-    private final HashMap<String, R66Dir> dirsFromSession = new HashMap<String, R66Dir>();
 
     /**
      * Create the session
@@ -175,7 +167,7 @@ public class R66Session implements SessionInterface {
             state.setCurrent(R66FiniteDualStates.ERROR);
         } catch (IllegalFiniteStateException e) {
             logger.error("Couldn't pass to error state. This should not happen");
-	}
+        }
     }
 
     /**
@@ -204,7 +196,7 @@ public class R66Session implements SessionInterface {
                 if (!localChannelReference.getFutureRequest().isDone()) {
                     R66Result result = new R66Result(new OpenR66RunnerErrorException(
                             "Close before ending"), this, true,
-                            ErrorCode.Disconnection, runner);// True since called from closed
+                                                     ErrorCode.Disconnection, runner);// True since called from closed
                     result.setRunner(runner);
                     try {
                         setFinalizeTransfer(false, result);
@@ -245,7 +237,7 @@ public class R66Session implements SessionInterface {
                 if (!localChannelReference.getFutureRequest().isDone()) {
                     R66Result result = new R66Result(new OpenR66RunnerErrorException(
                             "Close before ending"), this, true,
-                            ErrorCode.Disconnection, runner);// True since called from closed
+                                                     ErrorCode.Disconnection, runner);// True since called from closed
                     result.setRunner(runner);
                     try {
                         setFinalizeTransfer(false, result);
@@ -336,19 +328,57 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * @param localChannelReference
-     *            the localChannelReference to set
+     * Set the runner, and setup the directory first.
+     *
+     * This call should be followed by a startup() call.
+     *
+     * @param runner
+     *            the runner to set
+     * @throws OpenR66RunnerErrorException
      */
-    public void setLocalChannelReference(
-            LocalChannelReference localChannelReference) {
-        this.localChannelReference = localChannelReference;
-        this.localChannelReference.setSession(this);
-        if (this.localChannelReference.getNetworkChannel() != null) {
-            this.raddress = this.localChannelReference.getNetworkChannel().remoteAddress();
-            this.laddress = this.localChannelReference.getNetworkChannel().localAddress();
-        } else {
-            this.raddress = this.laddress = new InetSocketAddress(0);
+    public void setRunner(DbTaskRunner runner)
+            throws OpenR66RunnerErrorException {
+        this.runner = runner;
+        logger.debug("Runner to set: {} {}", runner.shallIgnoreSave(), runner);
+        this.runner.checkThroughMode();
+        if (this.businessObject != null) {
+            this.businessObject.checkAtStartup(this);
         }
+        if (this.runner.isSender()) {
+            if (runner.isSendThrough()) {
+                // May not change dir as needed
+                // Change dir
+                try {
+                    dir.changeDirectory(this.runner.getRule().getSendPath());
+                } catch (CommandAbstractException e) {
+                    // ignore
+                }
+            } else {
+                // Change dir
+                try {
+                    dir.changeDirectory(this.runner.getRule().getSendPath());
+                } catch (CommandAbstractException e) {
+                    throw new OpenR66RunnerErrorException(e);
+                }
+            }
+        } else {
+            if (runner.isRecvThrough()) {
+                // May not change dir as needed
+                // Change dir
+                try {
+                    dir.changeDirectory(this.runner.getRule().getWorkPath());
+                } catch (CommandAbstractException e) {
+                }
+            } else {
+                // Change dir
+                try {
+                    dir.changeDirectory(this.runner.getRule().getWorkPath());
+                } catch (CommandAbstractException e) {
+                    throw new OpenR66RunnerErrorException(e);
+                }
+            }
+        }
+        logger.debug("Dir is: " + dir.getFullPath());
     }
 
     /**
@@ -375,6 +405,22 @@ public class R66Session implements SessionInterface {
     }
 
     /**
+     * @param localChannelReference
+     *            the localChannelReference to set
+     */
+    public void setLocalChannelReference(
+            LocalChannelReference localChannelReference) {
+        this.localChannelReference = localChannelReference;
+        this.localChannelReference.setSession(this);
+        if (this.localChannelReference.getNetworkChannel() != null) {
+            this.raddress = this.localChannelReference.getNetworkChannel().remoteAddress();
+            this.laddress = this.localChannelReference.getNetworkChannel().localAddress();
+        } else {
+            this.raddress = this.laddress = new InetSocketAddress(0);
+        }
+    }
+
+    /**
      * To be called in case of No Session not from a valid LocalChannelHandler
      *
      * @param runner
@@ -385,7 +431,7 @@ public class R66Session implements SessionInterface {
         // Warning: the file is not correctly setup
         try {
             file = (R66File) dir.setFile(this.runner.getFilename(),
-                    false);
+                                         false);
         } catch (CommandAbstractException e1) {
         }
         this.auth.specialNoSessionAuth(false, Configuration.configuration.getHOST_ID());
@@ -397,7 +443,7 @@ public class R66Session implements SessionInterface {
                 this.localChannelReference = new LocalChannelReference();
             }
             this.localChannelReference.setErrorMessage(this.runner.getErrorInfo().getMesg(),
-                    this.runner.getErrorInfo());
+                                                       this.runner.getErrorInfo());
         }
         runner.setLocalChannelReference(this.localChannelReference);
         this.localChannelReference.setSession(this);
@@ -412,8 +458,8 @@ public class R66Session implements SessionInterface {
         // check first if the next step is the PRE task from beginning
         try {
             file = FileUtils.getFile(logger, this, this.runner.getOriginalFilename(),
-                    this.runner.isPreTaskStarting(), this.runner.isSender(),
-                    this.runner.isSendThrough(), file);
+                                     this.runner.isPreTaskStarting(), this.runner.isSender(),
+                                     this.runner.isSendThrough(), file);
         } catch (OpenR66RunnerErrorException e) {
             this.runner.setErrorExecutionStatus(ErrorCode.FileNotFound);
             throw e;
@@ -456,7 +502,7 @@ public class R66Session implements SessionInterface {
                 if (file == null) {
                     try {
                         file = (R66File) dir.setFile(this.runner.getFilename(),
-                                false);
+                                                     false);
                     } catch (CommandAbstractException e) {
                         // file is not under normal base directory, so is external
                         // File must already exist but can be using special code ('*?')
@@ -474,7 +520,7 @@ public class R66Session implements SessionInterface {
                     if (!file.canRead()) {
                         this.runner.setErrorExecutionStatus(ErrorCode.FileNotFound);
                         throw new OpenR66RunnerErrorException("File cannot be read: " +
-                                file.getTrueFile().getAbsolutePath());
+                                                              file.getTrueFile().getAbsolutePath());
                     }
                 }
             } catch (CommandAbstractException e) {
@@ -486,7 +532,7 @@ public class R66Session implements SessionInterface {
                 // Filename should be get back from runner load from database
                 try {
                     file = (R66File) dir.setFile(this.runner
-                            .getFilename(), true);
+                                                         .getFilename(), true);
                     if (runner.isRecvThrough()) {
                         // no test on file since it does not really exist
                         logger.debug("File is in through mode: {}", file);
@@ -509,7 +555,7 @@ public class R66Session implements SessionInterface {
                     newfilename = R66File.getBasename(newfilename);
                     try {
                         file = dir.setUniqueFile(this.runner.getSpecialId(),
-                                newfilename);
+                                                 newfilename);
                         this.runner.setFilename(file.getBasename());
                     } catch (CommandAbstractException e) {
                         this.runner.deleteTempFile();
@@ -592,60 +638,6 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * Set the runner, and setup the directory first.
-     *
-     * This call should be followed by a startup() call.
-     *
-     * @param runner
-     *            the runner to set
-     * @throws OpenR66RunnerErrorException
-     */
-    public void setRunner(DbTaskRunner runner)
-            throws OpenR66RunnerErrorException {
-        this.runner = runner;
-        logger.debug("Runner to set: {} {}", runner.shallIgnoreSave(), runner);
-        this.runner.checkThroughMode();
-        if (this.businessObject != null) {
-            this.businessObject.checkAtStartup(this);
-        }
-        if (this.runner.isSender()) {
-            if (runner.isSendThrough()) {
-                // May not change dir as needed
-                // Change dir
-                try {
-                    dir.changeDirectory(this.runner.getRule().getSendPath());
-                } catch (CommandAbstractException e) {
-                    // ignore
-                }
-            } else {
-                // Change dir
-                try {
-                    dir.changeDirectory(this.runner.getRule().getSendPath());
-                } catch (CommandAbstractException e) {
-                    throw new OpenR66RunnerErrorException(e);
-                }
-            }
-        } else {
-            if (runner.isRecvThrough()) {
-                // May not change dir as needed
-                // Change dir
-                try {
-                    dir.changeDirectory(this.runner.getRule().getWorkPath());
-                } catch (CommandAbstractException e) {
-                }
-            } else {
-                // Change dir
-                try {
-                    dir.changeDirectory(this.runner.getRule().getWorkPath());
-                } catch (CommandAbstractException e) {
-                    throw new OpenR66RunnerErrorException(e);
-                }
-            }
-        }
-        logger.debug("Dir is: " + dir.getFullPath());
-    }
-
-    /**
      * START from the PreTask if necessary, and prepare the file
      *
      * @param checkNotExternal
@@ -662,9 +654,9 @@ public class R66Session implements SessionInterface {
             restart.restartMarker(0);
         }
         logger.debug("GlobalLastStep: " + runner.getGloballaststep() + " vs " + TASKSTEP.NOTASK.ordinal() + ":"
-                + TASKSTEP.PRETASK.ordinal());
+                     + TASKSTEP.PRETASK.ordinal());
         if (runner.getGloballaststep() == TASKSTEP.NOTASK.ordinal() ||
-                runner.getGloballaststep() == TASKSTEP.PRETASK.ordinal()) {
+            runner.getGloballaststep() == TASKSTEP.PRETASK.ordinal()) {
             setFileBeforePreRunner();
             if (runner.isSender() && !runner.isSendThrough() && file != null && checkNotExternal) {
                 String path = null;
@@ -745,7 +737,7 @@ public class R66Session implements SessionInterface {
                         this.runner.setErrorExecutionStatus(ErrorCode.Internal);
                         throw new OpenR66RunnerErrorException(
                                 "File cannot be written due to unsufficient space available: " +
-                                        targetDir + " need " + needed + " more while available is " + available);
+                                targetDir + " need " + needed + " more while available is " + available);
                     }
                     if (file == null) {
                         this.runner.saveStatus();
@@ -758,16 +750,16 @@ public class R66Session implements SessionInterface {
                         restart.setSet(true);
                         if (oldPosition > length) {
                             int newRank = ((int) (length / this.runner.getBlocksize()))
-                                    - Configuration.getRANKRESTART();
+                                          - Configuration.getRANKRESTART();
                             if (newRank <= 0) {
                                 newRank = 1;
                             }
                             logger.info("OldPos: " + oldPosition + ":" + runner.getRank() +
-                                    " curLength: " + length + ":" + newRank);
+                                        " curLength: " + length + ":" + newRank);
                             logger.warn("Decreased Rank Restart for {} at " + newRank, runner);
                             runner.setTransferTask(newRank);
                             restart.restartMarker(this.runner.getBlocksize()
-                                    * this.runner.getRank());
+                                                  * this.runner.getRank());
                         }
                         try {
                             file.restartMarker(restart);
@@ -904,7 +896,7 @@ public class R66Session implements SessionInterface {
             }
             finalValue.setException(runnerErrorException);
             logger.debug("Pre task in error (or even before) : " +
-                    runnerErrorException.getMessage());
+                         runnerErrorException.getMessage());
             if (Configuration.configuration.isExecuteErrorBeforeTransferAllowed()) {
                 runner.finalizeTransfer(localChannelReference, file, finalValue, status);
             }
@@ -919,7 +911,7 @@ public class R66Session implements SessionInterface {
             R66Result result = finalValue;
             if (status) {
                 result = new R66Result(new OpenR66RunnerErrorException(e1),
-                        this, false, ErrorCode.Internal, runner);
+                                       this, false, ErrorCode.Internal, runner);
             }
             localChannelReference.invalidateRequest(result);
             throw (OpenR66RunnerErrorException) result.getException();
@@ -958,12 +950,12 @@ public class R66Session implements SessionInterface {
             localChannelReference.validateRequest(
                     new R66Result(this, true, ErrorCode.CompleteOk, runner));
         } else if (runner.getStatus() == ErrorCode.TransferOk &&
-                ((!runner.isSender()) || errorValue.getCode() == ErrorCode.QueryAlreadyFinished)) {
+                   ((!runner.isSender()) || errorValue.getCode() == ErrorCode.QueryAlreadyFinished)) {
             // Try to finalize it
             // status = true;
             try {
                 this.setFinalizeTransfer(true,
-                        new R66Result(this, true, ErrorCode.CompleteOk, runner));
+                                         new R66Result(this, true, ErrorCode.CompleteOk, runner));
                 localChannelReference.validateRequest(
                         localChannelReference.getFutureEndTransfer().getResult());
             } catch (OpenR66ProtocolSystemException e) {
@@ -1004,10 +996,10 @@ public class R66Session implements SessionInterface {
     @Override
     public String toString() {
         return "Session: FS[" + state.getCurrent() + "] " + status + "  " +
-                (auth != null ? auth.toString() : "no Auth") + "     " +
-                (dir != null ? dir.toString() : "no Dir") + "     " +
-                (file != null ? file.toString() : "no File") + "     " +
-                (runner != null ? runner.toShortString() : "no Runner");
+               (auth != null? auth.toString() : "no Auth") + "     " +
+               (dir != null? dir.toString() : "no Dir") + "     " +
+               (file != null? file.toString() : "no File") + "     " +
+               (runner != null? runner.toShortString() : "no Runner");
     }
 
     public String getUniqueExtension() {

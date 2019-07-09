@@ -1,26 +1,20 @@
 /**
-   This file is part of Waarp Project.
-
-   Copyright 2009, Frederic Bregier, and individual contributors by the @author
-   tags. See the COPYRIGHT.txt in the distribution for a full listing of
-   individual contributors.
-
-   All Waarp Project is free software: you can redistribute it and/or 
-   modify it under the terms of the GNU General Public License as published 
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Waarp is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Waarp .  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Waarp Project.
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with Waarp .  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.test;
-
-import java.io.File;
 
 import org.waarp.common.database.DbAdmin;
 import org.waarp.common.database.exception.WaarpDatabaseException;
@@ -48,9 +42,11 @@ import org.waarp.openr66.protocol.configuration.PartnerConfiguration;
 import org.waarp.openr66.protocol.localhandler.packet.RequestPacket;
 import org.waarp.openr66.protocol.localhandler.packet.RequestPacket.TRANSFERMODE;
 
+import java.io.File;
+
 /**
  * The object of this class is to test various tasks.
- * 
+ *
  * @author "Frederic Bregier"
  *
  */
@@ -82,10 +78,11 @@ public class TestTasks {
         String argTransfer = "basic information";
         R66Session session = new R66Session();
         DbRule rule = new DbRule("idRule", (String) null, TRANSFERMODE.SENDMODE.ordinal(), out, null, null, in,
-                null, null, null, null, null, null);
+                                 null, null, null, null, null, null);
         RequestPacket requestPacket = new RequestPacket(rule.getIdRule(), rule.getMode(), filename,
-                Configuration.BUFFERSIZEDEFAULT, (int) size / Configuration.BUFFERSIZEDEFAULT + 1,
-                1, argTransfer, size, PartnerConfiguration.BAR_SEPARATOR_FIELD);
+                                                        Configuration.BUFFERSIZEDEFAULT,
+                                                        (int) size / Configuration.BUFFERSIZEDEFAULT + 1,
+                                                        1, argTransfer, size, PartnerConfiguration.BAR_SEPARATOR_FIELD);
         DbTaskRunner runner = null;
         DbConstant.admin = new DbAdmin();
         session.getAuth().specialNoSessionAuth(false, "false");

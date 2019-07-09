@@ -1,26 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
-
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.logging.WaarpLogger;
@@ -35,24 +29,22 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolNoSslException;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Abstract implementation of task
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public abstract class AbstractTask implements Runnable {
-    /**
-     * Internal Logger
-     */
-    private static final WaarpLogger logger = WaarpLoggerFactory
-            .getLogger(AbstractTask.class);
-
     /**
      * Current full path of current FILENAME
      */
     public static final String TRUEFULLPATH = "#TRUEFULLPATH#";
-
     /**
      * Current FILENAME (basename) (change in retrieval part)
      */
@@ -61,102 +53,82 @@ public abstract class AbstractTask implements Runnable {
      * Current full path of Original FILENAME (as transmitted) (before changing in retrieval part)
      */
     public static final String ORIGINALFULLPATH = "#ORIGINALFULLPATH#";
-
     /**
      * Original FILENAME (basename) (before changing in retrieval part)
      */
     public static final String ORIGINALFILENAME = "#ORIGINALFILENAME#";
-
     /**
      * Size of the current FILE
      */
     public static final String FILESIZE = "#FILESIZE#";
-
     /**
      * Current full path of current RULE
      */
     public static final String RULE = "#RULE#";
-
     /**
      * Date in yyyyMMdd format
      */
     public static final String DATE = "#DATE#";
-
     /**
      * Hour in HHmmss format
      */
     public static final String HOUR = "#HOUR#";
-
     /**
      * Remote host id (if not the initiator of the call)
      */
     public static final String REMOTEHOST = "#REMOTEHOST#";
-
     /**
      * Remote host address
      */
     public static final String REMOTEHOSTADDR = "#REMOTEHOSTADDR#";
-
     /**
      * Local host id
      */
     public static final String LOCALHOST = "#LOCALHOST#";
-
     /**
      * Local host address
      */
     public static final String LOCALHOSTADDR = "#LOCALHOSTADDR#";
-
     /**
      * Transfer id
      */
     public static final String TRANSFERID = "#TRANSFERID#";
-
     /**
      * Requester Host
      */
     public static final String REQUESTERHOST = "#REQUESTERHOST#";
-
     /**
      * Requested Host
      */
     public static final String REQUESTEDHOST = "#REQUESTEDHOST#";
-
     /**
      * Full Transfer id (TRANSFERID_REQUESTERHOST_REQUESTEDHOST)
      */
     public static final String FULLTRANSFERID = "#FULLTRANSFERID#";
-
     /**
      * Current or final RANK of block
      */
     public static final String RANKTRANSFER = "#RANKTRANSFER#";
-
     /**
      * Block size used
      */
     public static final String BLOCKSIZE = "#BLOCKSIZE#";
-
     /**
      * IN Path used
      */
     public static final String INPATH = "#INPATH#";
-
     /**
      * OUT Path used
      */
     public static final String OUTPATH = "#OUTPATH#";
-
     /**
      * WORK Path used
      */
     public static final String WORKPATH = "#WORKPATH#";
-
     /**
      * ARCH Path used
      */
     public static final String ARCHPATH = "#ARCHPATH#";
-
     /**
      * HOME Path used
      */
@@ -182,7 +154,11 @@ public abstract class AbstractTask implements Runnable {
      * usage of LocalExec)
      */
     public static final String LOCALEXEC = "#LOCALEXEC#";
-
+    /**
+     * Internal Logger
+     */
+    private static final WaarpLogger logger = WaarpLoggerFactory
+            .getLogger(AbstractTask.class);
     /**
      * Type of operation
      */
@@ -223,14 +199,14 @@ public abstract class AbstractTask implements Runnable {
 
     /**
      * Constructor
-     * 
+     *
      * @param type
      * @param delay
      * @param arg
      * @param session
      */
     AbstractTask(TaskType type, int delay, String argRule, String argTransfer,
-            R66Session session) {
+                 R66Session session) {
         this.type = type;
         this.delay = delay;
         this.argRule = argRule;
@@ -240,7 +216,7 @@ public abstract class AbstractTask implements Runnable {
     }
 
     /**
-     * 
+     *
      * @return the TaskType of this AbstractTask
      */
     public TaskType getType() {
@@ -253,7 +229,7 @@ public abstract class AbstractTask implements Runnable {
     abstract public void run();
 
     /**
-     * 
+     *
      * @return True if the operation is in success status
      */
     public boolean isSuccess() {
@@ -262,7 +238,7 @@ public abstract class AbstractTask implements Runnable {
     }
 
     /**
-     * 
+     *
      * @return the R66Future of completion
      */
     public R66Future getFutureCompletion() {
@@ -270,7 +246,7 @@ public abstract class AbstractTask implements Runnable {
     }
 
     /**
-     * 
+     *
      * @param arg
      *            as the Format string where FIXED items will be replaced by context values and next
      *            using argFormat as format second argument; this arg comes from the rule itself
@@ -309,8 +285,8 @@ public abstract class AbstractTask implements Runnable {
             WaarpStringUtils.replaceAll(builder, ORIGINALFULLPATH, runner
                     .getOriginalFilename());
             WaarpStringUtils.replaceAll(builder, ORIGINALFILENAME,
-                    R66File.getBasename(runner
-                            .getOriginalFilename()));
+                                        R66File.getBasename(runner
+                                                                    .getOriginalFilename()));
             WaarpStringUtils.replaceAll(builder, RULE, runner
                     .getRuleId());
         }
@@ -323,18 +299,18 @@ public abstract class AbstractTask implements Runnable {
             WaarpStringUtils.replaceAll(builder, REMOTEHOST, session.getAuth().getUser());
             try {
                 WaarpStringUtils.replaceAll(builder, LOCALHOST,
-                        Configuration.configuration.getHostId(session.getAuth().isSsl()));
+                                            Configuration.configuration.getHostId(session.getAuth().isSsl()));
             } catch (OpenR66ProtocolNoSslException e) {
                 // replace by standard name
                 WaarpStringUtils.replaceAll(builder, LOCALHOST,
-                        Configuration.configuration.getHOST_ID());
+                                            Configuration.configuration.getHOST_ID());
             }
         }
         if (session.getRemoteAddress() != null) {
             WaarpStringUtils.replaceAll(builder, REMOTEHOSTADDR, session.getRemoteAddress()
-                    .toString());
+                                                                        .toString());
             WaarpStringUtils.replaceAll(builder, LOCALHOSTADDR, session.getLocalAddress()
-                    .toString());
+                                                                       .toString());
         } else {
             WaarpStringUtils.replaceAll(builder, REMOTEHOSTADDR, "unknown");
             WaarpStringUtils.replaceAll(builder, LOCALHOSTADDR, "unknown");
@@ -346,11 +322,11 @@ public abstract class AbstractTask implements Runnable {
             String requested = runner.getRequested();
             WaarpStringUtils.replaceAll(builder, REQUESTEDHOST, requested);
             WaarpStringUtils.replaceAll(builder, FULLTRANSFERID,
-                    runner.getSpecialId() + "_" + requester + "_" + requested);
+                                        runner.getSpecialId() + "_" + requester + "_" + requested);
             WaarpStringUtils.replaceAll(builder, RANKTRANSFER, Integer.toString(runner.getRank()));
         }
         WaarpStringUtils.replaceAll(builder, BLOCKSIZE, Integer.toString(session
-                .getBlockSize()));
+                                                                                 .getBlockSize()));
         R66Dir dir = new R66Dir(session);
         if (runner != null) {
             if (runner.isRecvThrough() || runner.isSendThrough()) {
@@ -435,13 +411,13 @@ public abstract class AbstractTask implements Runnable {
         } else {
             try {
                 WaarpStringUtils.replaceAll(builder, ERRORMSG, session.getLocalChannelReference()
-                        .getErrorMessage());
+                                                                      .getErrorMessage());
             } catch (NullPointerException e) {
                 WaarpStringUtils.replaceAll(builder, ERRORMSG, "NoError");
             }
             try {
                 WaarpStringUtils.replaceAll(builder, ERRORCODE, session.getLocalChannelReference()
-                        .getCurrentCode().getCode());
+                                                                       .getCurrentCode().getCode());
             } catch (NullPointerException e) {
                 WaarpStringUtils.replaceAll(builder, ERRORCODE, "-");
             }
@@ -453,13 +429,14 @@ public abstract class AbstractTask implements Runnable {
             }
         }
         // finalname
-        if (argFormat != null && argFormat.length > 0)
+        if (argFormat != null && argFormat.length > 0) {
             try {
                 return String.format(builder.toString(), argFormat);
             } catch (Exception e) {
                 // ignored error since bad argument in static rule info
-                logger.error("Bad format in Rule: {"+builder.toString()+"} " + e.getMessage());
+                logger.error("Bad format in Rule: {" + builder.toString() + "} " + e.getMessage());
             }
+        }
         return builder.toString();
     }
 }

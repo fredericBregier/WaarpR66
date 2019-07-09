@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.database.model;
-
-import java.sql.SQLException;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.DbRequest;
@@ -38,6 +34,9 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.configuration.PartnerConfiguration;
 import org.waarp.openr66.protocol.utils.R66Versions;
 
+import java.sql.SQLException;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * MariaDB Database Model implementation
  *
@@ -45,6 +44,8 @@ import org.waarp.openr66.protocol.utils.R66Versions;
  *
  */
 public class DbModelMariadb extends org.waarp.common.database.model.DbModelMariadb {
+    private final ReentrantLock lock = new ReentrantLock();
+
     /**
      * Create the object and initialize if necessary the driver
      *
@@ -57,8 +58,6 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             throws WaarpDatabaseNoConnectionException {
         super(dbserver, dbuser, dbpasswd);
     }
-
-    private final ReentrantLock lock = new ReentrantLock();
 
     @Override
     public void createTables(DbSession session) throws WaarpDatabaseNoConnectionException {
@@ -73,12 +72,12 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
                 .values();
         for (int i = 0; i < mcolumns.length - 1; i++) {
             action += mcolumns[i].name() +
-                    DBType.getType(DbMultipleMonitor.dbTypes[i]) + notNull +
-                    ", ";
+                      DBType.getType(DbMultipleMonitor.dbTypes[i]) + notNull +
+                      ", ";
         }
         action += mcolumns[mcolumns.length - 1].name() +
-                DBType.getType(DbMultipleMonitor.dbTypes[mcolumns.length - 1]) +
-                primaryKey + ")";
+                  DBType.getType(DbMultipleMonitor.dbTypes[mcolumns.length - 1]) +
+                  primaryKey + ")";
         System.out.println(action);
         DbRequest request = new DbRequest(session);
         try {
@@ -95,8 +94,9 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
         DbMultipleMonitor multipleMonitor = new DbMultipleMonitor(
                 Configuration.configuration.getHOST_ID(), 0, 0, 0);
         try {
-            if (!multipleMonitor.exist())
+            if (!multipleMonitor.exist()) {
                 multipleMonitor.insert();
+            }
         } catch (WaarpDatabaseException e1) {
             e1.printStackTrace();
         }
@@ -107,12 +107,12 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
                 .values();
         for (int i = 0; i < ccolumns.length - 1; i++) {
             action += ccolumns[i].name() +
-                    DBType.getType(DbConfiguration.dbTypes[i]) + notNull +
-                    ", ";
+                      DBType.getType(DbConfiguration.dbTypes[i]) + notNull +
+                      ", ";
         }
         action += ccolumns[ccolumns.length - 1].name() +
-                DBType.getType(DbConfiguration.dbTypes[ccolumns.length - 1]) +
-                primaryKey + ")";
+                  DBType.getType(DbConfiguration.dbTypes[ccolumns.length - 1]) +
+                  primaryKey + ")";
         System.out.println(action);
         request = new DbRequest(session);
         try {
@@ -133,12 +133,12 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
                 .values();
         for (int i = 0; i < chcolumns.length - 1; i++) {
             action += chcolumns[i].name() +
-                    DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
-                    ", ";
+                      DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
+                      ", ";
         }
         action += chcolumns[chcolumns.length - 1].name() +
-                DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
-                primaryKey + ")";
+                  DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
+                  primaryKey + ")";
         System.out.println(action);
         request = new DbRequest(session);
         try {
@@ -157,11 +157,11 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
         DbHostAuth.Columns[] hcolumns = DbHostAuth.Columns.values();
         for (int i = 0; i < hcolumns.length - 1; i++) {
             action += hcolumns[i].name() +
-                    DBType.getType(DbHostAuth.dbTypes[i]) + notNull + ", ";
+                      DBType.getType(DbHostAuth.dbTypes[i]) + notNull + ", ";
         }
         action += hcolumns[hcolumns.length - 1].name() +
-                DBType.getType(DbHostAuth.dbTypes[hcolumns.length - 1]) +
-                primaryKey + ")";
+                  DBType.getType(DbHostAuth.dbTypes[hcolumns.length - 1]) +
+                  primaryKey + ")";
         System.out.println(action);
         try {
             request.query(action);
@@ -180,11 +180,11 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
         DbRule.Columns[] rcolumns = DbRule.Columns.values();
         for (int i = 0; i < rcolumns.length - 1; i++) {
             action += rcolumns[i].name() +
-                    DBType.getType(DbRule.dbTypes[i]) + ", ";
+                      DBType.getType(DbRule.dbTypes[i]) + ", ";
         }
         action += rcolumns[rcolumns.length - 1].name() +
-                DBType.getType(DbRule.dbTypes[rcolumns.length - 1]) +
-                primaryKey + ")";
+                  DBType.getType(DbRule.dbTypes[rcolumns.length - 1]) +
+                  primaryKey + ")";
         System.out.println(action);
         try {
             request.query(action);
@@ -203,7 +203,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
         DbTaskRunner.Columns[] acolumns = DbTaskRunner.Columns.values();
         for (int i = 0; i < acolumns.length; i++) {
             action += acolumns[i].name() +
-                    DBType.getType(DbTaskRunner.dbTypes[i]) + notNull + ", ";
+                      DBType.getType(DbTaskRunner.dbTypes[i]) + notNull + ", ";
         }
         // Several columns for primary key
         action += " CONSTRAINT runner_pk " + primaryKey + "(";
@@ -251,7 +251,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
          * 1) WHERE name = ?; $seq = $db->LastInsertId();
          */
         action = "CREATE TABLE Sequences (name VARCHAR(22) NOT NULL PRIMARY KEY," +
-                "seq BIGINT NOT NULL)";
+                 "seq BIGINT NOT NULL)";
         System.out.println(action);
         try {
             request.query(action);
@@ -265,7 +265,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             request.close();
         }
         action = "INSERT INTO Sequences (name, seq) VALUES ('" + DbTaskRunner.fieldseq + "', " +
-                (DbConstant.ILLEGALVALUE + 1) + ")";
+                 (DbConstant.ILLEGALVALUE + 1) + ")";
         System.out.println(action);
         try {
             request.query(action);
@@ -280,14 +280,14 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
         }
 
         DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-            R66Versions.V2_4_25.getVersion());
+                                            R66Versions.V2_4_25.getVersion());
     }
 
     @Override
     public void resetSequence(DbSession session, long newvalue)
             throws WaarpDatabaseNoConnectionException {
         String action = "UPDATE Sequences SET seq = " + newvalue +
-                " WHERE name = '" + DbTaskRunner.fieldseq + "'";
+                        " WHERE name = '" + DbTaskRunner.fieldseq + "'";
         DbRequest request = new DbRequest(session);
         try {
             request.query(action);
@@ -306,12 +306,12 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
     @Override
     public synchronized long nextSequence(DbSession dbSession)
             throws WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException, WaarpDatabaseNoDataException {
+                   WaarpDatabaseSqlException, WaarpDatabaseNoDataException {
         lock.lock();
         try {
             long result = DbConstant.ILLEGALVALUE;
             String action = "SELECT seq FROM Sequences WHERE name = '" +
-                    DbTaskRunner.fieldseq + "' FOR UPDATE";
+                            DbTaskRunner.fieldseq + "' FOR UPDATE";
             DbPreparedStatement preparedStatement = new DbPreparedStatement(
                     dbSession);
             try {
@@ -336,7 +336,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
                 preparedStatement.realClose();
             }
             action = "UPDATE Sequences SET seq = " + (result + 1) +
-                    " WHERE name = '" + DbTaskRunner.fieldseq + "'";
+                     " WHERE name = '" + DbTaskRunner.fieldseq + "'";
             try {
                 preparedStatement.createPrepareStatement(action);
                 // Limit the search
@@ -367,12 +367,12 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
                     .values();
             for (int i = 0; i < chcolumns.length - 1; i++) {
                 action += chcolumns[i].name() +
-                        DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
-                        ", ";
+                          DBType.getType(DbHostConfiguration.dbTypes[i]) + notNull +
+                          ", ";
             }
             action += chcolumns[chcolumns.length - 1].name() +
-                    DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
-                    primaryKey + ")";
+                      DBType.getType(DbHostConfiguration.dbTypes[chcolumns.length - 1]) +
+                      primaryKey + ")";
             System.out.println(action);
             DbRequest request = new DbRequest(session);
             try {
@@ -389,15 +389,15 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             DbRequest request = new DbRequest(session);
             try {
                 String command = "ALTER TABLE "
-                        + DbTaskRunner.table
-                        + " ADD COLUMN "
-                        +
-                        DbTaskRunner.Columns.TRANSFERINFO.name()
-                        + " "
-                        +
-                        DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.TRANSFERINFO
-                                .ordinal()]) +
-                        " AFTER " + DbTaskRunner.Columns.FILEINFO.name();
+                                 + DbTaskRunner.table
+                                 + " ADD COLUMN "
+                                 +
+                                 DbTaskRunner.Columns.TRANSFERINFO.name()
+                                 + " "
+                                 +
+                                 DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.TRANSFERINFO
+                                         .ordinal()]) +
+                                 " AFTER " + DbTaskRunner.Columns.FILEINFO.name();
                 request.query(command);
             } catch (WaarpDatabaseSqlException e) {
                 e.printStackTrace();
@@ -411,15 +411,15 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             DbRequest request = new DbRequest(session);
             try {
                 String command = "ALTER TABLE "
-                        + DbHostAuth.table
-                        + " ADD COLUMN "
-                        +
-                        DbHostAuth.Columns.ISACTIVE.name()
-                        + " "
-                        +
-                        DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISACTIVE
-                                .ordinal()]) +
-                        " AFTER " + DbHostAuth.Columns.ISCLIENT.name();
+                                 + DbHostAuth.table
+                                 + " ADD COLUMN "
+                                 +
+                                 DbHostAuth.Columns.ISACTIVE.name()
+                                 + " "
+                                 +
+                                 DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISACTIVE
+                                         .ordinal()]) +
+                                 " AFTER " + DbHostAuth.Columns.ISCLIENT.name();
                 request.query(command);
                 command = "UPDATE " + DbHostAuth.table + " SET " + DbHostAuth.Columns.ISACTIVE.name() + " = " + true;
                 request.query(command);
@@ -431,18 +431,18 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             }
             try {
                 String command = "ALTER TABLE "
-                        + DbHostAuth.table
-                        + " ADD COLUMN "
-                        +
-                        DbHostAuth.Columns.ISPROXIFIED.name()
-                        + " "
-                        +
-                        DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISPROXIFIED
-                                .ordinal()]) +
-                        " AFTER " + DbHostAuth.Columns.ISACTIVE.name();
+                                 + DbHostAuth.table
+                                 + " ADD COLUMN "
+                                 +
+                                 DbHostAuth.Columns.ISPROXIFIED.name()
+                                 + " "
+                                 +
+                                 DBType.getType(DbHostAuth.dbTypes[DbHostAuth.Columns.ISPROXIFIED
+                                         .ordinal()]) +
+                                 " AFTER " + DbHostAuth.Columns.ISACTIVE.name();
                 request.query(command);
                 command = "UPDATE " + DbHostAuth.table + " SET " + DbHostAuth.Columns.ISPROXIFIED.name() + " = "
-                        + false;
+                          + false;
                 request.query(command);
             } catch (WaarpDatabaseSqlException e) {
                 e.printStackTrace();
@@ -454,9 +454,9 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
         if (PartnerConfiguration.isVersion2GTVersion1(version, R66Versions.V2_4_25.getVersion())) {
             System.out.println(version + " to " + R66Versions.V2_4_25.getVersion() + "? " + true);
             String command = "ALTER TABLE " + DbTaskRunner.table + " MODIFY " +
-                    DbTaskRunner.Columns.FILENAME.name() + " " +
-                    DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.FILENAME.ordinal()]) +
-                    " NOT NULL ";
+                             DbTaskRunner.Columns.FILENAME.name() + " " +
+                             DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.FILENAME.ordinal()]) +
+                             " NOT NULL ";
             DbRequest request = new DbRequest(session);
             try {
                 System.out.println("Command: " + command);
@@ -468,9 +468,9 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
                 request.close();
             }
             command = "ALTER TABLE " + DbTaskRunner.table + " MODIFY " +
-                    DbTaskRunner.Columns.ORIGINALNAME.name() + " " +
-                    DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.ORIGINALNAME.ordinal()]) +
-                    " NOT NULL ";
+                      DbTaskRunner.Columns.ORIGINALNAME.name() + " " +
+                      DBType.getType(DbTaskRunner.dbTypes[DbTaskRunner.Columns.ORIGINALNAME.ordinal()]) +
+                      " NOT NULL ";
             request = new DbRequest(session);
             try {
                 System.out.println("Command: " + command);
@@ -483,7 +483,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             }
         }
         DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                R66Versions.V2_4_25.getVersion());
+                                            R66Versions.V2_4_25.getVersion());
         return true;
     }
 
@@ -495,12 +495,13 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             try {
                 request = new DbRequest(session);
                 request.select("select " + DbHostConfiguration.Columns.HOSTID.name() + " from "
-                        + DbHostConfiguration.table +
-                        " where " + DbHostConfiguration.Columns.HOSTID + " = '" + Configuration.configuration.getHOST_ID()
-                        + "'");
+                               + DbHostConfiguration.table +
+                               " where " + DbHostConfiguration.Columns.HOSTID + " = '" +
+                               Configuration.configuration.getHOST_ID()
+                               + "'");
                 request.close();
                 DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                        R66Versions.V2_4_13.getVersion());
+                                                    R66Versions.V2_4_13.getVersion());
             } catch (WaarpDatabaseSqlException e) {
                 return !upgradeDb(session, version);
             } finally {
@@ -514,10 +515,10 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             try {
                 request = new DbRequest(session);
                 request.select("select " + DbTaskRunner.Columns.TRANSFERINFO.name() + " from " + DbTaskRunner.table +
-                        " where " + DbTaskRunner.Columns.SPECIALID + " = " + DbConstant.ILLEGALVALUE);
+                               " where " + DbTaskRunner.Columns.SPECIALID + " = " + DbConstant.ILLEGALVALUE);
                 request.close();
                 DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                        R66Versions.V2_4_17.getVersion());
+                                                    R66Versions.V2_4_17.getVersion());
             } catch (WaarpDatabaseSqlException e) {
                 return !upgradeDb(session, version);
             } finally {
@@ -531,10 +532,10 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             try {
                 request = new DbRequest(session);
                 request.select("select " + DbHostAuth.Columns.ISACTIVE.name() + " from " + DbHostAuth.table +
-                        " where " + DbHostAuth.Columns.PORT + " = " + 0);
+                               " where " + DbHostAuth.Columns.PORT + " = " + 0);
                 request.close();
                 DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                        R66Versions.V2_4_23.getVersion());
+                                                    R66Versions.V2_4_23.getVersion());
             } catch (WaarpDatabaseSqlException e) {
                 return !upgradeDb(session, version);
             } finally {
@@ -548,7 +549,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
             try {
                 if (upgradeDb(session, version)) {
                     DbHostConfiguration.updateVersionDb(Configuration.configuration.getHOST_ID(),
-                            R66Versions.V2_4_25.getVersion());
+                                                        R66Versions.V2_4_25.getVersion());
                 } else {
                     return true;
                 }

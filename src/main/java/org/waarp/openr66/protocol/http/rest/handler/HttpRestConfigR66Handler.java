@@ -1,25 +1,23 @@
 /**
-   This file is part of Waarp Project.
-
-   Copyright 2009, Frederic Bregier, and individual contributors by the @author
-   tags. See the COPYRIGHT.txt in the distribution for a full listing of
-   individual contributors.
-
-   All Waarp Project is free software: you can redistribute it and/or 
-   modify it under the terms of the GNU General Public License as published 
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Waarp is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Waarp .  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Waarp Project.
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with Waarp .  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.http.rest.handler;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.waarp.common.database.data.AbstractDbData;
 import org.waarp.common.json.JsonHandler;
@@ -27,11 +25,11 @@ import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.gateway.kernel.exception.HttpIncorrectRequestException;
 import org.waarp.gateway.kernel.exception.HttpInvalidAuthenticationException;
-import org.waarp.gateway.kernel.rest.HttpRestHandler;
-import org.waarp.gateway.kernel.rest.RestConfiguration;
 import org.waarp.gateway.kernel.rest.DataModelRestMethodHandler.COMMAND_TYPE;
+import org.waarp.gateway.kernel.rest.HttpRestHandler;
 import org.waarp.gateway.kernel.rest.HttpRestHandler.METHOD;
 import org.waarp.gateway.kernel.rest.RestArgument;
+import org.waarp.gateway.kernel.rest.RestConfiguration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolNotAuthenticatedException;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolPacketException;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
@@ -44,12 +42,9 @@ import org.waarp.openr66.protocol.localhandler.packet.json.ConfigImportJsonPacke
 import org.waarp.openr66.protocol.localhandler.packet.json.ConfigImportResponseJsonPacket;
 import org.waarp.openr66.protocol.localhandler.packet.json.JsonPacket;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Configuration Http REST interface: http://host/config?... + ConfigExportJsonPacket or ConfigImportJsonPacket as GET or PUT
- * 
+ *
  * @author "Frederic Bregier"
  *
  */
@@ -104,8 +99,8 @@ public class HttpRestConfigR66Handler extends HttpRestAbstractR66Handler {
                 resp.setFilealias(sresult[3]);
                 resp.setFileroles(sresult[4]);
                 if (resp.getFilerule() != null || resp.getFilehost() != null ||
-                        resp.getFilebusiness() != null || resp.getFilealias() != null ||
-                        resp.getFileroles() != null) {
+                    resp.getFilebusiness() != null || resp.getFilealias() != null ||
+                    resp.getFileroles() != null) {
                     setOk(handler, result, resp, HttpResponseStatus.OK);
                 } else {
                     result.setDetail("Export configuration in error");
@@ -115,8 +110,8 @@ public class HttpRestConfigR66Handler extends HttpRestAbstractR66Handler {
                 result.setCommand(ACTIONS_TYPE.ImportConfig.name());
                 ConfigImportResponseJsonPacket resp = serverHandler.configImport((ConfigImportJsonPacket) json);
                 if (resp.isImportedhost() || resp.isImportedrule() ||
-                        resp.isImportedbusiness() || resp.isImportedalias() ||
-                        resp.isImportedroles()) {
+                    resp.isImportedbusiness() || resp.isImportedalias() ||
+                    resp.isImportedroles()) {
                     setOk(handler, result, resp, HttpResponseStatus.OK);
                 } else {
                     result.setDetail("Import configuration in error");
@@ -154,7 +149,7 @@ public class HttpRestConfigR66Handler extends HttpRestAbstractR66Handler {
             try {
                 node1.add(resp.createObjectNode());
                 node2 = RestArgument.fillDetailedAllow(METHOD.GET, this.path, ACTIONS_TYPE.ExportConfig.name(),
-                        node3.createObjectNode(), node1);
+                                                       node3.createObjectNode(), node1);
                 node.add(node2);
             } catch (OpenR66ProtocolPacketException e1) {
             }
@@ -162,7 +157,8 @@ public class HttpRestConfigR66Handler extends HttpRestAbstractR66Handler {
         if (this.methods.contains(METHOD.PUT)) {
             ConfigImportJsonPacket node4 = new ConfigImportJsonPacket();
             node4.setRequestUserPacket();
-            node4.setComment("ConfigImport request (PUT) where items are either set through transfer Id, either set directly with a filename");
+            node4.setComment(
+                    "ConfigImport request (PUT) where items are either set through transfer Id, either set directly with a filename");
             node4.setAlias("AliasFilename if not through TransferId");
             node4.setBusiness("BusinessFilename if not through TransferId");
             node4.setHost("HostFilename if not through TransferId");
@@ -180,14 +176,15 @@ public class HttpRestConfigR66Handler extends HttpRestAbstractR66Handler {
             try {
                 node1.add(resp2.createObjectNode());
                 ObjectNode node2 = RestArgument.fillDetailedAllow(METHOD.PUT, this.path,
-                        ACTIONS_TYPE.ImportConfig.name(), node4.createObjectNode(), node1);
+                                                                  ACTIONS_TYPE.ImportConfig.name(),
+                                                                  node4.createObjectNode(), node1);
                 node.add(node2);
             } catch (OpenR66ProtocolPacketException e1) {
             }
         }
 
         ObjectNode node2 = RestArgument.fillDetailedAllow(METHOD.OPTIONS, this.path, COMMAND_TYPE.OPTIONS.name(), null,
-                null);
+                                                          null);
         node.add(node2);
 
         return node;

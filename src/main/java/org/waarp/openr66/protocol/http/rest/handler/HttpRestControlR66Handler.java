@@ -1,27 +1,23 @@
 /**
-   This file is part of Waarp Project.
-
-   Copyright 2009, Frederic Bregier, and individual contributors by the @author
-   tags. See the COPYRIGHT.txt in the distribution for a full listing of
-   individual contributors.
-
-   All Waarp Project is free software: you can redistribute it and/or 
-   modify it under the terms of the GNU General Public License as published 
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Waarp is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Waarp .  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Waarp Project.
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with Waarp .  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.http.rest.handler;
 
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.waarp.common.database.data.AbstractDbData;
 import org.waarp.common.database.data.DbValue;
@@ -30,11 +26,11 @@ import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.gateway.kernel.exception.HttpIncorrectRequestException;
 import org.waarp.gateway.kernel.exception.HttpInvalidAuthenticationException;
-import org.waarp.gateway.kernel.rest.HttpRestHandler;
-import org.waarp.gateway.kernel.rest.RestConfiguration;
 import org.waarp.gateway.kernel.rest.DataModelRestMethodHandler.COMMAND_TYPE;
+import org.waarp.gateway.kernel.rest.HttpRestHandler;
 import org.waarp.gateway.kernel.rest.HttpRestHandler.METHOD;
 import org.waarp.gateway.kernel.rest.RestArgument;
+import org.waarp.gateway.kernel.rest.RestConfiguration;
 import org.waarp.openr66.context.ErrorCode;
 import org.waarp.openr66.context.R66Result;
 import org.waarp.openr66.context.R66Session;
@@ -49,18 +45,17 @@ import org.waarp.openr66.protocol.localhandler.ServerActions;
 import org.waarp.openr66.protocol.localhandler.packet.ValidPacket;
 import org.waarp.openr66.protocol.localhandler.packet.json.InformationJsonPacket;
 import org.waarp.openr66.protocol.localhandler.packet.json.JsonPacket;
-import org.waarp.openr66.protocol.localhandler.packet.json.StopOrCancelJsonPacket;
 import org.waarp.openr66.protocol.localhandler.packet.json.RestartTransferJsonPacket;
+import org.waarp.openr66.protocol.localhandler.packet.json.StopOrCancelJsonPacket;
 import org.waarp.openr66.protocol.localhandler.packet.json.TransferRequestJsonPacket;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Date;
 
 /**
  * Transfer Http REST interface: http://host/control?... +
  * InformationJsonPacket (should be on Transfer only) RestartTransferJsonPacket StopOrCancelJsonPacket TransferRequestJsonPacket
  * as GET PUT PUT POST
- * 
+ *
  * @author "Frederic Bregier"
  *
  */
@@ -105,10 +100,10 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
                     ValidPacket validPacket = null;
                     if (node.isIdRequest()) {
                         validPacket = serverHandler.informationRequest(node.getId(), node.isTo(), node.getRulename(),
-                                true);
+                                                                       true);
                     } else {
                         validPacket = serverHandler.informationFile(node.getRequest(), node.getRulename(),
-                                node.getFilename(), true);
+                                                                    node.getFilename(), true);
                     }
                     if (validPacket != null) {
                         ObjectNode resp = JsonHandler.getFromString(validPacket.getSheader());
@@ -128,7 +123,7 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
                 result.setCommand(ACTIONS_TYPE.RestartTransfer.name());
                 RestartTransferJsonPacket node = (RestartTransferJsonPacket) json;
                 R66Result r66result = serverHandler.requestRestart(node.getRequested(), node.getRequester(),
-                        node.getSpecialid(), node.getRestarttime());
+                                                                   node.getSpecialid(), node.getRestarttime());
                 if (serverHandler.isCodeValid(r66result.getCode())) {
                     result.setDetail("Restart Transfer done");
                     setOk(handler, result, node, HttpResponseStatus.OK);
@@ -141,10 +136,10 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
                 StopOrCancelJsonPacket node = (StopOrCancelJsonPacket) json;
                 R66Result resulttest;
                 if (node.getRequested() == null || node.getRequester() == null
-                        || node.getSpecialid() == DbConstant.ILLEGALVALUE) {
+                    || node.getSpecialid() == DbConstant.ILLEGALVALUE) {
                     ErrorCode code = ErrorCode.CommandNotFound;
                     resulttest = new R66Result(session, true,
-                            code, session.getRunner());
+                                               code, session.getRunner());
                     result.setDetail("Not enough argument passed to identify a transfer");
                     setError(handler, result, node, HttpResponseStatus.NOT_FOUND);
                 } else {
@@ -197,7 +192,8 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
             ObjectNode node2;
             try {
                 node2 = RestArgument.fillDetailedAllow(METHOD.GET, this.path,
-                        ACTIONS_TYPE.GetTransferInformation.name(), node3.createObjectNode(), node1);
+                                                       ACTIONS_TYPE.GetTransferInformation.name(),
+                                                       node3.createObjectNode(), node1);
                 node.add(node2);
             } catch (OpenR66ProtocolPacketException e1) {
             }
@@ -213,7 +209,8 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
             try {
                 node1.add(node4.createObjectNode());
                 ObjectNode node2 = RestArgument.fillDetailedAllow(METHOD.PUT, this.path,
-                        ACTIONS_TYPE.RestartTransfer.name(), node4.createObjectNode(), node1);
+                                                                  ACTIONS_TYPE.RestartTransfer.name(),
+                                                                  node4.createObjectNode(), node1);
                 node.add(node2);
             } catch (OpenR66ProtocolPacketException e1) {
             }
@@ -226,7 +223,8 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
             try {
                 node1.add(node5.createObjectNode());
                 ObjectNode node2 = RestArgument.fillDetailedAllow(METHOD.PUT, this.path,
-                        ACTIONS_TYPE.StopOrCancelTransfer.name(), node5.createObjectNode(), node1);
+                                                                  ACTIONS_TYPE.StopOrCancelTransfer.name(),
+                                                                  node5.createObjectNode(), node1);
                 node.add(node2);
             } catch (OpenR66ProtocolPacketException e1) {
             }
@@ -244,14 +242,15 @@ public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
             try {
                 node1.add(node6.createObjectNode());
                 ObjectNode node2 = RestArgument.fillDetailedAllow(METHOD.POST, this.path,
-                        ACTIONS_TYPE.CreateTransfer.name(), node6.createObjectNode(), node1);
+                                                                  ACTIONS_TYPE.CreateTransfer.name(),
+                                                                  node6.createObjectNode(), node1);
                 node.add(node2);
             } catch (OpenR66ProtocolPacketException e1) {
             }
         }
 
         ObjectNode node2 = RestArgument.fillDetailedAllow(METHOD.OPTIONS, this.path, COMMAND_TYPE.OPTIONS.name(), null,
-                null);
+                                                          null);
         node.add(node2);
 
         return node;

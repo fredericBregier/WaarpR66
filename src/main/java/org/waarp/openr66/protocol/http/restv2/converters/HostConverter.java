@@ -35,71 +35,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.waarp.openr66.protocol.configuration.Configuration.configuration;
+import static org.waarp.openr66.protocol.configuration.Configuration.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.HostFields.*;
 import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 
 /**
- * A collection of utility methods to convert {@link Host} objects
- * to their corresponding {@link ObjectNode} and vice-versa.
+ * A collection of utility methods to convert {@link Host} objects to their corresponding {@link ObjectNode} and
+ * vice-versa.
  */
 public final class HostConverter {
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private HostConverter() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
     //########################### INNER CLASSES ################################
-
-    /** Represents all the possible ways to sort a list of host objects. */
-    public enum Order {
-        /** By hostID, in ascending order. */
-        ascId(new Comparator<Host>() {
-            @Override
-            public int compare(Host t1, Host t2) {
-                return t1.getHostid().compareTo(t2.getHostid());
-            }
-        }),
-        /** By hostID, in descending order. */
-        descId(new Comparator<Host>() {
-            @Override
-            public int compare(Host t1, Host t2) {
-                return -t1.getHostid().compareTo(t2.getHostid());
-            }
-        }),
-        /** By address, in ascending order. */
-        ascAddress(new Comparator<Host>() {
-            @Override
-            public int compare(Host t1, Host t2) {
-                return t1.getAddress().compareTo(t2.getAddress());
-            }
-        }),
-        /** By address, in descending order. */
-        descAddress(new Comparator<Host>() {
-            @Override
-            public int compare(Host t1, Host t2) {
-                return -t1.getAddress().compareTo(t2.getAddress());
-            }
-        });
-
-        /** The comparator used to sort the list of RestHost objects. */
-        public final Comparator<Host> comparator;
-
-        Order(Comparator<Host> comparator) {
-            this.comparator = comparator;
-        }
-    }
-
-    //########################### PUBLIC METHODS ###############################
 
     /**
      * Converts the given {@link Host} object into an {@link ObjectNode}.
      *
      * @param host the host to convert
-     * @return     the converted ObjectNode
+     *
+     * @return the converted ObjectNode
      */
     public static ObjectNode hostToNode(Host host) {
         ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
@@ -116,32 +78,35 @@ public final class HostConverter {
         return node;
     }
 
+    //########################### PUBLIC METHODS ###############################
+
     /**
      * Converts the given {@link ObjectNode} into a {@link Host} object.
      *
      * @param object the ObjectNode to convert
-     * @return       the corresponding Host object
-     * @throws RestErrorException if the given ObjectNode does not represent
-     *                            a Host object
+     *
+     * @return the corresponding Host object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Host object
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static Host nodeToNewHost(ObjectNode object) {
         Host emptyHost = new Host(null, null, -1, null, false, false, false,
-                false, true);
+                                  false, true);
 
         return nodeToUpdatedHost(object, emptyHost);
     }
 
     /**
-     * Returns the given {@link Host} object updated with the values defined
-     * in the {@link ObjectNode} parameter. All fields missing in the JSON
-     * object will stay unchanged in the updated host entry.
+     * Returns the given {@link Host} object updated with the values defined in the {@link ObjectNode} parameter. All
+     * fields missing in the JSON object will stay unchanged in the updated host entry.
      *
-     * @param object  the ObjectNode to convert.
+     * @param object the ObjectNode to convert.
      * @param oldHost the host entry to update.
-     * @return        the updated host entry
-     * @throws RestErrorException if the given ObjectNode does not represent
-     *                            a Host object
+     *
+     * @return the updated host entry
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Host object
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static Host nodeToUpdatedHost(ObjectNode object, Host oldHost) {
@@ -164,64 +129,55 @@ public final class HostConverter {
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(ADDRESS)) {
+            } else if (name.equalsIgnoreCase(ADDRESS)) {
                 if (value.isTextual()) {
                     oldHost.setAddress(value.asText());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(PORT)) {
+            } else if (name.equalsIgnoreCase(PORT)) {
                 if (value.canConvertToInt() && value.asInt() >= 0 && value.asInt() < 65536) {
                     oldHost.setPort(value.asInt());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(PASSWORD)) {
+            } else if (name.equalsIgnoreCase(PASSWORD)) {
                 if (value.isTextual()) {
                     oldHost.setHostkey(encryptPassword(value.asText()));
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(IS_SSL)) {
+            } else if (name.equalsIgnoreCase(IS_SSL)) {
                 if (value.isBoolean()) {
                     oldHost.setSSL(value.asBoolean());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(IS_CLIENT)) {
+            } else if (name.equalsIgnoreCase(IS_CLIENT)) {
                 if (value.isBoolean()) {
                     oldHost.setClient(value.asBoolean());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(IS_ADMIN)) {
+            } else if (name.equalsIgnoreCase(IS_ADMIN)) {
                 if (value.isBoolean()) {
                     oldHost.setAdmin(value.asBoolean());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(IS_ACTIVE)) {
+            } else if (name.equalsIgnoreCase(IS_ACTIVE)) {
                 if (value.isBoolean()) {
                     oldHost.setActive(value.asBoolean());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(IS_PROXY)) {
+            } else if (name.equalsIgnoreCase(IS_PROXY)) {
                 if (value.isBoolean()) {
                     oldHost.setProxified(value.asBoolean());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else {
+            } else {
                 errors.add(UNKNOWN_FIELD(name));
             }
         }
@@ -235,15 +191,14 @@ public final class HostConverter {
         }
     }
 
-    //########################## PRIVATE METHODS ###############################
-
     /**
      * Encrypts the given password String using the server's cryptographic key.
      *
      * @param password the password to encrypt
-     * @return         the encrypted password
-     * @throws InternalServerErrorException If an error occurred when encrypting
-     *                                      the password.
+     *
+     * @return the encrypted password
+     *
+     * @throws InternalServerErrorException If an error occurred when encrypting the password.
      */
     private static byte[] encryptPassword(String password) {
         try {
@@ -253,15 +208,16 @@ public final class HostConverter {
         }
     }
 
+    //########################## PRIVATE METHODS ###############################
+
     /**
-     * List all missing required fields.
-     * This method returns a list of {@link RestError} representing all
-     * the errors encountered when checking the given host's required  fields.
-     * If all required fields have indeed been initialized, an empty list
-     * is returned.
+     * List all missing required fields. This method returns a list of {@link RestError} representing all the errors
+     * encountered when checking the given host's required  fields. If all required fields have indeed been initialized,
+     * an empty list is returned.
      *
      * @param host the host entry to check
-     * @return     the list of encountered errors
+     *
+     * @return the list of encountered errors
      */
     private static List<RestError> checkRequiredFields(Host host) {
         List<RestError> errors = new ArrayList<RestError>();
@@ -279,5 +235,56 @@ public final class HostConverter {
         }
 
         return errors;
+    }
+
+    /**
+     * Represents all the possible ways to sort a list of host objects.
+     */
+    public enum Order {
+        /**
+         * By hostID, in ascending order.
+         */
+        ascId(new Comparator<Host>() {
+            @Override
+            public int compare(Host t1, Host t2) {
+                return t1.getHostid().compareTo(t2.getHostid());
+            }
+        }),
+        /**
+         * By hostID, in descending order.
+         */
+        descId(new Comparator<Host>() {
+            @Override
+            public int compare(Host t1, Host t2) {
+                return -t1.getHostid().compareTo(t2.getHostid());
+            }
+        }),
+        /**
+         * By address, in ascending order.
+         */
+        ascAddress(new Comparator<Host>() {
+            @Override
+            public int compare(Host t1, Host t2) {
+                return t1.getAddress().compareTo(t2.getAddress());
+            }
+        }),
+        /**
+         * By address, in descending order.
+         */
+        descAddress(new Comparator<Host>() {
+            @Override
+            public int compare(Host t1, Host t2) {
+                return -t1.getAddress().compareTo(t2.getAddress());
+            }
+        });
+
+        /**
+         * The comparator used to sort the list of RestHost objects.
+         */
+        public final Comparator<Host> comparator;
+
+        Order(Comparator<Host> comparator) {
+            this.comparator = comparator;
+        }
     }
 }

@@ -50,19 +50,20 @@ public class Host {
      * Empty constructor for compatibility issues
      */
     @Deprecated
-    public Host() {}
+    public Host() {
+    }
 
     public Host(String hostid, String address, int port, byte[] hostkey,
-        boolean ssl, boolean client, boolean proxified, boolean admin,
-        boolean active, UpdatedInfo updatedInfo) {
+                boolean ssl, boolean client, boolean proxified, boolean admin,
+                boolean active, UpdatedInfo updatedInfo) {
         this(hostid, address, port, hostkey, ssl,
-                client, proxified, admin, active);
+             client, proxified, admin, active);
         this.updatedInfo = updatedInfo;
     }
 
     public Host(String hostid, String address, int port, byte[] hostkey,
-            boolean ssl, boolean client, boolean proxified, boolean admin,
-            boolean active) {
+                boolean ssl, boolean client, boolean proxified, boolean admin,
+                boolean active) {
         this.hostid = hostid;
         this.hostkey = hostkey;
         //Force client status if unvalid port
@@ -82,13 +83,13 @@ public class Host {
     }
 
     public Host(String hostid, String address, int port, byte[] hostkey,
-            boolean ssl, boolean client, boolean proxified, boolean admin) {
+                boolean ssl, boolean client, boolean proxified, boolean admin) {
         this(hostid, address, port, hostkey, ssl,
-                client, proxified, admin, true);
+             client, proxified, admin, true);
     }
 
     public Host(String hostid, String address, int port, byte[] hostkey,
-            boolean ssl, boolean client) {
+                boolean ssl, boolean client) {
         this(hostid, address, port, hostkey, ssl, client, false, true);
     }
 
@@ -120,6 +121,10 @@ public class Host {
         return this.hostkey;
     }
 
+    public void setHostkey(byte[] hostkey) {
+        this.hostkey = hostkey;
+    }
+
     @XmlElement(name = XML_AUTHENTIFICATION_KEY)
     public String getKey() {
         return new String(this.hostkey);
@@ -127,10 +132,6 @@ public class Host {
 
     public void setKey(String key) {
         this.hostkey = key.getBytes();
-    }
-
-    public void setHostkey(byte[] hostkey) {
-        this.hostkey = hostkey;
     }
 
     public boolean isSSL() {

@@ -5,9 +5,8 @@ import java.io.FilenameFilter;
 
 /**
  * Extension Filter based on extension
- * 
+ *
  * @author Frederic Bregier
- * 
  */
 public class ExtensionFilter implements FilenameFilter {
     String filter;

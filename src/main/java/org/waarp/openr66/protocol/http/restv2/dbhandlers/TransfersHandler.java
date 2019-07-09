@@ -52,26 +52,22 @@ import javax.ws.rs.core.HttpHeaders;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.openr66.dao.database.DBTransferDAO.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.DAO_FACTORY;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.GetTransfersParams.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.TRANSFERS_HANDLER_URI;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ILLEGAL_PARAMETER_VALUE;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the transfer collection REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the transfer collection REST entry point.
  */
 @Path(TRANSFERS_HANDLER_URI)
 public class TransfersHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final io.netty.handler.codec.http.HttpHeaders OPTIONS_HEADERS;
 
@@ -94,45 +90,44 @@ public class TransfersHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to obtain a list of transfer entry matching the different
-     * filters given as parameters of the query. The response is sent as a JSON
-     * array containing all the requested entries, unless an unexpected error
-     * prevents it or if the request is invalid.
+     * Method called to obtain a list of transfer entry matching the different filters given as parameters of the query.
+     * The response is sent as a JSON array containing all the requested entries, unless an unexpected error prevents it
+     * or if the request is invalid.
      *
-     * @param request    the HttpRequest made on the resource
-     * @param responder  the HttpResponder which sends the reply to the request
-     * @param limit_str  maximum number of entries allowed in the response
+     * @param request the HttpRequest made on the resource
+     * @param responder the HttpResponder which sends the reply to the request
+     * @param limit_str maximum number of entries allowed in the response
      * @param offset_str index of the first accepted entry in the list of all valid answers
-     * @param order_str  the criteria used to sort the entries and the way of ordering
-     * @param ruleID     filter transfers that use this rule
-     * @param partner    filter transfers that have this partner
+     * @param order_str the criteria used to sort the entries and the way of ordering
+     * @param ruleID filter transfers that use this rule
+     * @param partner filter transfers that have this partner
      * @param status_str filter transfers currently in one of these statuses
-     * @param filename   filter transfers of a particular file
+     * @param filename filter transfers of a particular file
      * @param startTrans lower bound for the transfers' starting date
-     * @param stopTrans  upper bound for the transfers' starting date
+     * @param stopTrans upper bound for the transfers' starting date
      */
     @GET
     @Consumes(APPLICATION_FORM_URLENCODED)
     @RequiredRole(ROLE.READONLY)
     public void filterTransfer(HttpRequest request, HttpResponder responder,
                                @QueryParam(LIMIT) @DefaultValue("20")
-                                           String limit_str,
+                                       String limit_str,
                                @QueryParam(OFFSET) @DefaultValue("0")
-                                           String offset_str,
+                                       String offset_str,
                                @QueryParam(ORDER) @DefaultValue("ascId")
-                                           String order_str,
+                                       String order_str,
                                @QueryParam(RULE_ID) @DefaultValue("")
-                                           String ruleID,
+                                       String ruleID,
                                @QueryParam(PARTNER) @DefaultValue("")
-                                           String partner,
+                                       String partner,
                                @QueryParam(STATUS) @DefaultValue("")
-                                           String status_str,
+                                       String status_str,
                                @QueryParam(FILENAME) @DefaultValue("")
-                                           String filename,
+                                       String filename,
                                @QueryParam(START_TRANS) @DefaultValue("")
-                                           String startTrans,
+                                       String startTrans,
                                @QueryParam(STOP_TRANS) @DefaultValue("")
-                                           String stopTrans) {
+                                       String stopTrans) {
 
         ArrayList<RestError> errors = new ArrayList<RestError>();
 
@@ -190,7 +185,7 @@ public class TransfersHandler extends AbstractRestDbHandler {
             }
         }
 
-        if(!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             throw new RestErrorException(errors);
         }
 
@@ -199,7 +194,7 @@ public class TransfersHandler extends AbstractRestDbHandler {
         try {
             transferDAO = DAO_FACTORY.getTransferDAO();
             transferList = transferDAO.find(filters, order.column, order.ascend,
-                    limit, offset);
+                                            limit, offset);
         } catch (DAOException e) {
             throw new InternalServerErrorException(e);
         } finally {
@@ -219,11 +214,10 @@ public class TransfersHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to create a new transfer on the server. The reply will
-     * contain the created entry in JSON format, unless an unexpected error
-     * prevents it or if the request is invalid.
+     * Method called to create a new transfer on the server. The reply will contain the created entry in JSON format,
+     * unless an unexpected error prevents it or if the request is invalid.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @POST
@@ -251,16 +245,16 @@ public class TransfersHandler extends AbstractRestDbHandler {
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
         headers.add("transfer-uri", TRANSFERS_HANDLER_URI + transfer.getId() +
-                "_" + transfer.getRequested());
+                                    "_" + transfer.getRequested());
 
         responder.sendString(CREATED, responseText, headers);
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @OPTIONS

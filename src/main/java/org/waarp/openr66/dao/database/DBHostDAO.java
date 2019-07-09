@@ -1,5 +1,13 @@
 package org.waarp.openr66.dao.database;
 
+import org.waarp.common.logging.WaarpLogger;
+import org.waarp.common.logging.WaarpLoggerFactory;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.HostDAO;
+import org.waarp.openr66.dao.exception.DAOException;
+import org.waarp.openr66.pojo.Host;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,22 +16,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.waarp.common.logging.WaarpLogger;
-import org.waarp.common.logging.WaarpLoggerFactory;
-import org.waarp.openr66.dao.HostDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.dao.exception.DAOException;
-import org.waarp.openr66.pojo.Host;
-import org.waarp.openr66.pojo.UpdatedInfo;
-
 /**
  * Implementation of HostDAO for standard SQL databases
  */
 public class DBHostDAO extends StatementExecutor implements HostDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBHostDAO.class);
-
-    protected static final String TABLE = "hosts";
 
     public static final String HOSTID_FIELD = "hostid";
     public static final String ADDRESS_FIELD = "address";
@@ -35,37 +31,38 @@ public class DBHostDAO extends StatementExecutor implements HostDAO {
     public static final String HOSTKEY_FIELD = "hostkey";
     public static final String ADMINROLE_FIELD = "adminrole";
     public static final String UPDATED_INFO_FIELD = "updatedinfo";
-
+    protected static final String TABLE = "hosts";
     protected static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE;
-    protected static String SQL_DELETE = "DELETE FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_GET_ALL = "SELECT * FROM " + TABLE;
-    protected static String SQL_EXIST = "SELECT 1 FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
-    protected static String SQL_SELECT = "SELECT * FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_INSERT = "INSERT INTO " + TABLE +
-        " (" + HOSTID_FIELD + ", "
-        + ADDRESS_FIELD + ", "
-        + PORT_FIELD + ", "
-        + IS_SSL_FIELD + ", "
-        + IS_CLIENT_FIELD + ", "
-        + IS_ACTIVE_FIELD + ", "
-        + IS_PROXIFIED_FIELD + ", "
-        + HOSTKEY_FIELD + ", "
-        + ADMINROLE_FIELD + ", "
-        + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?,?,?,?,?)";
+                                               " (" + HOSTID_FIELD + ", "
+                                               + ADDRESS_FIELD + ", "
+                                               + PORT_FIELD + ", "
+                                               + IS_SSL_FIELD + ", "
+                                               + IS_CLIENT_FIELD + ", "
+                                               + IS_ACTIVE_FIELD + ", "
+                                               + IS_PROXIFIED_FIELD + ", "
+                                               + HOSTKEY_FIELD + ", "
+                                               + ADMINROLE_FIELD + ", "
+                                               + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?,?,?,?,?)";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(DBHostDAO.class);
+    protected static String SQL_DELETE = "DELETE FROM " + TABLE
+                                         + " WHERE " + HOSTID_FIELD + " = ?";
+    protected static String SQL_EXIST = "SELECT 1 FROM " + TABLE
+                                        + " WHERE " + HOSTID_FIELD + " = ?";
+    protected static String SQL_SELECT = "SELECT * FROM " + TABLE
+                                         + " WHERE " + HOSTID_FIELD + " = ?";
     protected static String SQL_UPDATE = "UPDATE " + TABLE +
-        " SET " + HOSTID_FIELD + " = ?, "
-        + ADDRESS_FIELD + " = ?, "
-        + PORT_FIELD + " = ?, "
-        + IS_SSL_FIELD + " = ?, "
-        + IS_CLIENT_FIELD + " = ?, "
-        + IS_ACTIVE_FIELD + " = ?, "
-        + IS_PROXIFIED_FIELD + " = ?, "
-        + HOSTKEY_FIELD + " = ?, "
-        + ADMINROLE_FIELD + " = ?, "
-        + UPDATED_INFO_FIELD + " = ? WHERE " + HOSTID_FIELD + " = ?";
+                                         " SET " + HOSTID_FIELD + " = ?, "
+                                         + ADDRESS_FIELD + " = ?, "
+                                         + PORT_FIELD + " = ?, "
+                                         + IS_SSL_FIELD + " = ?, "
+                                         + IS_CLIENT_FIELD + " = ?, "
+                                         + IS_ACTIVE_FIELD + " = ?, "
+                                         + IS_PROXIFIED_FIELD + " = ?, "
+                                         + HOSTKEY_FIELD + " = ?, "
+                                         + ADMINROLE_FIELD + " = ?, "
+                                         + UPDATED_INFO_FIELD + " = ? WHERE " + HOSTID_FIELD + " = ?";
 
     protected Connection connection;
 
@@ -208,16 +205,16 @@ public class DBHostDAO extends StatementExecutor implements HostDAO {
     @Override
     public void insert(Host host) throws DAOException {
         Object[] params = {
-            host.getHostid(),
-            host.getAddress(),
-            host.getPort(),
-            host.isSSL(),
-            host.isClient(),
-            host.isActive(),
-            host.isProxified(),
-            host.getHostkey(),
-            host.isAdmin(),
-            host.getUpdatedInfo().ordinal()
+                host.getHostid(),
+                host.getAddress(),
+                host.getPort(),
+                host.isSSL(),
+                host.isClient(),
+                host.isActive(),
+                host.isProxified(),
+                host.getHostkey(),
+                host.isAdmin(),
+                host.getUpdatedInfo().ordinal()
         };
 
         PreparedStatement stm = null;
@@ -235,17 +232,17 @@ public class DBHostDAO extends StatementExecutor implements HostDAO {
     @Override
     public void update(Host host) throws DAOException {
         Object[] params = {
-            host.getHostid(),
-            host.getAddress(),
-            host.getPort(),
-            host.isSSL(),
-            host.isClient(),
-            host.isActive(),
-            host.isProxified(),
-            host.getHostkey(),
-            host.isAdmin(),
-            host.getUpdatedInfo().ordinal(),
-            host.getHostid()
+                host.getHostid(),
+                host.getAddress(),
+                host.getPort(),
+                host.isSSL(),
+                host.isClient(),
+                host.isActive(),
+                host.isProxified(),
+                host.getHostkey(),
+                host.isAdmin(),
+                host.getUpdatedInfo().ordinal(),
+                host.getHostid()
         };
 
         PreparedStatement stm = null;

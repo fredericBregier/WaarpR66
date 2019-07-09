@@ -1,5 +1,13 @@
 package org.waarp.openr66.dao.database;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.HostDAO;
+import org.waarp.openr66.pojo.Host;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
@@ -8,22 +16,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static  org.junit.Assert.*;
-
-import org.waarp.openr66.dao.HostDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.pojo.Host;
-import org.waarp.openr66.pojo.UpdatedInfo;
+import static org.junit.Assert.*;
 
 public abstract class DBHostDAOIT {
 
     private Connection con;
 
     public abstract Connection getConnection() throws SQLException;
+
     public abstract void initDB() throws SQLException;
+
     public abstract void cleanDB() throws SQLException;
 
     public void runScript(String script) {
@@ -63,7 +65,7 @@ public abstract class DBHostDAOIT {
             dao.deleteAll();
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hosts");
+                               .executeQuery("SELECT * FROM hosts");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -77,7 +79,7 @@ public abstract class DBHostDAOIT {
             dao.delete(new Host("server1", "", 666, null, false, false));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hosts where hostid = 'server1'");
+                               .executeQuery("SELECT * FROM hosts where hostid = 'server1'");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -137,12 +139,12 @@ public abstract class DBHostDAOIT {
             dao.insert(new Host("chacha", "address", 666, "aaa".getBytes("utf-8"), false, false));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT COUNT(1) as count FROM hosts");
+                               .executeQuery("SELECT COUNT(1) as count FROM hosts");
             res.next();
             assertEquals(4, res.getInt("count"));
 
             ResultSet res2 = con.createStatement()
-                .executeQuery("SELECT * FROM hosts WHERE hostid = 'chacha'");
+                                .executeQuery("SELECT * FROM hosts WHERE hostid = 'chacha'");
             res2.next();
             assertEquals("chacha", res2.getString("hostid"));
             assertEquals("address", res2.getString("address"));
@@ -166,7 +168,7 @@ public abstract class DBHostDAOIT {
             dao.update(new Host("server2", "address", 666, "password".getBytes("utf-8"), false, false));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hosts WHERE hostid = 'server2'");
+                               .executeQuery("SELECT * FROM hosts WHERE hostid = 'server2'");
             res.next();
             assertEquals("server2", res.getString("hostid"));
             assertEquals("address", res.getString("address"));

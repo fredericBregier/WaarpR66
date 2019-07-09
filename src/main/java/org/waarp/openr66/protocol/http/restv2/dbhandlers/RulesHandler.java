@@ -34,8 +34,7 @@ import org.waarp.openr66.dao.Filter;
 import org.waarp.openr66.dao.RuleDAO;
 import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.pojo.Rule;
-import org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.ModeTrans;
-import org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.Order;
+import org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.*;
 import org.waarp.openr66.protocol.http.restv2.errors.RestError;
 import org.waarp.openr66.protocol.http.restv2.errors.RestErrorException;
 
@@ -51,33 +50,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.MediaType.*;
-import static org.waarp.openr66.dao.database.DBRuleDAO.MODE_TRANS_FIELD;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.DAO_FACTORY;
+import static org.waarp.openr66.dao.database.DBRuleDAO.*;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.GetRulesParams.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.RULES_HANDLER_URI;
-import static org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.Order.ascName;
-import static org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.nodeToNewRule;
-import static org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.ruleToNode;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ALREADY_EXISTING;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ILLEGAL_PARAMETER_VALUE;
-import static org.waarp.openr66.protocol.http.restv2.utils.JsonUtils.deserializeRequest;
-import static org.waarp.openr66.protocol.http.restv2.utils.JsonUtils.nodeToString;
+import static org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.Order.*;
+import static org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.*;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
+import static org.waarp.openr66.protocol.http.restv2.utils.JsonUtils.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all operations on the
- * host's transfer rule database.
+ * This is the {@link AbstractRestDbHandler} handling all operations on the host's transfer rule database.
  */
 @Path(RULES_HANDLER_URI)
 public class RulesHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final HttpHeaders OPTIONS_HEADERS;
 
@@ -95,16 +86,13 @@ public class RulesHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to obtain a list of transfer rules based on the filters
-     * in the query parameters.
+     * Method called to obtain a list of transfer rules based on the filters in the query parameters.
      *
-     * @param request       the HttpRequest made on the resource
-     * @param responder     the HttpResponder which sends the reply to the request
-     * @param limit_str     the maximum number of entries allowed in the response
-     * @param offset_str    the index of the first accepted entry in the list
-     *                      of all valid answers
-     * @param order_str     the criteria used to sort the entries and the way 
-     *                      of ordering them
+     * @param request the HttpRequest made on the resource
+     * @param responder the HttpResponder which sends the reply to the request
+     * @param limit_str the maximum number of entries allowed in the response
+     * @param offset_str the index of the first accepted entry in the list of all valid answers
+     * @param order_str the criteria used to sort the entries and the way of ordering them
      * @param modeTrans_str only keep rules that use this transfer mode
      */
     @GET
@@ -112,13 +100,13 @@ public class RulesHandler extends AbstractRestDbHandler {
     @RequiredRole(ROLE.READONLY)
     public void filterRules(HttpRequest request, HttpResponder responder,
                             @QueryParam(LIMIT) @DefaultValue("20")
-                                        String limit_str,
+                                    String limit_str,
                             @QueryParam(OFFSET) @DefaultValue("0")
-                                        String offset_str,
+                                    String offset_str,
                             @QueryParam(ORDER) @DefaultValue("ascName")
-                                        String order_str,
+                                    String order_str,
                             @QueryParam(MODE_TRANS) @DefaultValue("")
-                                        String modeTrans_str) {
+                                    String modeTrans_str) {
 
         List<RestError> errors = new ArrayList<RestError>();
 
@@ -128,7 +116,7 @@ public class RulesHandler extends AbstractRestDbHandler {
         try {
             limit = Integer.parseInt(limit_str);
             order = Order.valueOf(order_str);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             errors.add(ILLEGAL_PARAMETER_VALUE(LIMIT, limit_str));
         } catch (IllegalArgumentException e) {
             errors.add(ILLEGAL_PARAMETER_VALUE(ORDER, order_str));
@@ -138,7 +126,7 @@ public class RulesHandler extends AbstractRestDbHandler {
             if (!modeTrans_str.isEmpty()) {
                 modeTrans = ModeTrans.valueOf(modeTrans_str);
             }
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             errors.add(ILLEGAL_PARAMETER_VALUE(OFFSET, offset_str));
         } catch (IllegalArgumentException e) {
             errors.add(ILLEGAL_PARAMETER_VALUE(MODE_TRANS, e.getMessage()));
@@ -157,7 +145,7 @@ public class RulesHandler extends AbstractRestDbHandler {
         List<Filter> filters = new ArrayList<Filter>();
         if (modeTrans != null) {
             filters.add(new Filter(MODE_TRANS_FIELD, "=",
-                    Integer.toString(modeTrans.ordinal())));
+                                   Integer.toString(modeTrans.ordinal())));
         }
 
         List<Rule> rules;
@@ -189,11 +177,10 @@ public class RulesHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to add a new transfer rule in the server database.
-     * The reply will contain the created entry in JSON format, unless an
-     * unexpected error prevents it or if the request is invalid.
+     * Method called to add a new transfer rule in the server database. The reply will contain the created entry in JSON
+     * format, unless an unexpected error prevents it or if the request is invalid.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request.
      */
     @POST
@@ -232,12 +219,11 @@ public class RulesHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry
-     * point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
-     * @param responder The {@link HttpResponder} which sends the reply
-     *                  to the request.
+     * @param request the HttpRequest made on the resource
+     * @param responder The {@link HttpResponder} which sends the reply to the request.
      */
     @OPTIONS
     @Consumes(WILDCARD)

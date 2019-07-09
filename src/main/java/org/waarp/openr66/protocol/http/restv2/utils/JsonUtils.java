@@ -30,27 +30,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpRequest;
-import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 import org.waarp.openr66.protocol.http.restv2.errors.RestErrorException;
+import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotSupportedException;
 import java.io.IOException;
 
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.UTF8_CHARSET;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.MALFORMED_JSON;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.MISSING_BODY;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 
-/** A series of utility methods for serializing and deserializing JSON. */
+/**
+ * A series of utility methods for serializing and deserializing JSON.
+ */
 public final class JsonUtils {
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private JsonUtils() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
 
@@ -60,7 +63,9 @@ public final class JsonUtils {
      * Converts an ObjectNode into a String.
      *
      * @param object the ObjectNode to convert
-     * @return       the JSON object as a String
+     *
+     * @return the JSON object as a String
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static String nodeToString(ObjectNode object) {
@@ -76,8 +81,10 @@ public final class JsonUtils {
      * Deserializes a request's content as an ObjectNode
      *
      * @param request the request to deserialize
-     * @return        the deserialized JSON object
-     * @throws RestErrorException    If the content is not a valid JSON object.
+     *
+     * @return the deserialized JSON object
+     *
+     * @throws RestErrorException If the content is not a valid JSON object.
      * @throws NotSupportedException If the content type is not JSON.
      * @throws InternalServerErrorException if an unexpected error occurred
      */
@@ -88,7 +95,7 @@ public final class JsonUtils {
 
         try {
             String body = ((FullHttpRequest) request).content()
-                    .toString(UTF8_CHARSET);
+                                                     .toString(UTF8_CHARSET);
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -98,7 +105,7 @@ public final class JsonUtils {
                 return (ObjectNode) node;
             } else {
                 throw new RestErrorException(MALFORMED_JSON(0, 0,
-                        "The root JSON element is not an object"));
+                                                            "The root JSON element is not an object"));
             }
         } catch (JsonParseException e) {
             String contentType = request.headers().get(CONTENT_TYPE);
@@ -106,7 +113,7 @@ public final class JsonUtils {
                 throw new NotSupportedException(APPLICATION_JSON);
             } else {
                 throw new RestErrorException(MALFORMED_JSON(e.getLocation().getLineNr(),
-                        e.getLocation().getColumnNr(), e.getOriginalMessage()));
+                                                            e.getLocation().getColumnNr(), e.getOriginalMessage()));
             }
         } catch (JsonMappingException e) {
             JsonParser parser = (JsonParser) e.getProcessor();

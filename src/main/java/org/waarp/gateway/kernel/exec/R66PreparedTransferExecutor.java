@@ -1,26 +1,20 @@
 /**
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation; either version 3.0 of the
- * License, or (at your option) any later version.
- * 
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along with this
- * software; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
- * Boston, MA 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either version 3.0 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * <p>
+ * You should have received a copy of the GNU Lesser General Public License along with this software; if not, write to
+ * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site:
+ * http://www.fsf.org.
  */
 package org.waarp.gateway.kernel.exec;
-
-import java.io.File;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.command.exception.Reply421Exception;
@@ -37,13 +31,19 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.configuration.PartnerConfiguration;
 import org.waarp.openr66.protocol.localhandler.packet.RequestPacket;
 
+import java.io.File;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * R66PreparedTransferExecutor class. If the command starts with "REFUSED", the command will be
  * refused for execution. If "REFUSED" is set, the command "RETR" or "STOR" like operations will be
  * stopped at starting of command.
- * 
- * 
- * 
+ *
+ *
+ *
  * Format is like r66send command in any order except "-info" which should be the last item:<br>
  * "-to Host -file FILE -rule RULE [-md5] [-nolog] [-start yyyyMMddHHmmss or -delay (delay or +delay)] [-info INFO]" <br>
  * <br>
@@ -62,9 +62,9 @@ import org.waarp.openr66.protocol.localhandler.packet.RequestPacket;
  * So for instance
  * "-to Host -file #BASEPATH##FILE# -rule RULE [-md5] [-nolog] [-delay +delay]  [-info ##UUID## #USER# #ACCOUNT# #COMMAND# INFO]" <br>
  * will be a standard use of this function.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class R66PreparedTransferExecutor extends AbstractExecutor {
     /**
@@ -89,18 +89,19 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
 
     protected String remoteHost = null;
 
-    protected int blocksize = Configuration.configuration.getBLOCKSIZE();;
+    protected int blocksize = Configuration.configuration.getBLOCKSIZE();
+    ;
 
     protected DbSession dbsession;
 
     /**
-     * 
+     *
      * @param command
      * @param delay
      * @param futureCompletion
      */
     public R66PreparedTransferExecutor(String command, long delay,
-            WaarpFuture futureCompletion) {
+                                       WaarpFuture futureCompletion) {
         String args[] = command.split(" ");
         for (int i = 0; i < args.length; i++) {
             if (args[i].equalsIgnoreCase("-to")) {
@@ -148,7 +149,7 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
                 i++;
                 if (args[i].charAt(0) == '+') {
                     timestart = new Timestamp(System.currentTimeMillis() +
-                            Long.parseLong(args[i].substring(1)));
+                                              Long.parseLong(args[i].substring(1)));
                 } else {
                     timestart = new Timestamp(Long.parseLong(args[i]));
                 }
@@ -170,11 +171,11 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
 
     public void run() throws CommandAbstractException {
         String message = "R66Prepared with -to " + remoteHost + " -rule " +
-                rulename + " -file " + filename + " -nolog: " + nolog +
-                " -isMD5: " + isMD5 + " -info " + fileinfo;
+                         rulename + " -file " + filename + " -nolog: " + nolog +
+                         " -isMD5: " + isMD5 + " -info " + fileinfo;
         if (remoteHost == null || rulename == null || filename == null) {
             logger.error("Mandatory argument is missing: -to " + remoteHost +
-                    " -rule " + rulename + " -file " + filename);
+                         " -rule " + rulename + " -file " + filename);
             throw new Reply421Exception("Mandatory argument is missing\n    " + message);
         }
         logger.debug(message);
@@ -183,9 +184,9 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
             rule = new DbRule(rulename);
         } catch (WaarpDatabaseException e) {
             logger.error("Cannot get Rule: " + rulename + " since {}\n    " +
-                    message, e.getMessage());
+                         message, e.getMessage());
             throw new Reply421Exception("Cannot get Rule: " +
-                    rulename + "\n    " + message);
+                                        rulename + "\n    " + message);
         }
         int mode = rule.getMode();
         if (isMD5) {
@@ -200,14 +201,14 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
             }
         }
         RequestPacket request = new RequestPacket(rulename, mode, filename,
-                blocksize, 0, DbConstant.ILLEGALVALUE, fileinfo, originalSize, sep);
+                                                  blocksize, 0, DbConstant.ILLEGALVALUE, fileinfo, originalSize, sep);
         // Not isRecv since it is the requester, so send => isRetrieve is true
         boolean isRetrieve = !RequestPacket.isRecvMode(request.getMode());
         logger.debug("Will prepare: {}", request);
         DbTaskRunner taskRunner;
         try {
             taskRunner = new DbTaskRunner(rule, isRetrieve, request,
-                    remoteHost, timestart);
+                                          remoteHost, timestart);
         } catch (WaarpDatabaseException e) {
             logger.error("Cannot get new task since {}\n    " + message, e
                     .getMessage());

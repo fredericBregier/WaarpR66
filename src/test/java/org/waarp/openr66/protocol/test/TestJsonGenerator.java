@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -34,9 +33,9 @@ import org.waarp.openr66.protocol.exception.OpenR66ProtocolBusinessException;
 
 /**
  * Test class for JsonGenerator
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestJsonGenerator {
     /**
@@ -80,8 +79,8 @@ public class TestJsonGenerator {
         DbPreparedStatement preparedStatement;
         try {
             preparedStatement = DbTaskRunner.getFilterPrepareStatement(DbConstant.admin.getSession(), nb, false,
-                    null, null, null, null, null, null,
-                    false, false, false, false, true, null);
+                                                                       null, null, null, null, null, null,
+                                                                       false, false, false, false, true, null);
             preparedStatement.executeQuery();
             String tasks = DbTaskRunner.getJson(preparedStatement, nb);
             System.out.println(tasks);
@@ -97,7 +96,7 @@ public class TestJsonGenerator {
         System.out.println();
         try {
             preparedStatement = DbHostAuth.getFilterPrepareStament(DbConstant.admin.getSession(),
-                    null, null);
+                                                                   null, null);
             preparedStatement.executeQuery();
             String hosts = DbHostAuth.getJson(preparedStatement, nb);
             System.out.println(hosts);
@@ -113,7 +112,7 @@ public class TestJsonGenerator {
         System.out.println();
         try {
             preparedStatement = DbRule.getFilterPrepareStament(DbConstant.admin.getSession(),
-                    null, -1);
+                                                               null, -1);
             preparedStatement.executeQuery();
             String rules = DbRule.getJson(preparedStatement, nb);
             System.out.println(rules);

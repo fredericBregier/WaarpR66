@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -23,12 +22,12 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 
 /**
  * R66 Constraint Limit Handler
- * 
+ *
  * Constraint Limit (CPU and connection - network and local -) handler, only for server side
  * (requested or requester).
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
     public R66ConstraintLimitHandler() {
@@ -56,14 +55,14 @@ public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
      *            limit = 4096)
      */
     public R66ConstraintLimitHandler(boolean useJdKCpuLimit,
-            double lowcpuLimit, double highcpuLimit, double percentageDecrease,
-            GlobalTrafficShapingHandler handler, long delay,
-            long limitLowBandwidth) {
-        super(1000, Configuration.configuration != null ?
-                Configuration.configuration.getTIMEOUTCON() : 30000,
-                useJdKCpuLimit,
-                lowcpuLimit, highcpuLimit,
-                percentageDecrease, handler, delay, limitLowBandwidth);
+                                     double lowcpuLimit, double highcpuLimit, double percentageDecrease,
+                                     GlobalTrafficShapingHandler handler, long delay,
+                                     long limitLowBandwidth) {
+        super(1000, Configuration.configuration != null?
+                      Configuration.configuration.getTIMEOUTCON() : 30000,
+              useJdKCpuLimit,
+              lowcpuLimit, highcpuLimit,
+              percentageDecrease, handler, delay, limitLowBandwidth);
     }
 
     /**
@@ -77,10 +76,10 @@ public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
      *            number of connection limit (0<= x)
      */
     public R66ConstraintLimitHandler(boolean useCpuLimit,
-            boolean useJdKCpuLimit, double cpulimit, int channellimit) {
-        super(1000, Configuration.configuration != null ?
-                Configuration.configuration.getTIMEOUTCON() : 30000,
-                useCpuLimit, useJdKCpuLimit, cpulimit, channellimit);
+                                     boolean useJdKCpuLimit, double cpulimit, int channellimit) {
+        super(1000, Configuration.configuration != null?
+                      Configuration.configuration.getTIMEOUTCON() : 30000,
+              useCpuLimit, useJdKCpuLimit, cpulimit, channellimit);
     }
 
     /**
@@ -114,11 +113,11 @@ public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
             int channellimit, double lowcpuLimit, double highcpuLimit,
             double percentageDecrease, GlobalTrafficShapingHandler handler,
             long delay, long limitLowBandwidth) {
-        super(1000, Configuration.configuration != null ?
-                Configuration.configuration.getTIMEOUTCON() : 30000,
-                useCpuLimit, useJdKCpuLimit,
-                cpulimit, channellimit, lowcpuLimit, highcpuLimit,
-                percentageDecrease, handler, delay, limitLowBandwidth);
+        super(1000, Configuration.configuration != null?
+                      Configuration.configuration.getTIMEOUTCON() : 30000,
+              useCpuLimit, useJdKCpuLimit,
+              cpulimit, channellimit, lowcpuLimit, highcpuLimit,
+              percentageDecrease, handler, delay, limitLowBandwidth);
     }
 
     @Override

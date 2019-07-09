@@ -1,18 +1,16 @@
 /**
  * Classes implementing Tasks for pre, post or error operations
- * 
- * 
- * Several kind of tasks exist in OpenR66:<br>
- * LOG, MOVE, MOVERENAME, COPY, COPYRENAME, EXEC, EXECMOVE, LINKRENAME, TRANSFER, VALIDFILEPATH,
- * DELETE<br>
+ * <p>
+ * <p>
+ * Several kind of tasks exist in OpenR66:<br> LOG, MOVE, MOVERENAME, COPY, COPYRENAME, EXEC, EXECMOVE, LINKRENAME,
+ * TRANSFER, VALIDFILEPATH, DELETE<br>
  * <br>
  * <br>
  * <br>
- * 
- * Several tasks are possible to run before a transfer starts (pre action), after a transfer is
- * finished correctly (post action) or after an error occurs (either in pre or post action or during
- * transfer: error action).
- * 
+ * <p>
+ * Several tasks are possible to run before a transfer starts (pre action), after a transfer is finished correctly (post
+ * action) or after an error occurs (either in pre or post action or during transfer: error action).
+ * <p>
  * Those actions are defined in one rule. Each rule contains 2 parts:
  * <ul>
  * <li>Sender actions: A host is a Sender if it is the requester on a SEND rule or if it is the
@@ -20,9 +18,9 @@
  * <li>Receiver actions: A host is a Sender if it is the requester on a RECV rule or if it is the
  * requested on a SEND rule.</li>
  * </ul>
- * 
+ * <p>
  * Each action could be on pre, post or error step, each step can have several actions.
- * 
+ * <p>
  * It is defined with a unified form of XML:<br>
  * <xmp> <tasks> <task> <type>NAME</type> <path>path</path> <delay>x</delay> </task> <task>
  * <type>NAME</type> <path>path</path> <delay>x</delay> </task> </tasks></xmp><br>
@@ -61,67 +59,57 @@
  * Information).</li>
  * </ul>
  * <br>
- * 
+ * <p>
  * The different kinds of TASK are:<br>
  * <ul>
  * <li>LOG</li> This task logs or writes to an external file some info:<br>
- * - if delay is 0, no echo at all will be done<br>
- * - if delay is 1, will echo some information in the normal log<br>
- * - if delay is 2, will echo some information in the file (last deduced argument will be the full
- * path for the file output)<br>
- * - if delay is 3, will echo both in the normal log and in the file (last deduced argument will be
- * the full path for the file output)
+ * - if delay is 0, no echo at all will be done<br> - if delay is 1, will echo some information in the normal log<br> -
+ * if delay is 2, will echo some information in the file (last deduced argument will be the full path for the file
+ * output)<br> - if delay is 3, will echo both in the normal log and in the file (last deduced argument will be the full
+ * path for the file output)
  * <li>MOVE</li> Move the file to the path designed by Path and Transfer Information arguments
  * without renaming the filename (same basename). Delay is ignored. The file is marked as moved.
  * <li>MOVERENAME</li> Move the file to the path designed by Path and Transfer Information
- * arguments. Delay is ignored. After Path is transformed according to above dynamic replacements,
- * it is then used as a String Format where Transfer Information is used as input
- * (String.format(Path,Info)). The file is marked as moved.
+ * arguments. Delay is ignored. After Path is transformed according to above dynamic replacements, it is then used as a
+ * String Format where Transfer Information is used as input (String.format(Path,Info)). The file is marked as moved.
  * <li>COPY</li> Copy the file to the path designed by Path argument without renaming the filename
  * (same basename). Delay and Transfer Information are ignored. The file is not marked as moved.
  * <li>COPYRENAME</li> Copy the file to the path designed by Path and Transfer Information
- * arguments. Delay is ignored. After Path is transformed according to above dynamic replacements,
- * it is then used as a String Format where Transfer Information is used as input
- * (String.format(Path,Info)). The file is not marked as moved.
- * <li>EXEC</li> Execute an external command given by Path and Transfer Information arguments. The
- * Delay is the maximum amount of time in milliseconds before the task should be considered as over
- * time and so in error.<br>
- * The command path is obtained from Path transformed according to above dynamic replacements, and
- * after a String Format where Transfer Information is used as input (String.format(Path,Info)).
- * <li>EXECMOVE</li> Execute an external command given by Path and Transfer Information arguments.
- * The Delay is the maximum amount of time in milliseconds before the task should be considered as
- * over time and so in error.<br>
- * The command path is obtained from Path transformed according to above dynamic replacements, and
- * after a String Format where Transfer Information is used as input (String.format(Path,Info)).<br>
- * The last line returned by the external command is interpreted as the new full file path. The
- * external command is responsible to really move the previous file to the new one. The file is
- * marked as moved.
- * <li>TRANSFER</li> Submit a new transfer based on the Path and Transfer Information arguments. The
- * transfer arguments are obtained from Path transformed according to above dynamic replacements,
- * and after a String Format where Transfer Information is used as input (String.format(Path,Info)).
- * The result should be as r66send except that "-info" must be the last entry:<br>
- * "-file filepath -to requestedHost -rule rule [-md5] -info transferInformation" where each field
- * is separated by blank character. Last field (transferInformation) may contain however blank
- * character. Delay is ignored. The file is not marked as moved.
- * <li>VALIDFILEPATH</li> Test if the current file is under one of the paths based on the Path and
- * Transfer Information arguments. The paths arguments are obtained from Path transformed according
- * to above dynamic replacements, and after a String Format where Transfer Information is used as
- * input (String.format(Path,Info)). The result should be as: "path1 path2 ..." where each path is
- * separated by blank character. If Delay is not 0, a log is printed out. The file is not marked as
+ * arguments. Delay is ignored. After Path is transformed according to above dynamic replacements, it is then used as a
+ * String Format where Transfer Information is used as input (String.format(Path,Info)). The file is not marked as
  * moved.
+ * <li>EXEC</li> Execute an external command given by Path and Transfer Information arguments. The
+ * Delay is the maximum amount of time in milliseconds before the task should be considered as over time and so in
+ * error.<br> The command path is obtained from Path transformed according to above dynamic replacements, and after a
+ * String Format where Transfer Information is used as input (String.format(Path,Info)).
+ * <li>EXECMOVE</li> Execute an external command given by Path and Transfer Information arguments.
+ * The Delay is the maximum amount of time in milliseconds before the task should be considered as over time and so in
+ * error.<br> The command path is obtained from Path transformed according to above dynamic replacements, and after a
+ * String Format where Transfer Information is used as input (String.format(Path,Info)).<br> The last line returned by
+ * the external command is interpreted as the new full file path. The external command is responsible to really move the
+ * previous file to the new one. The file is marked as moved.
+ * <li>TRANSFER</li> Submit a new transfer based on the Path and Transfer Information arguments. The
+ * transfer arguments are obtained from Path transformed according to above dynamic replacements, and after a String
+ * Format where Transfer Information is used as input (String.format(Path,Info)). The result should be as r66send except
+ * that "-info" must be the last entry:<br> "-file filepath -to requestedHost -rule rule [-md5] -info
+ * transferInformation" where each field is separated by blank character. Last field (transferInformation) may contain
+ * however blank character. Delay is ignored. The file is not marked as moved.
+ * <li>VALIDFILEPATH</li> Test if the current file is under one of the paths based on the Path and
+ * Transfer Information arguments. The paths arguments are obtained from Path transformed according to above dynamic
+ * replacements, and after a String Format where Transfer Information is used as input (String.format(Path,Info)). The
+ * result should be as: "path1 path2 ..." where each path is separated by blank character. If Delay is not 0, a log is
+ * printed out. The file is not marked as moved.
  * <li>DELETE</li> This task deletes the current file.The current file is no more valid. No
  * arguments are taken into account.
  * <li>LINKRENAME</li> Create a link of the current file and make the file pointing to it. The link
- * first tries to be a hard link, then a soft link, and if it is really not possible (not supported
- * by the filesystem), it does a copy and rename task.<br>
- * Delay is ignored. After Path is transformed according to above dynamic replacements, it is then
- * used as a String Format where Transfer Information is used as input (String.format(Path,Info)).
- * The file is not marked as moved.
+ * first tries to be a hard link, then a soft link, and if it is really not possible (not supported by the filesystem),
+ * it does a copy and rename task.<br> Delay is ignored. After Path is transformed according to above dynamic
+ * replacements, it is then used as a String Format where Transfer Information is used as input
+ * (String.format(Path,Info)). The file is not marked as moved.
  * </ul>
  * <br>
  * <br>
- * 
- * 
+ *
  * @apiviz.landmark
  */
 package org.waarp.openr66.context.task;

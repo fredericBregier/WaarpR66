@@ -23,21 +23,22 @@ public class Limit {
      * Empty constructor for compatibility issues
      */
     @Deprecated
-    public Limit() {}
+    public Limit() {
+    }
 
     public Limit(String hostid, long delayLimit, long readGlobalLimit,
-            long writeGlobalLimit, long readSessionLimit,
-            long writeSessionLimit, UpdatedInfo updatedInfo) {
-        this(hostid, delayLimit, readGlobalLimit, writeGlobalLimit, 
-                readSessionLimit, writeSessionLimit);
+                 long writeGlobalLimit, long readSessionLimit,
+                 long writeSessionLimit, UpdatedInfo updatedInfo) {
+        this(hostid, delayLimit, readGlobalLimit, writeGlobalLimit,
+             readSessionLimit, writeSessionLimit);
         this.updatedInfo = updatedInfo;
     }
 
     public Limit(String hostid, long delayLimit, long readGlobalLimit,
-            long writeGlobalLimit, long readSessionLimit,
-            long writeSessionLimit) {
+                 long writeGlobalLimit, long readSessionLimit,
+                 long writeSessionLimit) {
         this.hostid = hostid;
-        this.delayLimit = delayLimit;	
+        this.delayLimit = delayLimit;
         this.readGlobalLimit = readGlobalLimit;
         this.writeGlobalLimit = writeGlobalLimit;
         this.readSessionLimit = readSessionLimit;

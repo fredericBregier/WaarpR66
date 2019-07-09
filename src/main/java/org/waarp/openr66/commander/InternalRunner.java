@@ -1,31 +1,21 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.commander;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.waarp.common.database.data.AbstractDbData.UpdatedInfo;
 import org.waarp.common.database.exception.WaarpDatabaseNoConnectionException;
 import org.waarp.common.database.exception.WaarpDatabaseSqlException;
 import org.waarp.common.logging.WaarpLogger;
@@ -36,11 +26,19 @@ import org.waarp.openr66.database.data.DbTaskRunner;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 /**
  * This class launch and control the Commander and enable TaskRunner job submissions
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class InternalRunner {
     /**
@@ -50,15 +48,15 @@ public class InternalRunner {
             .getLogger(InternalRunner.class);
 
     private final ScheduledExecutorService scheduledExecutorService;
+    private final ThreadPoolExecutor threadPoolExecutor;
+    private final NetworkTransaction networkTransaction;
     private ScheduledFuture<?> scheduledFuture;
     private CommanderInterface commander = null;
     private volatile boolean isRunning = true;
-    private final ThreadPoolExecutor threadPoolExecutor;
-    private final NetworkTransaction networkTransaction;
 
     /**
      * Create the structure to enable submission by database
-     * 
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -71,11 +69,15 @@ public class InternalRunner {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new WaarpThreadFactory("InternalRunner"));
         isRunning = true;
         BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
-        threadPoolExecutor = new ThreadPoolExecutor(Configuration.configuration.getRUNNER_THREAD(), Configuration.configuration.getRUNNER_THREAD(),
-                1000, TimeUnit.MILLISECONDS, workQueue);
+        threadPoolExecutor = new ThreadPoolExecutor(Configuration.configuration.getRUNNER_THREAD(),
+                                                    Configuration.configuration.getRUNNER_THREAD(),
+                                                    1000, TimeUnit.MILLISECONDS, workQueue);
         scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(commander,
-                Configuration.configuration.getDelayCommander(),
-                Configuration.configuration.getDelayCommander(), TimeUnit.MILLISECONDS);
+                                                                          Configuration.configuration
+                                                                                  .getDelayCommander(),
+                                                                          Configuration.configuration
+                                                                                  .getDelayCommander(),
+                                                                          TimeUnit.MILLISECONDS);
         networkTransaction = new NetworkTransaction();
     }
 
@@ -85,17 +87,17 @@ public class InternalRunner {
 
     /**
      * Submit a task
-     * 
+     *
      * @param taskRunner
      */
     public void submitTaskRunner(DbTaskRunner taskRunner) {
         if (isRunning || !Configuration.configuration.isShutdown()) {
-            if (threadPoolExecutor.getActiveCount() < 
-                    Configuration.configuration.getRUNNER_THREAD()) {
+            if (threadPoolExecutor.getActiveCount() <
+                Configuration.configuration.getRUNNER_THREAD()) {
                 logger.debug("Will run {}", taskRunner);
                 ClientRunner runner = new ClientRunner(networkTransaction, taskRunner, null);
                 if (taskRunner.isSendThrough() && (taskRunner.isRescheduledTransfer()
-                        || taskRunner.isPreTaskStarting())) {
+                                                   || taskRunner.isPreTaskStarting())) {
                     runner.setSendThroughMode();
                     taskRunner.checkThroughMode();
                 }
@@ -148,7 +150,10 @@ public class InternalRunner {
             commander = new CommanderNoDb(this);
         }
         scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(commander,
-                Configuration.configuration.getDelayCommander(),
-                Configuration.configuration.getDelayCommander(), TimeUnit.MILLISECONDS);
+                                                                          Configuration.configuration
+                                                                                  .getDelayCommander(),
+                                                                          Configuration.configuration
+                                                                                  .getDelayCommander(),
+                                                                          TimeUnit.MILLISECONDS);
     }
 }

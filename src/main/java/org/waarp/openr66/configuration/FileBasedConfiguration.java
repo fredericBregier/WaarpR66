@@ -1,38 +1,29 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.configuration;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale;
-
+import io.netty.handler.traffic.AbstractTrafficShapingHandler;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
-import io.netty.handler.traffic.AbstractTrafficShapingHandler;
 import org.waarp.common.crypto.Des;
 import org.waarp.common.crypto.ssl.WaarpSecureKeyStore;
 import org.waarp.common.crypto.ssl.WaarpSslContextFactory;
+import org.waarp.common.database.ConnectionFactory;
 import org.waarp.common.database.DbAdmin;
 import org.waarp.common.database.DbRequest;
 import org.waarp.common.database.data.AbstractDbData.UpdatedInfo;
@@ -40,7 +31,6 @@ import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.database.exception.WaarpDatabaseNoConnectionException;
 import org.waarp.common.database.exception.WaarpDatabaseSqlException;
 import org.waarp.common.database.model.DbType;
-import org.waarp.common.database.ConnectionFactory;
 import org.waarp.common.digest.FilesystemBasedDigest;
 import org.waarp.common.digest.FilesystemBasedDigest.DigestAlgo;
 import org.waarp.common.exception.CryptoException;
@@ -80,6 +70,15 @@ import org.waarp.openr66.protocol.networkhandler.ssl.NetworkSslServerInitializer
 import org.waarp.openr66.protocol.utils.FileUtils;
 import org.waarp.openr66.server.ServerInitDatabase;
 import org.waarp.snmp.SnmpConfiguration;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * File Based Configuration
@@ -507,7 +506,11 @@ public class FileBasedConfiguration {
      * SERVER REST interface CRUD per method
      */
     private static final String XML_REST_CRUD = "restcrud";
-
+    public static final XmlDecl[] configRestMethodDecls = {
+            // Rest Method
+            new XmlDecl(XmlType.STRING, XML_REST_METHOD_NAME),
+            new XmlDecl(XmlType.STRING, XML_REST_CRUD)
+    };
     /**
      * Structure of the Configuration file
      *
@@ -559,7 +562,6 @@ public class FileBasedConfiguration {
             new XmlDecl(XmlType.INTEGER, XML_SERVER_HTTPPORT),
             new XmlDecl(XmlType.INTEGER, XML_SERVER_HTTPSPORT)
     };
-
     /**
      * Structure of the Configuration file
      *
@@ -587,7 +589,6 @@ public class FileBasedConfiguration {
             new XmlDecl(XmlType.BOOLEAN, XML_DBAUTOUPGRADE),
             new XmlDecl(XmlType.BOOLEAN, XML_SAVE_TASKRUNNERNODB)
     };
-
     /**
      * Structure of the Configuration file
      *
@@ -653,12 +654,6 @@ public class FileBasedConfiguration {
             new XmlDecl(XmlType.STRING, XML_WORKINGPATH),
             new XmlDecl(XmlType.STRING, XML_CONFIGPATH)
     };
-
-    public static final XmlDecl[] configRestMethodDecls = {
-            // Rest Method
-            new XmlDecl(XmlType.STRING, XML_REST_METHOD_NAME),
-            new XmlDecl(XmlType.STRING, XML_REST_CRUD)
-    };
     /**
      * Overall structure of the Configuration file
      */
@@ -693,61 +688,67 @@ public class FileBasedConfiguration {
      */
     private static final XmlDecl[] configServer = {
             new XmlDecl(XML_IDENTITY, XmlType.XVAL, XML_ROOT + XML_IDENTITY, configIdentityDecls,
-                    false),
+                        false),
             new XmlDecl(XML_SERVER, XmlType.XVAL, XML_ROOT + XML_SERVER, configServerParamDecls,
-                    false),
+                        false),
             new XmlDecl(XML_NETWORK, XmlType.XVAL, XML_ROOT + XML_NETWORK,
-                    configNetworkServerDecls, false),
+                        configNetworkServerDecls, false),
             new XmlDecl(XML_SSL, XmlType.XVAL, XML_ROOT + XML_SSL, configSslDecls, false),
             new XmlDecl(XML_DIRECTORY, XmlType.XVAL, XML_ROOT + XML_DIRECTORY,
-                    configDirectoryDecls, false),
+                        configDirectoryDecls, false),
             new XmlDecl(XML_LIMIT, XmlType.XVAL, XML_ROOT + XML_LIMIT, configLimitDecls, false),
             new XmlDecl(XML_REST, XmlType.XVAL, XML_ROOT + XML_REST, configRestDecls, true),
             new XmlDecl(XML_DB, XmlType.XVAL, XML_ROOT + XML_DB, configDbDecls, false),
             new XmlDecl(DbHostConfiguration.XML_BUSINESS, XmlType.STRING, XML_ROOT + DbHostConfiguration.XML_BUSINESS
-                    + "/"
-                    + DbHostConfiguration.XML_BUSINESSID, true),
+                                                                          + "/"
+                                                                          + DbHostConfiguration.XML_BUSINESSID, true),
             new XmlDecl(DbHostConfiguration.XML_ROLES, XmlType.XVAL, XML_ROOT + DbHostConfiguration.XML_ROLES + "/"
-                    + DbHostConfiguration.XML_ROLE, DbHostConfiguration.configRoleDecls, true),
+                                                                     + DbHostConfiguration.XML_ROLE,
+                        DbHostConfiguration.configRoleDecls, true),
             new XmlDecl(DbHostConfiguration.XML_ALIASES, XmlType.XVAL, XML_ROOT + DbHostConfiguration.XML_ALIASES + "/"
-                    + DbHostConfiguration.XML_ALIAS, DbHostConfiguration.configAliasDecls, true)
+                                                                       + DbHostConfiguration.XML_ALIAS,
+                        DbHostConfiguration.configAliasDecls, true)
     };
     /**
      * Global Structure for Client Configuration
      */
     private static final XmlDecl[] configClient = {
             new XmlDecl(XML_IDENTITY, XmlType.XVAL, XML_ROOT + XML_IDENTITY, configIdentityDecls,
-                    false),
+                        false),
             new XmlDecl(XML_CLIENT, XmlType.XVAL, XML_ROOT + XML_CLIENT, configClientParamDecls,
-                    false),
+                        false),
             new XmlDecl(XML_SSL, XmlType.XVAL, XML_ROOT + XML_SSL, configSslDecls, false),
             new XmlDecl(XML_DIRECTORY, XmlType.XVAL, XML_ROOT + XML_DIRECTORY,
-                    configDirectoryDecls, false),
+                        configDirectoryDecls, false),
             new XmlDecl(XML_LIMIT, XmlType.XVAL, XML_ROOT + XML_LIMIT, configLimitDecls, false),
             new XmlDecl(XML_REST, XmlType.XVAL, XML_ROOT + XML_REST, configRestDecls, false),
             new XmlDecl(XML_DB, XmlType.XVAL, XML_ROOT + XML_DB, configDbDecls, false),
             new XmlDecl(DbHostConfiguration.XML_BUSINESS, XmlType.STRING, XML_ROOT + DbHostConfiguration.XML_BUSINESS
-                    + "/"
-                    + DbHostConfiguration.XML_BUSINESSID, true),
+                                                                          + "/"
+                                                                          + DbHostConfiguration.XML_BUSINESSID, true),
             new XmlDecl(DbHostConfiguration.XML_ALIASES, XmlType.XVAL, XML_ROOT + DbHostConfiguration.XML_ALIASES + "/"
-                    + DbHostConfiguration.XML_ALIAS, DbHostConfiguration.configAliasDecls, true)
+                                                                       + DbHostConfiguration.XML_ALIAS,
+                        DbHostConfiguration.configAliasDecls, true)
     };
     /**
      * Global Structure for Submit only Client Configuration
      */
     private static final XmlDecl[] configSubmitClient = {
             new XmlDecl(XML_IDENTITY, XmlType.XVAL, XML_ROOT + XML_IDENTITY, configIdentityDecls,
-                    false),
+                        false),
             new XmlDecl(XML_DIRECTORY, XmlType.XVAL, XML_ROOT + XML_DIRECTORY,
-                    configDirectoryDecls, false),
+                        configDirectoryDecls, false),
             new XmlDecl(XML_LIMIT, XmlType.XVAL, XML_ROOT + XML_LIMIT, configSubmitLimitDecls,
-                    false),
+                        false),
             new XmlDecl(XML_DB, XmlType.XVAL, XML_ROOT + XML_DB, configDbDecls, false),
             new XmlDecl(DbHostConfiguration.XML_ALIASES, XmlType.XVAL, XML_ROOT + DbHostConfiguration.XML_ALIASES + "/"
-                    + DbHostConfiguration.XML_ALIAS, DbHostConfiguration.configAliasDecls, true)
+                                                                       + DbHostConfiguration.XML_ALIAS,
+                        DbHostConfiguration.configAliasDecls, true)
     };
+    public static boolean autoupgrade = false;
     private static XmlValue[] configuration = null;
     private static XmlRootHash hashRootConfig = null;
+    private static boolean alreadySetLimit = false;
 
     /**
      * Load the locale from configuration file
@@ -818,7 +819,8 @@ public class FileBasedConfiguration {
                         return false;
                     }
                 } else {
-                    logger.warn(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Authentication file"); //$NON-NLS-1$
+                    logger.warn(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                                "Authentication file"); //$NON-NLS-1$
                     return false;
                 }
             }
@@ -861,15 +863,18 @@ public class FileBasedConfiguration {
                         try {
                             addr = InetAddress.getByName(saddr);
                         } catch (UnknownHostException e) {
-                            logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "LocalExec Address"); //$NON-NLS-1$
+                            logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                                         "LocalExec Address"); //$NON-NLS-1$
                             return false;
                         }
                     } else {
-                        logger.warn(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "LocalExec Address"); //$NON-NLS-1$
+                        logger.warn(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                                    "LocalExec Address"); //$NON-NLS-1$
                         try {
                             addr = InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 });
                         } catch (UnknownHostException e) {
-                            logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "LocalExec Address"); //$NON-NLS-1$
+                            logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                                         "LocalExec Address"); //$NON-NLS-1$
                             return false;
                         }
                     }
@@ -895,14 +900,16 @@ public class FileBasedConfiguration {
             if (value != null && (!value.isEmpty())) {
                 config.setADMINNAME(value.getString());
             } else {
-                logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Administrator name"); //$NON-NLS-1$
+                logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                             "Administrator name"); //$NON-NLS-1$
                 return false;
             }
             if (config.getCryptoKey() == null) {
                 XmlHash hashConfig2 = new XmlHash(hashRootConfig.get(XML_IDENTITY));
                 try {
                     if (!setCryptoKey(config, hashConfig2)) {
-                        logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Crypto Key"); //$NON-NLS-1$
+                        logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                                     "Crypto Key"); //$NON-NLS-1$
                         return false;
                     }
                 } finally {
@@ -918,7 +925,8 @@ public class FileBasedConfiguration {
                 if (value != null && (!value.isEmpty())) {
                     passwd = value.getString();
                 } else {
-                    logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Password"); //$NON-NLS-1$
+                    logger.error(
+                            Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Password"); //$NON-NLS-1$
                     return false;
                 }
                 try {
@@ -927,7 +935,7 @@ public class FileBasedConfiguration {
                 } catch (Exception e) {
                     logger.error(
                             "Unable to Decrypt Server Password in Config file from: " +
-                                    passwd, e);
+                            passwd, e);
                     return false;
                 }
             } else {
@@ -944,36 +952,40 @@ public class FileBasedConfiguration {
                 } catch (Exception e2) {
                     logger.error(
                             "Unable to Decrypt Server Password in Config file from: " +
-                                    skey, e2);
+                            skey, e2);
                     return false;
                 }
             }
             config.setSERVERKEY(decodedByteKeys);
             value = hashConfig.get(XML_HTTPADMINPATH);
             if (value == null || (value.isEmpty())) {
-                logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Http Admin Base"); //$NON-NLS-1$
+                logger.error(
+                        Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Http Admin Base"); //$NON-NLS-1$
                 return false;
             }
             String path = value.getString();
             if (path == null || path.isEmpty()) {
-                logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Http Admin Base"); //$NON-NLS-1$
+                logger.error(
+                        Messages.getString("FileBasedConfiguration.NoSetConfig") + "Http Admin Base"); //$NON-NLS-1$
                 return false;
             }
             File file = new File(path);
             if (!file.isDirectory()) {
-                logger.error(Messages.getString("FileBasedConfiguration.NotDirectory") + "Http Admin Base"); //$NON-NLS-1$
+                logger.error(
+                        Messages.getString("FileBasedConfiguration.NotDirectory") + "Http Admin Base"); //$NON-NLS-1$
                 return false;
             }
             try {
                 config.setHttpBasePath(FilesystemBasedDirImpl.normalizePath(file.getCanonicalPath()) +
-                        DirInterface.SEPARATOR);
+                                       DirInterface.SEPARATOR);
             } catch (IOException e1) {
-                logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Http Admin Path"); //$NON-NLS-1$
+                logger.error(
+                        Messages.getString("FileBasedConfiguration.NoSetConfig") + "Http Admin Path"); //$NON-NLS-1$
                 return false;
             }
             value = hashConfig.get(XML_HTTPADMINMODEL);
             // 0 = standard, 1 = responsive (preferred default)
-            int model = (! new File(file, HttpResponsiveSslHandler.LISTING_PAGE).isFile()) ? 0 : 1;
+            int model = (!new File(file, HttpResponsiveSslHandler.LISTING_PAGE).isFile())? 0 : 1;
             if (value != null && (!value.isEmpty())) {
                 model = value.getInteger();
             }
@@ -1009,7 +1021,7 @@ public class FileBasedConfiguration {
                 }
                 try {
                     Configuration.setWaarpSecureKeyStore(new WaarpSecureKeyStore(keypath, keystorepass,
-                            keypass));
+                                                                                 keypass));
                 } catch (CryptoException e) {
                     logger.error("Bad SecureKeyStore construction for AdminSsl");
                     return false;
@@ -1044,8 +1056,8 @@ public class FileBasedConfiguration {
                 config.setMultipleMonitors(value.getInteger());
                 if (config.getMultipleMonitors() > 1) {
                     logger.warn(Messages.getString("FileBasedConfiguration.MMOn") //$NON-NLS-1$
-                            + config.getMultipleMonitors()
-                            + Messages.getString("FileBasedConfiguration.MMOn2")); //$NON-NLS-1$
+                                + config.getMultipleMonitors()
+                                + Messages.getString("FileBasedConfiguration.MMOn2")); //$NON-NLS-1$
                 } else {
                     config.setMultipleMonitors(1);
                     if (config.isWarnOnStartup()) {
@@ -1065,7 +1077,8 @@ public class FileBasedConfiguration {
             value = hashConfig.get(XML_BUSINESS_FACTORY);
             if (value != null && (!value.isEmpty())) {
                 try {
-                    config.setR66BusinessFactory((R66BusinessFactoryInterface) Class.forName(value.getString()).newInstance());
+                    config.setR66BusinessFactory(
+                            (R66BusinessFactoryInterface) Class.forName(value.getString()).newInstance());
                 } catch (Exception e) {
                     logger.error("Bad Business Factory class", e);
                     return false;
@@ -1100,7 +1113,8 @@ public class FileBasedConfiguration {
             value = hashConfig.get(XML_BUSINESS_FACTORY);
             if (value != null && (!value.isEmpty())) {
                 try {
-                    config.setR66BusinessFactory((R66BusinessFactoryInterface) Class.forName(value.getString()).newInstance());
+                    config.setR66BusinessFactory(
+                            (R66BusinessFactoryInterface) Class.forName(value.getString()).newInstance());
                 } catch (Exception e) {
                     logger.error("Bad Business Factory class", e);
                     return false;
@@ -1134,42 +1148,42 @@ public class FileBasedConfiguration {
             }
             try {
                 config.setBaseDirectory(FilesystemBasedDirImpl
-                        .normalizePath(file.getCanonicalPath()));
+                                                .normalizePath(file.getCanonicalPath()));
             } catch (IOException e1) {
                 logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Home"); //$NON-NLS-1$
                 return false;
             }
             try {
                 config.setConfigPath(FilesystemBasedDirImpl
-                        .normalizePath(getSubPath(config, XML_CONFIGPATH)));
+                                             .normalizePath(getSubPath(config, XML_CONFIGPATH)));
             } catch (OpenR66ProtocolSystemException e2) {
                 logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Config"); //$NON-NLS-1$
                 return false;
             }
             try {
                 config.setInPath(FilesystemBasedDirImpl
-                        .normalizePath(getSubPath(config, XML_INPATH)));
+                                         .normalizePath(getSubPath(config, XML_INPATH)));
             } catch (OpenR66ProtocolSystemException e2) {
                 logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "In"); //$NON-NLS-1$
                 return false;
             }
             try {
                 config.setOutPath(FilesystemBasedDirImpl
-                        .normalizePath(getSubPath(config, XML_OUTPATH)));
+                                          .normalizePath(getSubPath(config, XML_OUTPATH)));
             } catch (OpenR66ProtocolSystemException e2) {
                 logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Out"); //$NON-NLS-1$
                 return false;
             }
             try {
                 config.setWorkingPath(FilesystemBasedDirImpl
-                        .normalizePath(getSubPath(config, XML_WORKINGPATH)));
+                                              .normalizePath(getSubPath(config, XML_WORKINGPATH)));
             } catch (OpenR66ProtocolSystemException e2) {
                 logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Working"); //$NON-NLS-1$
                 return false;
             }
             try {
                 config.setArchivePath(FilesystemBasedDirImpl
-                        .normalizePath(getSubPath(config, XML_ARCHIVEPATH)));
+                                              .normalizePath(getSubPath(config, XML_ARCHIVEPATH)));
             } catch (OpenR66ProtocolSystemException e2) {
                 logger.error(Messages.getString("FileBasedConfiguration.NoSetConfig") + "Archive"); //$NON-NLS-1$
                 return false;
@@ -1180,8 +1194,6 @@ public class FileBasedConfiguration {
             hashConfig = null;
         }
     }
-
-    private static boolean alreadySetLimit = false;
 
     /**
      *
@@ -1203,7 +1215,7 @@ public class FileBasedConfiguration {
                 }
                 config.setServerGlobalWriteLimit(config.getServerGlobalReadLimit());
                 logger.info("Global Limit: {}",
-                        config.getServerGlobalReadLimit());
+                            config.getServerGlobalReadLimit());
             }
             value = hashConfig.get(XML_LIMITSESSION);
             if (value != null && (!value.isEmpty())) {
@@ -1213,10 +1225,11 @@ public class FileBasedConfiguration {
                 }
                 config.setServerChannelWriteLimit(config.getServerChannelReadLimit());
                 logger.info("SessionInterface Limit: {}",
-                        config.getServerChannelReadLimit());
+                            config.getServerChannelReadLimit());
             }
-            config.setAnyBandwidthLimitation((config.getServerGlobalReadLimit() > 0 || config.getServerGlobalWriteLimit() > 0 ||
-                    config.getServerChannelReadLimit() > 0 || config.getServerChannelWriteLimit() > 0));
+            config.setAnyBandwidthLimitation(
+                    (config.getServerGlobalReadLimit() > 0 || config.getServerGlobalWriteLimit() > 0 ||
+                     config.getServerChannelReadLimit() > 0 || config.getServerChannelWriteLimit() > 0));
             config.setDelayLimit(AbstractTrafficShapingHandler.DEFAULT_CHECK_INTERVAL);
             value = hashConfig.get(XML_LIMITDELAY);
             if (value != null && (!value.isEmpty())) {
@@ -1225,14 +1238,14 @@ public class FileBasedConfiguration {
                     config.setDelayLimit(0);
                 }
                 logger.info("Delay Limit: {}",
-                        config.getDelayLimit());
+                            config.getDelayLimit());
             }
             value = hashConfig.get(XML_LIMITRUNNING);
             if (value != null && (!value.isEmpty())) {
                 config.setRUNNER_THREAD(value.getInteger());
             }
             logger.info("Limit of Runner: {}",
-                    config.getRUNNER_THREAD());
+                        config.getRUNNER_THREAD());
             value = hashConfig.get(XML_DELAYCOMMANDER);
             if (value != null && (!value.isEmpty())) {
                 config.setDelayCommander((value.getLong() / 10) * 10);
@@ -1240,7 +1253,7 @@ public class FileBasedConfiguration {
                     config.setDelayCommander(100);
                 }
                 logger.info("Delay Commander: {}",
-                        config.getDelayCommander());
+                            config.getDelayCommander());
             }
             value = hashConfig.get(XML_DELAYRETRY);
             if (value != null && (!value.isEmpty())) {
@@ -1249,7 +1262,7 @@ public class FileBasedConfiguration {
                     config.setDelayRetry(1000);
                 }
                 logger.info("Delay Retry: {}",
-                        config.getDelayRetry());
+                            config.getDelayRetry());
             }
             if (DbConstant.admin.isActive() && updateLimit) {
                 value = hashConfig.get(XML_SERVER_HOSTID);
@@ -1333,12 +1346,14 @@ public class FileBasedConfiguration {
             if (useCpuLimit || highcpuLimit > 0) {
                 if (highcpuLimit > 0) {
                     logger.debug("full setup of ContraintLimitHandler");
-                    config.setConstraintLimitHandler(new R66ConstraintLimitHandler(useCpuLimit, useCpuLimitJDK, cpulimit, connlimit,
-                            lowcpuLimit, highcpuLimit, percentageDecrease, null, delay,
-                            limitLowBandwidth));
+                    config.setConstraintLimitHandler(
+                            new R66ConstraintLimitHandler(useCpuLimit, useCpuLimitJDK, cpulimit, connlimit,
+                                                          lowcpuLimit, highcpuLimit, percentageDecrease, null, delay,
+                                                          limitLowBandwidth));
                 } else {
                     logger.debug("partial setup of ContraintLimitHandler");
-                    config.setConstraintLimitHandler(new R66ConstraintLimitHandler(useCpuLimit, useCpuLimitJDK, cpulimit, connlimit));
+                    config.setConstraintLimitHandler(
+                            new R66ConstraintLimitHandler(useCpuLimit, useCpuLimitJDK, cpulimit, connlimit));
                 }
             } else {
                 logger.debug("No setup of ContraintLimitHandler");
@@ -1465,7 +1480,7 @@ public class FileBasedConfiguration {
                 }
                 try {
                     NetworkSslServerInitializer.setWaarpSecureKeyStore(new WaarpSecureKeyStore(keypath, keystorepass,
-                            keypass));
+                                                                                               keypass));
                 } catch (CryptoException e) {
                     logger.error("Bad SecureKeyStore construction");
                     return false;
@@ -1499,7 +1514,7 @@ public class FileBasedConfiguration {
                 }
                 try {
                     NetworkSslServerInitializer.getWaarpSecureKeyStore().initTrustStore(keypath,
-                            keystorepass, useClientAuthent);
+                                                                                        keystorepass, useClientAuthent);
                 } catch (CryptoException e) {
                     logger.error("Bad TrustKeyStore construction");
                     return false;
@@ -1608,12 +1623,14 @@ public class FileBasedConfiguration {
                                 String fileKey = valueKey.getString();
                                 File file = new File(fileKey);
                                 if (!file.canRead()) {
-                                    file = new File(configuration.getConfigPath() + FilesystemBasedDirImpl.SEPARATOR + fileKey);
+                                    file = new File(
+                                            configuration.getConfigPath() + FilesystemBasedDirImpl.SEPARATOR + fileKey);
                                     if (!file.canRead()) {
                                         logger.error("Unable to find REST Key in Config file");
                                         return false;
                                     }
-                                    (fileKey) = configuration.getConfigPath() + FilesystemBasedDirImpl.SEPARATOR + fileKey;
+                                    (fileKey) =
+                                            configuration.getConfigPath() + FilesystemBasedDirImpl.SEPARATOR + fileKey;
                                 }
                                 try {
                                     config.initializeKey(file);
@@ -1657,10 +1674,10 @@ public class FileBasedConfiguration {
                                 }
                                 found = true;
                                 byte def = 0x0;
-                                def |= (crud.contains("C") ? RestConfiguration.CRUD.CREATE.mask : 0);
-                                def |= (crud.contains("R") ? RestConfiguration.CRUD.READ.mask : 0);
-                                def |= (crud.contains("U") ? RestConfiguration.CRUD.UPDATE.mask : 0);
-                                def |= (crud.contains("D") ? RestConfiguration.CRUD.DELETE.mask : 0);
+                                def |= (crud.contains("C")? RestConfiguration.CRUD.CREATE.mask : 0);
+                                def |= (crud.contains("R")? RestConfiguration.CRUD.READ.mask : 0);
+                                def |= (crud.contains("U")? RestConfiguration.CRUD.UPDATE.mask : 0);
+                                def |= (crud.contains("D")? RestConfiguration.CRUD.DELETE.mask : 0);
                                 if (name.equalsIgnoreCase("all")) {
                                     for (int i = 0; i < config.RESTHANDLERS_CRUD.length; i++) {
                                         config.RESTHANDLERS_CRUD[i] = def;
@@ -1743,11 +1760,11 @@ public class FileBasedConfiguration {
             }
         } else {
             if (config.getBaseDirectory() != null &&
-                    config.getConfigPath() != null) {
+                config.getConfigPath() != null) {
                 // load Rules from files
                 File dirConfig = new File(
                         config.getBaseDirectory() +
-                                config.getConfigPath());
+                        config.getConfigPath());
                 if (dirConfig.isDirectory()) {
                     try {
                         RuleFileBasedConfiguration.importRules(dirConfig);
@@ -1760,8 +1777,8 @@ public class FileBasedConfiguration {
                     }
                 } else {
                     logger.error("Config Directory is not a directory: " +
-                            config.getBaseDirectory() +
-                            config.getConfigPath());
+                                 config.getBaseDirectory() +
+                                 config.getConfigPath());
                     return false;
                 }
             }
@@ -1770,8 +1787,6 @@ public class FileBasedConfiguration {
         }
         return true;
     }
-
-    public static boolean autoupgrade = false;
 
     /**
      * Load database parameter
@@ -1805,7 +1820,8 @@ public class FileBasedConfiguration {
                 String dbdriver = value.getString();
                 value = hashConfig.get(XML_DBSERVER);
                 if (value == null || (value.isEmpty())) {
-                    logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "DBServer"); //$NON-NLS-1$
+                    logger.error(
+                            Messages.getString("FileBasedConfiguration.NotFoundConfig") + "DBServer"); //$NON-NLS-1$
                     return false;
                 }
                 String dbserver = value.getString();
@@ -1817,52 +1833,55 @@ public class FileBasedConfiguration {
                 String dbuser = value.getString();
                 value = hashConfig.get(XML_DBPASSWD);
                 if (value == null || (value.isEmpty())) {
-                    logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "DBPassword"); //$NON-NLS-1$
+                    logger.error(
+                            Messages.getString("FileBasedConfiguration.NotFoundConfig") + "DBPassword"); //$NON-NLS-1$
                     return false;
                 }
                 String dbpasswd = value.getString();
                 if (dbdriver == null || dbserver == null || dbuser == null ||
-                        dbpasswd == null || dbdriver.isEmpty() ||
-                        dbserver.isEmpty() || dbuser.isEmpty() ||
-                        dbpasswd.isEmpty()) {
-                    logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") + "Correct DB data"); //$NON-NLS-1$
+                    dbpasswd == null || dbdriver.isEmpty() ||
+                    dbserver.isEmpty() || dbuser.isEmpty() ||
+                    dbpasswd.isEmpty()) {
+                    logger.error(Messages.getString("FileBasedConfiguration.NotFoundConfig") +
+                                 "Correct DB data"); //$NON-NLS-1$
                     return false;
                 }
                 try {
                     DbConstant.admin =
                             DbModelFactory.initialize(dbdriver, dbserver, dbuser, dbpasswd,
-                                    true);
-		            // New way of initializing database services
+                                                      true);
+                    // New way of initializing database services
                     try {
                         ConnectionFactory.initialize(dbserver, dbuser, dbpasswd);
-		            } catch (UnsupportedOperationException e) {
-		                logger.error(e);
-			            return false;
+                    } catch (UnsupportedOperationException e) {
+                        logger.error(e);
+                        return false;
                     } catch (SQLException e) {
                         logger.error("Cannot create ConnectionFactory", e);
-			            return false;
+                        return false;
                     }
                     DAOFactory.initialize(ConnectionFactory.getInstance());
 
                     if (config.getMultipleMonitors() > 1) {
                         DbConstant.noCommitAdmin =
                                 DbModelFactory.initialize(dbdriver, dbserver, dbuser, dbpasswd,
-                                        true);
+                                                          true);
                         Configuration.setNBDBSESSION(Configuration.getNBDBSESSION() + 1);
                         DbConstant.noCommitAdmin.getSession().setAutoCommit(false);
                     } else {
                         DbConstant.noCommitAdmin = DbConstant.admin;
                     }
                     logger.info("Database connection: Admin:" + (DbConstant.admin != null) + " NoCommitAdmin:"
-                            + (DbConstant.noCommitAdmin != null));
+                                + (DbConstant.noCommitAdmin != null));
 
                     try {
                         logger.info("DefaultTransactionIsolation: " +
-                                DbConstant.admin.getSession().getConn().getMetaData().getDefaultTransactionIsolation() +
-                                " MaxConnections: " +
-                                DbConstant.admin.getSession().getConn().getMetaData().getMaxConnections() +
-                                " MaxStatements: " +
-                                DbConstant.admin.getSession().getConn().getMetaData().getMaxStatements());
+                                    DbConstant.admin.getSession().getConn().getMetaData()
+                                                    .getDefaultTransactionIsolation() +
+                                    " MaxConnections: " +
+                                    DbConstant.admin.getSession().getConn().getMetaData().getMaxConnections() +
+                                    " MaxStatements: " +
+                                    DbConstant.admin.getSession().getConn().getMetaData().getMaxStatements());
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -1884,18 +1903,18 @@ public class FileBasedConfiguration {
                             request.close();
                         }
                     } catch (WaarpDatabaseNoConnectionException e1) {
-                    // ignore
-                    /* TODO: Why Ignore?
-                     * throwing bad configuration seems better
-                     */
+                        // ignore
+                        /* TODO: Why Ignore?
+                         * throwing bad configuration seems better
+                         */
                     }
                 }
                 // TODO to remove when <dbcheck> is drop from config file
                 value = hashConfig.get(XML_DBCHECK);
                 if (value != null && (!value.isEmpty())) {
                     logger.warn("<{}> is deprecated in configuration file "
-                                    + "use <{}> instead",
-                            XML_DBCHECK, XML_DBAUTOUPGRADE);
+                                + "use <{}> instead",
+                                XML_DBCHECK, XML_DBAUTOUPGRADE);
                     autoupgrade = value.getBoolean();
                 } else {
                     // Keep this part
@@ -2150,7 +2169,7 @@ public class FileBasedConfiguration {
      * @return True if OK
      */
     public static boolean setConfigurationInitDatabase(Configuration config,
-               String filename, boolean initdb) {
+                                                       String filename, boolean initdb) {
         Document document = null;
         // Open config file
         try {
@@ -2203,11 +2222,11 @@ public class FileBasedConfiguration {
      */
     public static boolean setConfigurationServerMinimalFromXml(Configuration config, String filename) {
         if (!SystemPropertyUtil.get(
-                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "" )
-                .equals("")) {
+                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "")
+                               .equals("")) {
             logger.warn("{} is deprecated in system properties use {} instead",
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
             FileBasedConfiguration.autoupgrade = SystemPropertyUtil.getBoolean(
                     R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, false);
         } else {
@@ -2255,7 +2274,7 @@ public class FileBasedConfiguration {
         config.setHOST_AUTH(R66Auth.getServerAuth(
                 DbConstant.admin.getSession(), config.getHOST_ID()));
         if (config.getHOST_AUTH() == null &&
-                config.isUseNOSSL()) {
+            config.isUseNOSSL()) {
             logger.error("Cannot find Authentication for current host");
             return false;
         }
@@ -2264,7 +2283,7 @@ public class FileBasedConfiguration {
                     DbConstant.admin.getSession(),
                     config.getHOST_SSLID()));
             if (config.getHOST_SSLAUTH() == null &&
-                    config.isUseSSL()) {
+                config.isUseSSL()) {
                 logger.error("Cannot find SSL Authentication for current host");
                 return false;
             }
@@ -2283,13 +2302,13 @@ public class FileBasedConfiguration {
      * @return True if OK
      */
     public static boolean setConfigurationServerShutdownFromXml(Configuration config,
-            String filename) {
+                                                                String filename) {
         if (!SystemPropertyUtil.get(
-                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "" )
-                .equals("")) {
+                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "")
+                               .equals("")) {
             logger.warn("{} is deprecated in system properties use {} instead",
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
             FileBasedConfiguration.autoupgrade = SystemPropertyUtil.getBoolean(
                     R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, false);
         } else {
@@ -2352,7 +2371,7 @@ public class FileBasedConfiguration {
         config.setHOST_AUTH(R66Auth.getServerAuth(
                 DbConstant.admin.getSession(), config.getHOST_ID()));
         if (config.getHOST_AUTH() == null &&
-                config.isUseNOSSL()) {
+            config.isUseNOSSL()) {
             logger.error("Cannot find Authentication for current host");
             return false;
         }
@@ -2361,7 +2380,7 @@ public class FileBasedConfiguration {
                     DbConstant.admin.getSession(),
                     config.getHOST_SSLID()));
             if (config.getHOST_SSLAUTH() == null &&
-                    config.isUseSSL()) {
+                config.isUseSSL()) {
                 logger.error("Cannot find SSL Authentication for current host");
                 return false;
             }
@@ -2444,7 +2463,7 @@ public class FileBasedConfiguration {
         config.setHOST_AUTH(R66Auth.getServerAuth(
                 DbConstant.admin.getSession(), config.getHOST_ID()));
         if (config.getHOST_AUTH() == null &&
-                config.isUseNOSSL()) {
+            config.isUseNOSSL()) {
             logger.error("Cannot find Authentication for current host");
             return false;
         }
@@ -2453,7 +2472,7 @@ public class FileBasedConfiguration {
                     DbConstant.admin.getSession(),
                     config.getHOST_SSLID()));
             if (config.getHOST_SSLAUTH() == null &&
-                    config.isUseSSL()) {
+                config.isUseSSL()) {
                 logger.error("Cannot find SSL Authentication for current host");
                 return false;
             }
@@ -2475,11 +2494,11 @@ public class FileBasedConfiguration {
      */
     public static boolean setClientConfigurationFromXml(Configuration config, String filename) {
         if (!SystemPropertyUtil.get(
-                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "" )
-                .equals("")) {
+                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "")
+                               .equals("")) {
             logger.warn("{} is deprecated in system properties use {} instead",
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
             FileBasedConfiguration.autoupgrade = SystemPropertyUtil.getBoolean(
                     R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, false);
         } else {
@@ -2572,11 +2591,11 @@ public class FileBasedConfiguration {
      */
     public static boolean setSubmitClientConfigurationFromXml(Configuration config, String filename) {
         if (!SystemPropertyUtil.get(
-                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "" )
-                .equals("")) {
+                R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, "")
+                               .equals("")) {
             logger.warn("{} is deprecated in system properties use {} instead",
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
-                    R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK,
+                        R66SystemProperties.OPENR66_STARTUP_DATABASE_AUTOUPGRADE);
             FileBasedConfiguration.autoupgrade = SystemPropertyUtil.getBoolean(
                     R66SystemProperties.OPENR66_STARTUP_DATABASE_CHECK, false);
         } else {

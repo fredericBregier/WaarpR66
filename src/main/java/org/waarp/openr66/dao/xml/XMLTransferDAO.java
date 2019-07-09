@@ -16,12 +16,14 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -29,53 +31,48 @@ import java.util.List;
 
 public class XMLTransferDAO implements TransferDAO {
 
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLTransferDAO.class);
-
     public static final String ROOT_LIST = "taskrunners";
     public static final String ROOT_ELEMENT = "runner";
-
-    public static String GLOBAL_STEP_FIELD="globalstep";
-    public static String LAST_GLOBAL_STEP_FIELD="globallaststep";
-    public static String STEP_FIELD="step";
-    public static String RANK_FIELD="rank";
-    public static String STEP_STATUS_FIELD="stepstatus";
-    public static String RETRIEVE_MODE_FIELD="retrievemode";
-    public static String FILENAME_FIELD="filename";
-    public static String IS_MOVED_FIELD="ismoved";
-    public static String RULE_FIELD="idrule";
-    public static String BLOCK_SIZE_FIELD="blocksz";
-    public static String ORIGINAL_NAME_FIELD="originalname";
-    public static String FILE_INFO_FIELD="fileinfo";
-    public static String TRANSFER_MODE_FIELD="modetrans";
-    public static String START_FIELD="starttrans";
-    public static String STOP_FIELD="stoptrans";
-    public static String INFO_STATUS_FIELD="infostatus";
-    public static String OWNER_FIELD="ownerreq";
-    public static String REQUESTER_FIELD="requester";
-    public static String REQUESTED_FIELD="requested";
-    public static String ID_FIELD="specialid";
-
+    public static final String XMLEXTENSION = "_singlerunner.xml";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLTransferDAO.class);
     private static final String XML_SELECT = "//runner[" +
-            "specialid=$specialid and requester='$requester' and " +
-            "requested='$requested' and ownerreq='ownerreq']";
-    private static final String XML_GET_ALL= "runner";
-
+                                             "specialid=$specialid and requester='$requester' and " +
+                                             "requested='$requested' and ownerreq='ownerreq']";
+    private static final String XML_GET_ALL = "runner";
+    public static String GLOBAL_STEP_FIELD = "globalstep";
+    public static String LAST_GLOBAL_STEP_FIELD = "globallaststep";
+    public static String STEP_FIELD = "step";
+    public static String RANK_FIELD = "rank";
+    public static String STEP_STATUS_FIELD = "stepstatus";
+    public static String RETRIEVE_MODE_FIELD = "retrievemode";
+    public static String FILENAME_FIELD = "filename";
+    public static String IS_MOVED_FIELD = "ismoved";
+    public static String RULE_FIELD = "idrule";
+    public static String BLOCK_SIZE_FIELD = "blocksz";
+    public static String ORIGINAL_NAME_FIELD = "originalname";
+    public static String FILE_INFO_FIELD = "fileinfo";
+    public static String TRANSFER_MODE_FIELD = "modetrans";
+    public static String START_FIELD = "starttrans";
+    public static String STOP_FIELD = "stoptrans";
+    public static String INFO_STATUS_FIELD = "infostatus";
+    public static String OWNER_FIELD = "ownerreq";
+    public static String REQUESTER_FIELD = "requester";
+    public static String REQUESTED_FIELD = "requested";
+    public static String ID_FIELD = "specialid";
     private File file;
 
     public XMLTransferDAO(String filePath) {
         this.file = new File(filePath);
     }
 
-    public void close() {}
-
-
-    public static final String XMLEXTENSION = "_singlerunner.xml";
+    public void close() {
+    }
 
     private File getFile(String requester, String requested, long id) {
         return new File(Configuration.configuration.getBaseDirectory() +
-                Configuration.configuration.getArchivePath() + "/"
-                + requester + "_" + requested + "_"
-                + id + XMLEXTENSION);
+                        Configuration.configuration.getArchivePath() + "/"
+                        + requester + "_" + requested + "_"
+                        + id + XMLEXTENSION);
     }
 
     public void delete(Transfer transfer) throws DAOException {
@@ -90,7 +87,7 @@ public class XMLTransferDAO implements TransferDAO {
         File arch = new File(Configuration.configuration.getArchivePath());
         File[] runnerFiles = arch.listFiles();
         List<Transfer> res = new ArrayList<Transfer>();
-        for(File file : runnerFiles) {
+        for (File file : runnerFiles) {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 Document document = dbf.newDocumentBuilder().parse(file);
@@ -98,7 +95,7 @@ public class XMLTransferDAO implements TransferDAO {
                 XPath xPath = XPathFactory.newInstance().newXPath();
                 XPathExpression xpe = xPath.compile(XML_GET_ALL);
                 NodeList listNode = (NodeList) xpe.evaluate(document,
-                        XPathConstants.NODESET);
+                                                            XPathConstants.NODESET);
                 // Iterate through all found nodes
                 for (int i = 0; i < listNode.getLength(); i++) {
                     Node node = listNode.item(i);
@@ -148,7 +145,8 @@ public class XMLTransferDAO implements TransferDAO {
     }
 
     @Override
-    public List<Transfer> find(List<Filter> filters, String column, boolean ascend, int limit, int offset) throws DAOException {
+    public List<Transfer> find(List<Filter> filters, String column, boolean ascend, int limit, int offset)
+            throws DAOException {
         throw new DAOException("Operation not supported on XML DAO");
     }
 
@@ -157,7 +155,7 @@ public class XMLTransferDAO implements TransferDAO {
         transfer.setId(new LongUuid().getLong());
 
         file = getFile(transfer.getRequester(), transfer.getRequested(),
-                transfer.getId());
+                       transfer.getId());
         if (file.exists()) {
             throw new DAOException("File already exist");
         }
@@ -175,7 +173,7 @@ public class XMLTransferDAO implements TransferDAO {
     }
 
     public Transfer select(long id, String requester, String requested,
-                       String owner) throws DAOException {
+                           String owner) throws DAOException {
         file = getFile(requester, requested, id);
         if (!file.exists()) {
             return null;
@@ -212,7 +210,7 @@ public class XMLTransferDAO implements TransferDAO {
 
     public void update(Transfer transfer) throws DAOException {
         file = getFile(transfer.getRequester(), transfer.getRequested(),
-                transfer.getId());
+                       transfer.getId());
         if (!file.exists()) {
             throw new DAOException("File doesn't exist");
         }
@@ -307,47 +305,47 @@ public class XMLTransferDAO implements TransferDAO {
     private Node getNode(Document doc, Transfer transfer) {
         Node res = doc.createElement(ROOT_ELEMENT);
         res.appendChild(XMLUtils.createNode(doc, ID_FIELD,
-                Long.toString(transfer.getId())));
+                                            Long.toString(transfer.getId())));
         res.appendChild(XMLUtils.createNode(doc, OWNER_FIELD,
-                transfer.getOwnerRequest()));
+                                            transfer.getOwnerRequest()));
         res.appendChild(XMLUtils.createNode(doc, REQUESTER_FIELD,
-                transfer.getRequester()));
+                                            transfer.getRequester()));
         res.appendChild(XMLUtils.createNode(doc, REQUESTED_FIELD,
-                transfer.getRequested()));
+                                            transfer.getRequested()));
         res.appendChild(XMLUtils.createNode(doc, RULE_FIELD,
-                transfer.getRule()));
+                                            transfer.getRule()));
         res.appendChild(XMLUtils.createNode(doc, RETRIEVE_MODE_FIELD,
-                Boolean.toString(transfer.getRetrieveMode())));
+                                            Boolean.toString(transfer.getRetrieveMode())));
         res.appendChild(XMLUtils.createNode(doc, TRANSFER_MODE_FIELD,
-                Integer.toString(transfer.getTransferMode())));
+                                            Integer.toString(transfer.getTransferMode())));
         res.appendChild(XMLUtils.createNode(doc, FILENAME_FIELD,
-                transfer.getRequested()));
+                                            transfer.getRequested()));
         res.appendChild(XMLUtils.createNode(doc, ORIGINAL_NAME_FIELD,
-                transfer.getFilename()));
+                                            transfer.getFilename()));
         res.appendChild(XMLUtils.createNode(doc, REQUESTED_FIELD,
-                transfer.getOriginalName()));
+                                            transfer.getOriginalName()));
         res.appendChild(XMLUtils.createNode(doc, FILE_INFO_FIELD,
-                transfer.getFileInfo()));
+                                            transfer.getFileInfo()));
         res.appendChild(XMLUtils.createNode(doc, IS_MOVED_FIELD,
-                Boolean.toString(transfer.getIsMoved())));
+                                            Boolean.toString(transfer.getIsMoved())));
         res.appendChild(XMLUtils.createNode(doc, BLOCK_SIZE_FIELD,
-                Integer.toString(transfer.getBlockSize())));
+                                            Integer.toString(transfer.getBlockSize())));
         res.appendChild(XMLUtils.createNode(doc, GLOBAL_STEP_FIELD,
-                Integer.toString(transfer.getGlobalStep().ordinal())));
+                                            Integer.toString(transfer.getGlobalStep().ordinal())));
         res.appendChild(XMLUtils.createNode(doc, LAST_GLOBAL_STEP_FIELD,
-                Integer.toString(transfer.getLastGlobalStep().ordinal())));
+                                            Integer.toString(transfer.getLastGlobalStep().ordinal())));
         res.appendChild(XMLUtils.createNode(doc, STEP_FIELD,
-                Integer.toString(transfer.getStep())));
+                                            Integer.toString(transfer.getStep())));
         res.appendChild(XMLUtils.createNode(doc, RANK_FIELD,
-                Integer.toString(transfer.getRank())));
+                                            Integer.toString(transfer.getRank())));
         res.appendChild(XMLUtils.createNode(doc, STEP_STATUS_FIELD,
-                transfer.getStepStatus().getCode()));
+                                            transfer.getStepStatus().getCode()));
         res.appendChild(XMLUtils.createNode(doc, INFO_STATUS_FIELD,
-                transfer.getInfoStatus().getCode()));
+                                            transfer.getInfoStatus().getCode()));
         res.appendChild(XMLUtils.createNode(doc, START_FIELD,
-                transfer.getStart().toString()));
+                                            transfer.getStart().toString()));
         res.appendChild(XMLUtils.createNode(doc, STOP_FIELD,
-                transfer.getStop().toString()));
+                                            transfer.getStop().toString()));
         return res;
     }
 }

@@ -45,22 +45,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.WILDCARD;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
+import static org.waarp.common.role.RoleDefault.ROLE.HOST;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the single host REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the single host REST entry point.
  */
 @Path(HOST_ID_HANDLER_URI)
 public class HostIdHandler extends AbstractRestDbHandler {
 
     /**
-     * The content of the 'Allow' header sent when an 'OPTIONS' request is made
-     * on the handler.
+     * The content of the 'Allow' header sent when an 'OPTIONS' request is made on the handler.
      */
     private static final HttpHeaders OPTIONS_HEADERS;
 
@@ -85,12 +83,11 @@ public class HostIdHandler extends AbstractRestDbHandler {
 
 
     /**
-     * Method called to retrieve a host entry from the database with the id
-     * in the request URI.
+     * Method called to retrieve a host entry from the database with the id in the request URI.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
+     * @param id the requested host's name
      */
     @GET
     @Consumes(WILDCARD)
@@ -119,12 +116,12 @@ public class HostIdHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to update the host entry with the given id. The entry is
-     * replaced by the one in the request's body.
+     * Method called to update the host entry with the given id. The entry is replaced by the one in the request's
+     * body.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
+     * @param id the requested host's name
      */
     @PUT
     @Consumes(APPLICATION_JSON)
@@ -163,9 +160,9 @@ public class HostIdHandler extends AbstractRestDbHandler {
     /**
      * Method called to delete a host entry from the database.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
+     * @param id the requested host's name
      */
     @DELETE
     @Consumes(WILDCARD)
@@ -193,12 +190,12 @@ public class HostIdHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on this entry point.
-     * The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on this entry point. The HTTP methods are sent as an
+     * array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
-     * @param id        the requested host's name
+     * @param id the requested host's name
      */
     @OPTIONS
     @Consumes(WILDCARD)

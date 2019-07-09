@@ -1,31 +1,22 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.exec.CommandLine;
-
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -38,14 +29,21 @@ import org.waarp.openr66.database.data.DbTaskRunner;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolNoSslException;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Execute an external command
  *
  * It provides some common functionnalities.
- * 
- * 
+ *
+ *
  * @author Bruno Carlin
- * 
+ *
  */
 public abstract class AbstractExecTask extends AbstractTask {
     /**
@@ -56,14 +54,14 @@ public abstract class AbstractExecTask extends AbstractTask {
 
     /**
      * Constructor
-     * 
+     *
      * @param type
      * @param delay
      * @param arg
      * @param session
      */
     AbstractExecTask(TaskType type, int delay, String argRule, String argTransfer,
-            R66Session session) {
+                     R66Session session) {
         super(type, delay, argRule, argTransfer, session);
     }
 
@@ -80,7 +78,7 @@ public abstract class AbstractExecTask extends AbstractTask {
                 return String.format(line, argFormat);
             } catch (Exception e) {
                 // ignored error since bad argument in static rule info
-                logger.error("Bad format in Rule: {"+line+"} " + e.getMessage());
+                logger.error("Bad format in Rule: {" + line + "} " + e.getMessage());
             }
         }
         return line;
@@ -108,7 +106,7 @@ public abstract class AbstractExecTask extends AbstractTask {
             if (!exec.canExecute()) {
                 logger.error("Exec command is not executable: " + line);
                 R66Result result = new R66Result(session, false,
-                        ErrorCode.CommandNotFound, session.getRunner());
+                                                 ErrorCode.CommandNotFound, session.getRunner());
                 futureCompletion.setResult(result);
                 futureCompletion.cancel();
                 return null;
@@ -145,7 +143,7 @@ public abstract class AbstractExecTask extends AbstractTask {
         if (runner != null) {
             rv.put(ORIGINALFULLPATH.replace("#", ""), runner.getOriginalFilename());
             rv.put(ORIGINALFILENAME.replace("#", ""),
-                    R66File.getBasename(runner.getOriginalFilename()));
+                   R66File.getBasename(runner.getOriginalFilename()));
             rv.put(RULE.replace("#", ""), runner.getRuleId());
         }
 
@@ -168,9 +166,9 @@ public abstract class AbstractExecTask extends AbstractTask {
         }
         if (session.getRemoteAddress() != null) {
             rv.put(REMOTEHOSTADDR.replace("#", ""), session.getRemoteAddress()
-                    .toString());
+                                                           .toString());
             rv.put(LOCALHOSTADDR.replace("#", ""), session.getLocalAddress()
-                    .toString());
+                                                          .toString());
         } else {
             rv.put(REMOTEHOSTADDR.replace("#", ""), "unknown");
             rv.put(LOCALHOSTADDR.replace("#", ""), "unknown");
@@ -179,11 +177,11 @@ public abstract class AbstractExecTask extends AbstractTask {
             rv.put(TRANSFERID.replace("#", ""), runner.getSpecialId());
             rv.put(REQUESTERHOST.replace("#", ""), runner.getRequester());
             rv.put(REQUESTEDHOST.replace("#", ""), runner.getRequested());
-            rv.put(FULLTRANSFERID.replace("#", ""), runner.getSpecialId() + "_" 
-                    + runner.getRequester() + "_" + runner.getRequested());
+            rv.put(FULLTRANSFERID.replace("#", ""), runner.getSpecialId() + "_"
+                                                    + runner.getRequester() + "_" + runner.getRequested());
             rv.put(RANKTRANSFER.replace("#", ""), Integer.toString(runner.getRank()));
         }
-        rv.put(BLOCKSIZE.replace("#", ""), session .getBlockSize());
+        rv.put(BLOCKSIZE.replace("#", ""), session.getBlockSize());
 
         R66Dir dir = new R66Dir(session);
         if (runner != null) {
@@ -269,13 +267,13 @@ public abstract class AbstractExecTask extends AbstractTask {
         } else {
             try {
                 rv.put(ERRORMSG.replace("#", ""), session.getLocalChannelReference()
-                        .getErrorMessage());
+                                                         .getErrorMessage());
             } catch (NullPointerException e) {
                 rv.put(ERRORMSG.replace("#", ""), "NoError");
             }
             try {
                 rv.put(ERRORCODE.replace("#", ""), session.getLocalChannelReference()
-                        .getCurrentCode().getCode());
+                                                          .getCurrentCode().getCode());
             } catch (NullPointerException e) {
                 rv.put(ERRORCODE.replace("#", ""), "-");
             }

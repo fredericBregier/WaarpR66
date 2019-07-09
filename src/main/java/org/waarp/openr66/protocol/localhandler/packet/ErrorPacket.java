@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -24,9 +23,9 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Error Message class for packet
- * 
+ *
  * 2 strings+1 error code: sheader,smiddle,code
- * 
+ *
  * @author frederic bregier
  */
 public class ErrorPacket extends AbstractLocalPacket {
@@ -45,6 +44,17 @@ public class ErrorPacket extends AbstractLocalPacket {
     private final int code;
 
     /**
+     * @param header
+     * @param middle
+     * @param code
+     */
+    public ErrorPacket(String header, String middle, int code) {
+        sheader = header;
+        smiddle = middle;
+        this.code = code;
+    }
+
+    /**
      * @param headerLength
      * @param middleLength
      * @param endLength
@@ -53,7 +63,7 @@ public class ErrorPacket extends AbstractLocalPacket {
      * @throws OpenR66ProtocolPacketException
      */
     public static ErrorPacket createFromBuffer(int headerLength,
-            int middleLength, int endLength, ByteBuf buf)
+                                               int middleLength, int endLength, ByteBuf buf)
             throws OpenR66ProtocolPacketException {
         final byte[] bheader = new byte[headerLength - 1];
         final byte[] bmiddle = new byte[middleLength];
@@ -67,18 +77,7 @@ public class ErrorPacket extends AbstractLocalPacket {
             throw new OpenR66ProtocolPacketException("Packet not correct");
         }
         return new ErrorPacket(new String(bheader),
-                new String(bmiddle), buf.readInt());
-    }
-
-    /**
-     * @param header
-     * @param middle
-     * @param code
-     */
-    public ErrorPacket(String header, String middle, int code) {
-        sheader = header;
-        smiddle = middle;
-        this.code = code;
+                               new String(bmiddle), buf.readInt());
     }
 
     @Override

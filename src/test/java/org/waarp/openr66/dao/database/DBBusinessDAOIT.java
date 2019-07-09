@@ -1,5 +1,13 @@
 package org.waarp.openr66.dao.database;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.waarp.openr66.dao.BusinessDAO;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.pojo.Business;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
@@ -8,22 +16,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static  org.junit.Assert.*;
-
-import org.waarp.openr66.dao.BusinessDAO; 
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.pojo.Business;
-import org.waarp.openr66.pojo.UpdatedInfo;
+import static org.junit.Assert.*;
 
 public abstract class DBBusinessDAOIT {
 
     private Connection con;
 
     public abstract Connection getConnection() throws SQLException;
+
     public abstract void initDB() throws SQLException;
+
     public abstract void cleanDB() throws SQLException;
 
     public void runScript(String script) {
@@ -63,7 +65,7 @@ public abstract class DBBusinessDAOIT {
             dao.deleteAll();
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hostconfig");
+                               .executeQuery("SELECT * FROM hostconfig");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -77,7 +79,7 @@ public abstract class DBBusinessDAOIT {
             dao.delete(new Business("server1", "", "", "", ""));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hostconfig where hostid = 'server1'");
+                               .executeQuery("SELECT * FROM hostconfig where hostid = 'server1'");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -129,16 +131,16 @@ public abstract class DBBusinessDAOIT {
         try {
             BusinessDAO dao = new DBBusinessDAO(getConnection());
             dao.insert(new Business("chacha",
-                    "lolo", "lala", "minou", "ect",
-                    UpdatedInfo.TOSUBMIT));
+                                    "lolo", "lala", "minou", "ect",
+                                    UpdatedInfo.TOSUBMIT));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT COUNT(1) as count FROM hostconfig");
+                               .executeQuery("SELECT COUNT(1) as count FROM hostconfig");
             res.next();
             assertEquals(6, res.getInt("count"));
 
             ResultSet res2 = con.createStatement()
-                .executeQuery("SELECT * FROM hostconfig WHERE hostid = 'chacha'");
+                                .executeQuery("SELECT * FROM hostconfig WHERE hostid = 'chacha'");
             res2.next();
             assertEquals("chacha", res2.getString("hostid"));
             assertEquals("lolo", res2.getString("business"));
@@ -156,11 +158,11 @@ public abstract class DBBusinessDAOIT {
         try {
             BusinessDAO dao = new DBBusinessDAO(getConnection());
             dao.update(new Business("server2",
-                    "lolo", "lala", "minou", "ect",
-                    UpdatedInfo.RUNNING));
+                                    "lolo", "lala", "minou", "ect",
+                                    UpdatedInfo.RUNNING));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM hostconfig WHERE hostid = 'server2'");
+                               .executeQuery("SELECT * FROM hostconfig WHERE hostid = 'server2'");
             res.next();
             assertEquals("server2", res.getString("hostid"));
             assertEquals("lolo", res.getString("business"));

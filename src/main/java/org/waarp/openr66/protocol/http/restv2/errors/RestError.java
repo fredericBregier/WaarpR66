@@ -28,39 +28,36 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * This class represents a user error encountered during the processing of
- * a request. To create a new Error instance, use the factory method that corresponds to
- * the desired error in the {@link RestErrors} factory class.
- * To objectToJson a {@code Error} object as a JSON String to be sent back,
- * use the {@code objectToJson} method with the desired {@code Error}
- * object and {@link Locale}. To objectToJson an entire list of errors, use
- * the {@code serializeErrors} method instead.
+ * This class represents a user error encountered during the processing of a request. To create a new Error instance,
+ * use the factory method that corresponds to the desired error in the {@link RestErrors} factory class. To objectToJson
+ * a {@code Error} object as a JSON String to be sent back, use the {@code objectToJson} method with the desired {@code
+ * Error} object and {@link Locale}. To objectToJson an entire list of errors, use the {@code serializeErrors} method
+ * instead.
  */
 public class RestError {
 
     /**
-     * The name of the property in the {@code restmessages} ResourceBundle
-     * corresponding to the error message.
+     * The name of the property in the {@code restmessages} ResourceBundle corresponding to the error message.
      */
     private final String msgKey;
 
     /**
-     * The message arguments (typically field or parameter names) used to give
-     * more context on the cause of the error.
+     * The message arguments (typically field or parameter names) used to give more context on the cause of the error.
      */
     private final String[] args;
 
-    /** The error's code in the REST API specification. */
+    /**
+     * The error's code in the REST API specification.
+     */
     private final Integer code;
 
     /**
-     * Creates an object representing the response message to a request which
-     * produced an error 401 - Bad Request. Should never be called outside of
-     * the {@link RestErrors} factory class.
+     * Creates an object representing the response message to a request which produced an error 401 - Bad Request.
+     * Should never be called outside of the {@link RestErrors} factory class.
      *
      * @param msgKey the message's property name
-     * @param args   the message's parameters
-     * @param code   the error's code
+     * @param args the message's parameters
+     * @param code the error's code
      */
     RestError(String msgKey, String[] args, int code) {
         this.msgKey = msgKey;
@@ -71,8 +68,9 @@ public class RestError {
     /**
      * Returns the error as an {@link ObjectNode}.
      *
-     * @param lang  the language of the error message
-     * @return      the serialized RestError object
+     * @param lang the language of the error message
+     *
+     * @return the serialized RestError object
      */
     public ObjectNode makeNode(Locale lang) {
         ResourceBundle bundle = ResourceBundle.getBundle("restmessages", lang);

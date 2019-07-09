@@ -1,7 +1,6 @@
 package org.waarp.openr66.dao.xml;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.waarp.common.logging.WaarpLogger;
@@ -15,9 +14,12 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +27,10 @@ import java.util.List;
 //TODO
 public class XMLBusinessDAO implements BusinessDAO {
 
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLBusinessDAO.class);
-
     public static final String HOSTID_FIELD = "hostid";
-
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLBusinessDAO.class);
     private static final String XML_SELECT = "/authent/entry[hostid=$hostid]";
-    private static final String XML_GET_ALL= "/authent/entry";
+    private static final String XML_GET_ALL = "/authent/entry";
 
     private File file;
 
@@ -38,7 +38,8 @@ public class XMLBusinessDAO implements BusinessDAO {
         this.file = new File(filePath);
     }
 
-    public void close() {}
+    public void close() {
+    }
 
     public void delete(Business business) throws DAOException {
         throw new DAOException("Operation not supported on XML DAO");
@@ -59,7 +60,7 @@ public class XMLBusinessDAO implements BusinessDAO {
             XPath xPath = XPathFactory.newInstance().newXPath();
             XPathExpression xpe = xPath.compile(XML_GET_ALL);
             NodeList listNode = (NodeList) xpe.evaluate(document,
-                    XPathConstants.NODESET);
+                                                        XPathConstants.NODESET);
             // Iterate through all found nodes
             List<Business> res = new ArrayList<Business>(listNode.getLength());
             for (int i = 0; i < listNode.getLength(); i++) {
@@ -93,7 +94,7 @@ public class XMLBusinessDAO implements BusinessDAO {
             xPath.setXPathVariableResolver(resolver);
             XPathExpression xpe = xPath.compile(XML_SELECT);
             // Query will return "" if nothing is found
-            return(!"".equals(xpe.evaluate(document)));
+            return (!"".equals(xpe.evaluate(document)));
         } catch (SAXException e) {
             throw new DAOException(e);
         } catch (XPathExpressionException e) {

@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -23,9 +22,9 @@ import org.waarp.openr66.protocol.exception.OpenR66Exception;
 
 /**
  * This class is the result for every operations in OpenR66.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class R66Result {
     /**
@@ -61,7 +60,7 @@ public class R66Result {
      * @param runner
      */
     public R66Result(OpenR66Exception exception, R66Session session,
-            boolean isAnswered, ErrorCode code, DbTaskRunner runner) {
+                     boolean isAnswered, ErrorCode code, DbTaskRunner runner) {
         this.setException(exception);
         this.setRunner(runner);
         if (session != null) {
@@ -79,7 +78,7 @@ public class R66Result {
      * @param runner
      */
     public R66Result(R66Session session, boolean isAnswered, ErrorCode code,
-            DbTaskRunner runner) {
+                     DbTaskRunner runner) {
         this.setRunner(runner);
         if (session != null) {
             setFile(session.getFile());
@@ -91,14 +90,14 @@ public class R66Result {
 
     @Override
     public String toString() {
-        return (getException() != null ? "Exception: " + getException().toString() : "") +
-                (getFile() != null ? getFile().toString() : " no file") + "     " +
-                (getRunner() != null ? getRunner().toShortString() : " no runner") +
-                " isAnswered: " + isAnswered() + " Code: " + getCode().getMesg();
+        return (getException() != null? "Exception: " + getException().toString() : "") +
+               (getFile() != null? getFile().toString() : " no file") + "     " +
+               (getRunner() != null? getRunner().toShortString() : " no runner") +
+               " isAnswered: " + isAnswered() + " Code: " + getCode().getMesg();
     }
 
     /**
-     * 
+     *
      * @return the associated message with this Result
      */
     public String getMessage() {

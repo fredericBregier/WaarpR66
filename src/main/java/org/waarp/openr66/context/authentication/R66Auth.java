@@ -1,23 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.authentication;
-
-import java.io.File;
 
 import org.waarp.common.command.NextCommandReply;
 import org.waarp.common.command.exception.Reply421Exception;
@@ -31,9 +28,10 @@ import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.role.RoleDefault;
 import org.waarp.common.role.RoleDefault.ROLE;
 import org.waarp.openr66.context.R66Session;
-import org.waarp.openr66.database.DbConstant;
 import org.waarp.openr66.database.data.DbHostAuth;
 import org.waarp.openr66.protocol.configuration.Configuration;
+
+import java.io.File;
 
 /**
  * @author frederic bregier
@@ -64,6 +62,23 @@ public class R66Auth extends FilesystemBasedAuthImpl {
      */
     public R66Auth(R66Session session) {
         super(session);
+    }
+
+    /**
+     * @param dbSession
+     * @param server
+     * @return the SimpleAuth if any for this user
+     */
+    @Deprecated
+    public static DbHostAuth getServerAuth(DbSession dbSession, String server) {
+        DbHostAuth auth = null;
+        try {
+            auth = new DbHostAuth(server);
+        } catch (WaarpDatabaseException e) {
+            logger.warn("Cannot find the authentication " + server, e);
+            return null;
+        }
+        return auth;
     }
 
     @Override
@@ -237,25 +252,8 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     @Override
     public String toString() {
         return "Auth:" + isIdentified + " " +
-                (currentAuth != null ? currentAuth.toString()
-                        : "no Internal Auth") + " " + this.role.toString();
-    }
-
-    /**
-     * @param dbSession
-     * @param server
-     * @return the SimpleAuth if any for this user
-     */
-    @Deprecated
-    public static DbHostAuth getServerAuth(DbSession dbSession, String server) {
-        DbHostAuth auth = null;
-        try {
-            auth = new DbHostAuth(server);
-        } catch (WaarpDatabaseException e) {
-            logger.warn("Cannot find the authentication " + server, e);
-            return null;
-        }
-        return auth;
+               (currentAuth != null? currentAuth.toString()
+                       : "no Internal Auth") + " " + this.role.toString();
     }
 
     /**

@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -38,9 +37,9 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * Test class for Send Through client
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestSendThroughClient extends SendThroughClient {
 
@@ -55,10 +54,94 @@ public class TestSendThroughClient extends SendThroughClient {
      * @param networkTransaction
      */
     public TestSendThroughClient(R66Future future, String remoteHost,
-            String filename, String rulename, String fileinfo, boolean isMD5,
-            int blocksize, NetworkTransaction networkTransaction) {
+                                 String filename, String rulename, String fileinfo, boolean isMD5,
+                                 int blocksize, NetworkTransaction networkTransaction) {
         super(future, remoteHost, filename, rulename, fileinfo, isMD5, blocksize,
-                DbConstant.ILLEGALVALUE, networkTransaction);
+              DbConstant.ILLEGALVALUE, networkTransaction);
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(
+                null));
+        if (logger == null) {
+            logger = WaarpLoggerFactory.getLogger(TestSendThroughClient.class);
+        }
+        if (!getParams(args, false)) {
+            logger.error("Wrong initialization");
+            if (DbConstant.admin != null && DbConstant.admin.isActive()) {
+                DbConstant.admin.close();
+            }
+            System.exit(1);
+        }
+        Configuration.configuration.pipelineInit();
+        NetworkTransaction networkTransaction = new NetworkTransaction();
+        try {
+            R66Future future = new R66Future(true);
+            TestSendThroughClient transaction = new TestSendThroughClient(future,
+                                                                          rhost, localFilename, rule, fileInfo, ismd5,
+                                                                          block,
+                                                                          networkTransaction);
+            transaction.normalInfoAsWarn = snormalInfoAsWarn;
+            long time1 = System.currentTimeMillis();
+            if (!transaction.initiateRequest()) {
+                logger.error("Transfer in Error", future.getCause());
+                return;
+            }
+            if (transaction.sendFile()) {
+                transaction.finalizeRequest();
+            } else {
+                transaction.transferInError(null);
+            }
+            future.awaitUninterruptibly();
+
+            long time2 = System.currentTimeMillis();
+            long delay = time2 - time1;
+            R66Result result = future.getResult();
+            if (future.isSuccess()) {
+                if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
+                    logger.warn("Warning with Id: " +
+                                result.getRunner().getSpecialId() + " on file: " +
+                                (result.getFile() != null? result.getFile().toString() : "no file")
+                                + " delay: " + delay);
+                } else {
+                    logger.warn("Success with Id: " +
+                                result.getRunner().getSpecialId() + " on Final file: " +
+                                (result.getFile() != null? result.getFile().toString() : "no file")
+                                + " delay: " + delay);
+                }
+                if (nolog || result.getRunner().shallIgnoreSave()) {
+                    // In case of success, delete the runner
+                    try {
+                        result.getRunner().delete();
+                    } catch (WaarpDatabaseException e) {
+                        logger.warn("Cannot apply nolog to " + result.getRunner().toString(), e);
+                    }
+                }
+            } else {
+                if (result == null || result.getRunner() == null) {
+                    logger.warn("Transfer in Error with no Id", future.getCause());
+                    networkTransaction.closeAll();
+                    System.exit(1);
+                }
+                if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
+                    logger.warn("Transfer in Warning with Id: " +
+                                result.getRunner().getSpecialId(), future.getCause());
+                    networkTransaction.closeAll();
+                    System.exit(result.getCode().ordinal());
+                } else {
+                    logger.error("Transfer in Error with Id: " +
+                                 result.getRunner().getSpecialId(), future.getCause());
+                    networkTransaction.closeAll();
+                    System.exit(result.getCode().ordinal());
+                }
+            }
+        } finally {
+            networkTransaction.closeAll();
+        }
+
     }
 
     public boolean sendFile() {
@@ -134,89 +217,6 @@ public class TestSendThroughClient extends SendThroughClient {
             this.transferInError(e);
             return false;
         }
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(
-                null));
-        if (logger == null) {
-            logger = WaarpLoggerFactory.getLogger(TestSendThroughClient.class);
-        }
-        if (!getParams(args, false)) {
-            logger.error("Wrong initialization");
-            if (DbConstant.admin != null && DbConstant.admin.isActive()) {
-                DbConstant.admin.close();
-            }
-            System.exit(1);
-        }
-        Configuration.configuration.pipelineInit();
-        NetworkTransaction networkTransaction = new NetworkTransaction();
-        try {
-            R66Future future = new R66Future(true);
-            TestSendThroughClient transaction = new TestSendThroughClient(future,
-                    rhost, localFilename, rule, fileInfo, ismd5, block,
-                    networkTransaction);
-            transaction.normalInfoAsWarn = snormalInfoAsWarn;
-            long time1 = System.currentTimeMillis();
-            if (!transaction.initiateRequest()) {
-                logger.error("Transfer in Error", future.getCause());
-                return;
-            }
-            if (transaction.sendFile()) {
-                transaction.finalizeRequest();
-            } else {
-                transaction.transferInError(null);
-            }
-            future.awaitUninterruptibly();
-
-            long time2 = System.currentTimeMillis();
-            long delay = time2 - time1;
-            R66Result result = future.getResult();
-            if (future.isSuccess()) {
-                if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
-                    logger.warn("Warning with Id: " +
-                            result.getRunner().getSpecialId() + " on file: " +
-                            (result.getFile() != null ? result.getFile().toString() : "no file")
-                            + " delay: " + delay);
-                } else {
-                    logger.warn("Success with Id: " +
-                            result.getRunner().getSpecialId() + " on Final file: " +
-                            (result.getFile() != null ? result.getFile().toString() : "no file")
-                            + " delay: " + delay);
-                }
-                if (nolog || result.getRunner().shallIgnoreSave()) {
-                    // In case of success, delete the runner
-                    try {
-                        result.getRunner().delete();
-                    } catch (WaarpDatabaseException e) {
-                        logger.warn("Cannot apply nolog to " + result.getRunner().toString(), e);
-                    }
-                }
-            } else {
-                if (result == null || result.getRunner() == null) {
-                    logger.warn("Transfer in Error with no Id", future.getCause());
-                    networkTransaction.closeAll();
-                    System.exit(1);
-                }
-                if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
-                    logger.warn("Transfer in Warning with Id: " +
-                            result.getRunner().getSpecialId(), future.getCause());
-                    networkTransaction.closeAll();
-                    System.exit(result.getCode().ordinal());
-                } else {
-                    logger.error("Transfer in Error with Id: " +
-                            result.getRunner().getSpecialId(), future.getCause());
-                    networkTransaction.closeAll();
-                    System.exit(result.getCode().ordinal());
-                }
-            }
-        } finally {
-            networkTransaction.closeAll();
-        }
-
     }
 
 }

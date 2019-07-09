@@ -1,5 +1,13 @@
 package org.waarp.openr66.dao.database;
 
+import org.waarp.common.logging.WaarpLogger;
+import org.waarp.common.logging.WaarpLoggerFactory;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.LimitDAO;
+import org.waarp.openr66.dao.exception.DAOException;
+import org.waarp.openr66.pojo.Limit;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,22 +16,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.waarp.common.logging.WaarpLogger;
-import org.waarp.common.logging.WaarpLoggerFactory;
-import org.waarp.openr66.dao.LimitDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.dao.exception.DAOException;
-import org.waarp.openr66.pojo.Limit;
-import org.waarp.openr66.pojo.UpdatedInfo;
-
 /**
  * Implementation of LimitDAO for standard SQL databases
  */
 public class DBLimitDAO extends StatementExecutor implements LimitDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(LimitDAO.class);
-
-    protected static final String TABLE = "configuration";
 
     public static final String HOSTID_FIELD = "hostid";
     public static final String READ_GLOBAL_LIMIT_FIELD = "readgloballimit";
@@ -32,34 +28,32 @@ public class DBLimitDAO extends StatementExecutor implements LimitDAO {
     public static final String WRITE_SESSION_LIMIT_FIELD = "writesessionlimit";
     public static final String DELAY_LIMIT_FIELD = "delaylimit";
     public static final String UPDATED_INFO_FIELD = "updatedinfo";
-
+    protected static final String TABLE = "configuration";
     protected static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE;
     protected static final String SQL_DELETE = "DELETE FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
+                                               + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_GET_ALL = "SELECT * FROM " + TABLE;
     protected static final String SQL_EXIST = "SELECT 1 FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
+                                              + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_SELECT = "SELECT * FROM " + TABLE
-        + " WHERE " + HOSTID_FIELD + " = ?";
+                                               + " WHERE " + HOSTID_FIELD + " = ?";
     protected static final String SQL_INSERT = "INSERT INTO " + TABLE
-        + " (" + HOSTID_FIELD + ", "
-        + READ_GLOBAL_LIMIT_FIELD + ", "
-        + WRITE_GLOBAL_LIMIT_FIELD + ", "
-        + READ_SESSION_LIMIT_FIELD + ", "
-        + WRITE_SESSION_LIMIT_FIELD + ", "
-        + DELAY_LIMIT_FIELD + ", "
-        + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?,?)";
-
+                                               + " (" + HOSTID_FIELD + ", "
+                                               + READ_GLOBAL_LIMIT_FIELD + ", "
+                                               + WRITE_GLOBAL_LIMIT_FIELD + ", "
+                                               + READ_SESSION_LIMIT_FIELD + ", "
+                                               + WRITE_SESSION_LIMIT_FIELD + ", "
+                                               + DELAY_LIMIT_FIELD + ", "
+                                               + UPDATED_INFO_FIELD + ") VALUES (?,?,?,?,?,?,?)";
     protected static final String SQL_UPDATE = "UPDATE " + TABLE
-        +  " SET " + HOSTID_FIELD + " = ?, "
-        + READ_GLOBAL_LIMIT_FIELD + " = ?, "
-        + WRITE_GLOBAL_LIMIT_FIELD + " = ?, "
-        + READ_SESSION_LIMIT_FIELD + " = ?, "
-        + WRITE_SESSION_LIMIT_FIELD + " = ?, "
-        + DELAY_LIMIT_FIELD + " = ?, "
-        + UPDATED_INFO_FIELD + " = ? WHERE " + HOSTID_FIELD + " = ?";
-
-
+                                               + " SET " + HOSTID_FIELD + " = ?, "
+                                               + READ_GLOBAL_LIMIT_FIELD + " = ?, "
+                                               + WRITE_GLOBAL_LIMIT_FIELD + " = ?, "
+                                               + READ_SESSION_LIMIT_FIELD + " = ?, "
+                                               + WRITE_SESSION_LIMIT_FIELD + " = ?, "
+                                               + DELAY_LIMIT_FIELD + " = ?, "
+                                               + UPDATED_INFO_FIELD + " = ? WHERE " + HOSTID_FIELD + " = ?";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(LimitDAO.class);
     protected Connection connection;
 
     public DBLimitDAO(Connection con) {
@@ -201,13 +195,13 @@ public class DBLimitDAO extends StatementExecutor implements LimitDAO {
     @Override
     public void insert(Limit limit) throws DAOException {
         Object[] params = {
-            limit.getHostid(),
-            limit.getReadGlobalLimit(),
-            limit.getWriteGlobalLimit(),
-            limit.getReadSessionLimit(),
-            limit.getWriteSessionLimit(),
-            limit.getDelayLimit(),
-            limit.getUpdatedInfo().ordinal()
+                limit.getHostid(),
+                limit.getReadGlobalLimit(),
+                limit.getWriteGlobalLimit(),
+                limit.getReadSessionLimit(),
+                limit.getWriteSessionLimit(),
+                limit.getDelayLimit(),
+                limit.getUpdatedInfo().ordinal()
         };
 
         PreparedStatement stm = null;
@@ -225,14 +219,14 @@ public class DBLimitDAO extends StatementExecutor implements LimitDAO {
     @Override
     public void update(Limit limit) throws DAOException {
         Object[] params = {
-            limit.getHostid(),
-            limit.getReadGlobalLimit(),
-            limit.getWriteGlobalLimit(),
-            limit.getReadSessionLimit(),
-            limit.getWriteSessionLimit(),
-            limit.getDelayLimit(),
-            limit.getUpdatedInfo().ordinal(),
-            limit.getHostid()
+                limit.getHostid(),
+                limit.getReadGlobalLimit(),
+                limit.getWriteGlobalLimit(),
+                limit.getReadSessionLimit(),
+                limit.getWriteSessionLimit(),
+                limit.getDelayLimit(),
+                limit.getUpdatedInfo().ordinal(),
+                limit.getHostid()
         };
 
         PreparedStatement stm = null;

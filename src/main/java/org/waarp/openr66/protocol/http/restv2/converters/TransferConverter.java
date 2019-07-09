@@ -33,8 +33,8 @@ import org.waarp.openr66.pojo.Transfer;
 import org.waarp.openr66.pojo.UpdatedInfo;
 import org.waarp.openr66.protocol.http.restv2.converters.RuleConverter.ModeTrans;
 import org.waarp.openr66.protocol.http.restv2.errors.RestError;
-import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 import org.waarp.openr66.protocol.http.restv2.errors.RestErrorException;
+import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 
 import javax.ws.rs.InternalServerErrorException;
 import java.sql.Timestamp;
@@ -44,66 +44,34 @@ import java.util.List;
 import java.util.Map;
 
 import static org.waarp.openr66.dao.database.DBTransferDAO.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.DAO_FACTORY;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.SERVER_NAME;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.TransferFields.*;
 import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 
 /**
- * A collection of utility methods to convert {@link Transfer} objects
- * to their corresponding {@link ObjectNode} and vice-versa.
+ * A collection of utility methods to convert {@link Transfer} objects to their corresponding {@link ObjectNode} and
+ * vice-versa.
  */
 public final class TransferConverter {
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private TransferConverter() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
 
     //########################### INNER CLASSES ################################
 
-    /** All the possible ways to order a list of transfer objects. */
-    public enum Order {
-        /** By transferId, in ascending order. */
-        ascId(ID_FIELD, true),
-        /** By transferId, in descending order. */
-        descId(ID_FIELD, false),
-        /** By fileName, in ascending order. */
-        ascFile(ORIGINAL_NAME_FIELD, true),
-        /** By fileName, in descending order. */
-        descFile(ORIGINAL_NAME_FIELD, false),
-        /** By starting date, in ascending order. */
-        ascStart(TRANSFER_START_FIELD, true),
-        /** By starting date, in descending order. */
-        descStart(TRANSFER_START_FIELD, false),
-        /** By end date, in ascending order. */
-        ascStop(TRANSFER_STOP_FIELD, true),
-        /** By end date, in descending order. */
-        descStop(TRANSFER_STOP_FIELD, false);
-
-        /** The name of the database column used for sorting. */
-        public final String column;
-        /** If the order is ascending or descending. */
-        public final boolean ascend;
-
-        Order(String column, boolean ascend) {
-            this.column = column;
-            this.ascend = ascend;
-        }
-    }
-
-
-    //########################## PUBLIC METHODS ################################
-
     /**
-     * Returns an {@link ObjectNode} representing the {@link Transfer} object
-     * given as parameter.
+     * Returns an {@link ObjectNode} representing the {@link Transfer} object given as parameter.
      *
      * @param transfer the Transfer object to serialize
-     * @return         the corresponding ObjectNode
+     *
+     * @return the corresponding ObjectNode
      */
     public static ObjectNode transferToNode(Transfer transfer) {
         ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
@@ -131,14 +99,17 @@ public final class TransferConverter {
         return node;
     }
 
+
+    //########################## PUBLIC METHODS ################################
+
     /**
-     * Initialize a {@link Transfer} object using the values of the given
-     * {@link ObjectNode}.
+     * Initialize a {@link Transfer} object using the values of the given {@link ObjectNode}.
      *
      * @param object the ObjectNode to convert
-     * @return       the new Transfer object
-     * @throws RestErrorException if the given ObjectNode does not represent
-     *                            a Transfer object
+     *
+     * @return the new Transfer object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Transfer object
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static Transfer nodeToNewTransfer(ObjectNode object) {
@@ -173,14 +144,12 @@ public final class TransferConverter {
         return transfer;
     }
 
-
-    //######################### PRIVATE METHODS ################################
-
     /**
      * Tells if the given rule exists in the database.
      *
      * @param rule the name of the rule
-     * @return     {@code true} if the rule exists, {@code false} otherwise.
+     *
+     * @return {@code true} if the rule exists, {@code false} otherwise.
      */
     private static boolean ruleExists(String rule) {
         RuleDAO ruleDAO = null;
@@ -196,11 +165,15 @@ public final class TransferConverter {
         }
     }
 
+
+    //######################### PRIVATE METHODS ################################
+
     /**
      * Tells if the given host exists in the database.
      *
      * @param host the name of the host
-     * @return     {@code true} if the host exists, {@code false} otherwise.
+     *
+     * @return {@code true} if the host exists, {@code false} otherwise.
      */
     private static boolean hostExists(String host) {
         HostDAO hostDAO = null;
@@ -221,8 +194,8 @@ public final class TransferConverter {
      *
      * @param host the name of the host
      * @param rule the name of the rule
-     * @return {@code true} if the host is allowed to use the rule, {@code false}
-     *         otherwise
+     *
+     * @return {@code true} if the host is allowed to use the rule, {@code false} otherwise
      */
     private static boolean canUseRule(String host, String rule) {
         RuleDAO ruleDAO = null;
@@ -240,12 +213,12 @@ public final class TransferConverter {
     }
 
     /**
-     * Returns a list of {@link RestError} corresponding to all the fields required
-     * to initialize a transfer that are missing from the given {@link Transfer}
-     * object. If no fields are missing, an empty list is returned.
+     * Returns a list of {@link RestError} corresponding to all the fields required to initialize a transfer that are
+     * missing from the given {@link Transfer} object. If no fields are missing, an empty list is returned.
      *
      * @param transfer the Transfer object to check.
-     * @return         the list of all missing fields
+     *
+     * @return the list of all missing fields
      */
     private static List<RestError> checkRequiredFields(Transfer transfer) {
         List<RestError> errors = new ArrayList<RestError>();
@@ -263,14 +236,15 @@ public final class TransferConverter {
     }
 
     /**
-     * Fills the fields of the given {@link Transfer} object with the values
-     * extracted from the {@link ObjectNode} parameter, and returns the result.
+     * Fills the fields of the given {@link Transfer} object with the values extracted from the {@link ObjectNode}
+     * parameter, and returns the result.
      *
-     * @param object   the ObjectNode from which the values should be extracted
+     * @param object the ObjectNode from which the values should be extracted
      * @param transfer the Transfer object whose fields will be filled
-     * @return         the filled Transfer object
-     * @throws RestErrorException if the given ObjectNode does not represent
-     *                            a Transfer object.
+     *
+     * @return the filled Transfer object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Transfer object.
      */
     private static Transfer parseNode(ObjectNode object, Transfer transfer) {
         List<RestError> errors = new ArrayList<RestError>();
@@ -291,16 +265,14 @@ public final class TransferConverter {
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(FILENAME)) {
+            } else if (name.equalsIgnoreCase(FILENAME)) {
                 if (value.isTextual()) {
                     transfer.setOriginalName(value.asText());
                     transfer.setFilename(value.asText());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(REQUESTED)) {
+            } else if (name.equalsIgnoreCase(REQUESTED)) {
                 if (value.isTextual()) {
                     if (hostExists(value.asText())) {
                         transfer.setRequested(value.asText());
@@ -310,22 +282,19 @@ public final class TransferConverter {
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(BLOCK_SIZE)) {
+            } else if (name.equalsIgnoreCase(BLOCK_SIZE)) {
                 if (value.canConvertToInt() && value.asInt() > 0) {
                     transfer.setBlockSize(value.asInt());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(FILE_INFO)) {
+            } else if (name.equalsIgnoreCase(FILE_INFO)) {
                 if (value.isTextual()) {
                     transfer.setFileInfo(value.asText());
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(START)) {
+            } else if (name.equalsIgnoreCase(START)) {
                 if (value.isTextual()) {
                     try {
                         DateTime start = DateTime.parse(value.asText());
@@ -360,6 +329,58 @@ public final class TransferConverter {
             return transfer;
         } else {
             throw new RestErrorException(errors);
+        }
+    }
+
+    /**
+     * All the possible ways to order a list of transfer objects.
+     */
+    public enum Order {
+        /**
+         * By transferId, in ascending order.
+         */
+        ascId(ID_FIELD, true),
+        /**
+         * By transferId, in descending order.
+         */
+        descId(ID_FIELD, false),
+        /**
+         * By fileName, in ascending order.
+         */
+        ascFile(ORIGINAL_NAME_FIELD, true),
+        /**
+         * By fileName, in descending order.
+         */
+        descFile(ORIGINAL_NAME_FIELD, false),
+        /**
+         * By starting date, in ascending order.
+         */
+        ascStart(TRANSFER_START_FIELD, true),
+        /**
+         * By starting date, in descending order.
+         */
+        descStart(TRANSFER_START_FIELD, false),
+        /**
+         * By end date, in ascending order.
+         */
+        ascStop(TRANSFER_STOP_FIELD, true),
+        /**
+         * By end date, in descending order.
+         */
+        descStop(TRANSFER_STOP_FIELD, false);
+
+        /**
+         * The name of the database column used for sorting.
+         */
+        public final String column;
+        /**
+         * If the order is ascending or descending.
+         */
+        public final boolean ascend;
+
+        Order(String column, boolean ascend) {
+            this.column = column;
+            this.ascend = ascend;
         }
     }
 }

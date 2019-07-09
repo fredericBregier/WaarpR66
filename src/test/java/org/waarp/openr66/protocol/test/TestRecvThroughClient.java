@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -32,23 +31,11 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * Test class for Recv Through client
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestRecvThroughClient extends RecvThroughClient {
-    public static class TestRecvThroughHandler extends RecvThroughHandler {
-        @Override
-        public void writeByteBuf(ByteBuf buffer)
-                throws OpenR66ProtocolBusinessException {
-            buffer.skipBytes(buffer.readableBytes());
-            // byte [] array = this.getByte(buffer);
-            // FIXME one should use the array for its own goal
-            // logger.debug("Write {}", array.length);
-        }
-
-    }
-
     /**
      * @param future
      * @param remoteHost
@@ -60,11 +47,11 @@ public class TestRecvThroughClient extends RecvThroughClient {
      * @param networkTransaction
      */
     public TestRecvThroughClient(R66Future future, TestRecvThroughHandler handler,
-            String remoteHost,
-            String filename, String rulename, String fileinfo, boolean isMD5,
-            int blocksize, NetworkTransaction networkTransaction) {
+                                 String remoteHost,
+                                 String filename, String rulename, String fileinfo, boolean isMD5,
+                                 int blocksize, NetworkTransaction networkTransaction) {
         super(future, handler, remoteHost, filename, rulename, fileinfo, isMD5, blocksize,
-                DbConstant.ILLEGALVALUE, networkTransaction);
+              DbConstant.ILLEGALVALUE, networkTransaction);
     }
 
     /**
@@ -88,9 +75,10 @@ public class TestRecvThroughClient extends RecvThroughClient {
             R66Future future = new R66Future(true);
             TestRecvThroughHandler handler = new TestRecvThroughHandler();
             TestRecvThroughClient transaction = new TestRecvThroughClient(future,
-                    handler,
-                    rhost, localFilename, rule, fileInfo, ismd5, block,
-                    networkTransaction);
+                                                                          handler,
+                                                                          rhost, localFilename, rule, fileInfo, ismd5,
+                                                                          block,
+                                                                          networkTransaction);
             transaction.normalInfoAsWarn = snormalInfoAsWarn;
             long time1 = System.currentTimeMillis();
             transaction.run();
@@ -102,14 +90,14 @@ public class TestRecvThroughClient extends RecvThroughClient {
             if (future.isSuccess()) {
                 if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
                     logger.warn("Warning with Id: " +
-                            result.getRunner().getSpecialId() + " on file: " +
-                            (result.getFile() != null ? result.getFile().toString() : "no file")
-                            + " delay: " + delay);
+                                result.getRunner().getSpecialId() + " on file: " +
+                                (result.getFile() != null? result.getFile().toString() : "no file")
+                                + " delay: " + delay);
                 } else {
                     logger.warn("Success with Id: " +
-                            result.getRunner().getSpecialId() + " on Final file: " +
-                            (result.getFile() != null ? result.getFile().toString() : "no file")
-                            + " delay: " + delay);
+                                result.getRunner().getSpecialId() + " on Final file: " +
+                                (result.getFile() != null? result.getFile().toString() : "no file")
+                                + " delay: " + delay);
                 }
             } else {
                 if (result == null || result.getRunner() == null) {
@@ -119,18 +107,30 @@ public class TestRecvThroughClient extends RecvThroughClient {
                 }
                 if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
                     logger.warn("Transfer in Warning with Id: " +
-                            result.getRunner().getSpecialId(), future.getCause());
+                                result.getRunner().getSpecialId(), future.getCause());
                     networkTransaction.closeAll();
                     System.exit(result.getCode().ordinal());
                 } else {
                     logger.error("Transfer in Error with Id: " +
-                            result.getRunner().getSpecialId(), future.getCause());
+                                 result.getRunner().getSpecialId(), future.getCause());
                     networkTransaction.closeAll();
                     System.exit(result.getCode().ordinal());
                 }
             }
         } finally {
             networkTransaction.closeAll();
+        }
+
+    }
+
+    public static class TestRecvThroughHandler extends RecvThroughHandler {
+        @Override
+        public void writeByteBuf(ByteBuf buffer)
+                throws OpenR66ProtocolBusinessException {
+            buffer.skipBytes(buffer.readableBytes());
+            // byte [] array = this.getByte(buffer);
+            // FIXME one should use the array for its own goal
+            // logger.debug("Write {}", array.length);
         }
 
     }

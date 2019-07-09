@@ -33,6 +33,7 @@ public abstract class DAOFactory {
      * Return a BusinessDAO
      *
      * @return a ready to use BusinessDAO
+     *
      * @throws DAOException if cannot create the DAO
      */
     public abstract BusinessDAO getBusinessDAO() throws DAOException;
@@ -41,6 +42,7 @@ public abstract class DAOFactory {
      * Return a HostDAO
      *
      * @return a ready to use HostDAO
+     *
      * @throws DAOException if cannot create the DAO
      */
     public abstract HostDAO getHostDAO() throws DAOException;
@@ -49,6 +51,7 @@ public abstract class DAOFactory {
      * Return a LimitDAO
      *
      * @return a ready to use LimitDAO
+     *
      * @throws DAOException if cannot create the DAO
      */
     public abstract LimitDAO getLimitDAO() throws DAOException;
@@ -57,6 +60,7 @@ public abstract class DAOFactory {
      * Return a MultipleMonitorDAO
      *
      * @return a ready to use MultipleMonitorDAO
+     *
      * @throws DAOException if cannot create the DAO
      */
     public abstract MultipleMonitorDAO getMultipleMonitorDAO()
@@ -66,6 +70,7 @@ public abstract class DAOFactory {
      * Return a RuleDAO
      *
      * @return a ready to use RuleDAO
+     *
      * @throws DAOException if cannot create the DAO
      */
     public abstract RuleDAO getRuleDAO() throws DAOException;
@@ -74,6 +79,7 @@ public abstract class DAOFactory {
      * Return a TransferDAO
      *
      * @return a ready to use TramsferDAO
+     *
      * @throws DAOException if cannot create the DAO
      */
     public abstract TransferDAO getTransferDAO() throws DAOException;

@@ -1,21 +1,20 @@
 package org.waarp.openr66.dao.database.mariadb;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import org.junit.ClassRule;
 import org.testcontainers.containers.MariaDBContainer;
 import org.waarp.openr66.dao.database.DBMultipleMonitorDAOIT;
 
-public class DBMultipleMonitorMariaDBDAOIT extends DBMultipleMonitorDAOIT {
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-    private String createScript = "mysql/create.sql";
-    private String populateScript = "mysql/populate.sql";
-    private String cleanScript = "mysql/clean.sql";
+public class DBMultipleMonitorMariaDBDAOIT extends DBMultipleMonitorDAOIT {
 
     @ClassRule
     public static MariaDBContainer db = new MariaDBContainer();
+    private String createScript = "mysql/create.sql";
+    private String populateScript = "mysql/populate.sql";
+    private String cleanScript = "mysql/clean.sql";
 
     @Override
     public Connection getConnection() throws SQLException {

@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.commander;
-
-import java.io.File;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.waarp.common.database.data.AbstractDbData;
 import org.waarp.common.database.data.AbstractDbData.UpdatedInfo;
@@ -34,6 +30,9 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.utils.FileUtils;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
 
+import java.io.File;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  * Commander is responsible to read list of updated data from time to time in order to achieve new
  * runner or new configuration updates.
@@ -44,14 +43,13 @@ import org.waarp.openr66.protocol.utils.R66ShutdownHook;
  *
  */
 public class CommanderNoDb implements CommanderInterface {
+    public static final ConcurrentLinkedQueue<AbstractDbData> todoList = new ConcurrentLinkedQueue<AbstractDbData>();
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(CommanderNoDb.class);
-
     private InternalRunner internalRunner = null;
-    public static final ConcurrentLinkedQueue<AbstractDbData> todoList = new ConcurrentLinkedQueue<AbstractDbData>();
 
     /**
      * Prepare requests that will be executed from time to time
@@ -81,9 +79,9 @@ public class CommanderNoDb implements CommanderInterface {
              * +XMLEXTENSION;
              */
             File directory = new File(Configuration.configuration.getBaseDirectory() +
-                    Configuration.configuration.getArchivePath());
+                                      Configuration.configuration.getArchivePath());
             File[] files = FileUtils.getFiles(directory,
-                    new ExtensionFilter(DbTaskRunner.XMLEXTENSION));
+                                              new ExtensionFilter(DbTaskRunner.XMLEXTENSION));
             for (File file : files) {
                 String shortname = file.getName();
                 String[] info = shortname.split("_");
@@ -160,7 +158,7 @@ public class CommanderNoDb implements CommanderInterface {
                     logger.debug("get a task: {}", taskRunner);
                     // Launch if possible this task
                     String key = taskRunner.getRequested() + " " + taskRunner.getRequester() +
-                            " " + taskRunner.getSpecialId();
+                                 " " + taskRunner.getSpecialId();
                     if (Configuration.configuration.getLocalTransaction().
                             getFromRequest(key) != null) {
                         // already running

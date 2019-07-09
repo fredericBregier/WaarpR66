@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -24,17 +23,26 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Validation Message class for packet
- * 
+ *
  * 2 strings and one byte: sheader,smiddle,send
- * 
+ *
  * @author frederic bregier
  */
 public class ValidPacket extends AbstractLocalPacket {
     private final String sheader;
-
+    private final byte send;
     private String smiddle;
 
-    private final byte send;
+    /**
+     * @param header
+     * @param middle
+     * @param end
+     */
+    public ValidPacket(String header, String middle, byte end) {
+        sheader = header;
+        smiddle = middle;
+        send = end;
+    }
 
     /**
      * @param headerLength
@@ -44,7 +52,7 @@ public class ValidPacket extends AbstractLocalPacket {
      * @return the new ValidPacket from buffer
      */
     public static ValidPacket createFromBuffer(int headerLength,
-            int middleLength, int endLength, ByteBuf buf) {
+                                               int middleLength, int endLength, ByteBuf buf) {
         final byte[] bheader = new byte[headerLength - 1];
         final byte[] bmiddle = new byte[middleLength];
         final byte bend;
@@ -56,18 +64,7 @@ public class ValidPacket extends AbstractLocalPacket {
         }
         bend = buf.readByte();
         return new ValidPacket(new String(bheader),
-                new String(bmiddle), bend);
-    }
-
-    /**
-     * @param header
-     * @param middle
-     * @param end
-     */
-    public ValidPacket(String header, String middle, byte end) {
-        sheader = header;
-        smiddle = middle;
-        send = end;
+                               new String(bmiddle), bend);
     }
 
     @Override
@@ -115,7 +112,7 @@ public class ValidPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @param smiddle
      */
     public void setSmiddle(String smiddle) {

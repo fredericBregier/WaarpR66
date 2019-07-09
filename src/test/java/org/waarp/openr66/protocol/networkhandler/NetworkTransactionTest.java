@@ -1,13 +1,11 @@
 package org.waarp.openr66.protocol.networkhandler;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import io.netty.channel.Channel;
 import org.junit.Test;
 
-import io.netty.channel.Channel;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+
+import static org.mockito.Mockito.*;
 
 public class NetworkTransactionTest {
 

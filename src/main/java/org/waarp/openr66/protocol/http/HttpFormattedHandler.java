@@ -1,25 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.http;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.*;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -43,11 +38,8 @@ import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.handler.traffic.TrafficCounter;
-
 import org.waarp.common.database.DbAdmin;
-import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.DbSession;
-import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.database.exception.WaarpDatabaseNoConnectionException;
 import org.waarp.common.database.exception.WaarpDatabaseSqlException;
 import org.waarp.common.exception.FileTransferException;
@@ -75,7 +67,14 @@ import org.waarp.openr66.protocol.exception.OpenR66Exception;
 import org.waarp.openr66.protocol.exception.OpenR66ExceptionTrappedFactory;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolBusinessNoWriteBackException;
 import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
-import org.waarp.openr66.protocol.localhandler.packet.RequestPacket;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handler for HTTP information support
@@ -84,100 +83,33 @@ import org.waarp.openr66.protocol.localhandler.packet.RequestPacket;
  *
  */
 public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+    public static final int LIMITROW = 60; // better if it can be divided by 4
     /**
      * Internal Logger
      */
     private static final WaarpLogger logger = WaarpLoggerFactory
             .getLogger(HttpFormattedHandler.class);
-
-    private static enum REQUEST {
-        index("index.html"),
-        active("monitoring_header.html", "monitoring_end.html"),
-        error("monitoring_header.html", "monitoring_end.html"),
-        done("monitoring_header.html", "monitoring_end.html"),
-        all("monitoring_header.html", "monitoring_end.html"),
-        status("monitoring_header.html", "monitoring_end.html"),
-        statusxml(""),
-        statusjson("");
-
-        private String header;
-        private String end;
-
-        /**
-         * Constructor for a unique file
-         *
-         * @param uniquefile
-         */
-        private REQUEST(String uniquefile) {
-            this.header = uniquefile;
-            this.end = uniquefile;
-        }
-
-        /**
-         * @param header
-         * @param end
-         */
-        private REQUEST(String header, String end) {
-            this.header = header;
-            this.end = end;
-        }
-
-        /**
-         * Reader for a unique file
-         *
-         * @return the content of the unique file
-         */
-        public String readFileUnique(HttpFormattedHandler handler) {
-            return handler.readFileHeader(Configuration.configuration.getHttpBasePath() + "monitor/"
-                    + this.header);
-        }
-
-        public String readHeader(HttpFormattedHandler handler) {
-            return handler.readFileHeader(Configuration.configuration.getHttpBasePath() + "monitor/"
-                    + this.header);
-        }
-
-        public String readEnd() {
-            return WaarpStringUtils.readFile(Configuration.configuration.getHttpBasePath() + "monitor/"
-                    + this.end);
-        }
-    }
-
-    private static enum REPLACEMENT {
-        XXXHOSTIDXXX, XXXLOCACTIVEXXX, XXXNETACTIVEXXX, XXXBANDWIDTHXXX, XXXDATEXXX, XXXLANGXXX;
-    }
-
-    public static final int LIMITROW = 60; // better if it can be divided by 4
     private static final String I18NEXT = "i18next";
-
+    private static final String sINFO = "INFO",
+            sNB = "NB", sDETAIL = "DETAIL";
     private final R66Session authentHttp = new R66Session();
-
+    private final StringBuilder responseContent = new StringBuilder();
     private String lang = Messages.getSlocale();
 
     private FullHttpRequest request;
-
-    private final StringBuilder responseContent = new StringBuilder();
-
     private HttpResponseStatus status;
-
     private String uriRequest;
-
-    private static final String sINFO = "INFO",
-            sNB = "NB", sDETAIL = "DETAIL";
-
     /**
      * The Database connection attached to this NetworkChannelReference shared among all associated
      * LocalChannels
      */
     private DbSession dbSession = DbConstant.admin.getSession();
-
     /**
      * Does this dbSession is private and so should be closed
      */
     private boolean isPrivateDbSession = false;
     private boolean isCurrentRequestXml = false;
     private boolean isCurrentRequestJson = false;
-
     private Map<String, List<String>> params = null;
 
     private String readFileHeader(String filename) {
@@ -194,22 +126,22 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
         StringBuilder builder = new StringBuilder(value);
 
         WaarpStringUtils.replace(builder, REPLACEMENT.XXXDATEXXX.toString(),
-                (new Date()).toString());
+                                 (new Date()).toString());
         WaarpStringUtils.replace(builder, REPLACEMENT.XXXLOCACTIVEXXX.toString(),
-                Integer.toString(
-                        Configuration.configuration.getLocalTransaction().
-                                getNumberLocalChannel()));
+                                 Integer.toString(
+                                         Configuration.configuration.getLocalTransaction().
+                                                 getNumberLocalChannel()));
         WaarpStringUtils.replace(builder, REPLACEMENT.XXXNETACTIVEXXX.toString(),
-                Integer.toString(
-                        DbAdmin.getNbConnection()));
+                                 Integer.toString(
+                                         DbAdmin.getNbConnection()));
         WaarpStringUtils.replace(builder, REPLACEMENT.XXXHOSTIDXXX.toString(),
-                Configuration.configuration.getHOST_ID());
+                                 Configuration.configuration.getHOST_ID());
         TrafficCounter trafficCounter =
                 Configuration.configuration.getGlobalTrafficShapingHandler().trafficCounter();
         WaarpStringUtils.replace(builder, REPLACEMENT.XXXBANDWIDTHXXX.toString(),
-                "IN:" + (trafficCounter.lastReadThroughput() / 131072) +
-                        "Mbits&nbsp;&nbsp;OUT:" +
-                        (trafficCounter.lastWriteThroughput() / 131072) + "Mbits");
+                                 "IN:" + (trafficCounter.lastReadThroughput() / 131072) +
+                                 "Mbits&nbsp;&nbsp;OUT:" +
+                                 (trafficCounter.lastWriteThroughput() / 131072) + "Mbits");
         WaarpStringUtils.replace(builder, REPLACEMENT.XXXLANGXXX.toString(), lang);
         return builder.toString();
     }
@@ -237,10 +169,10 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
         uriRequest = queryStringDecoder.path();
         logger.debug("Msg: " + uriRequest);
         if (uriRequest.contains("gre/") || uriRequest.contains("img/") ||
-                uriRequest.contains("res/") || uriRequest.contains("favicon.ico")) {
+            uriRequest.contains("res/") || uriRequest.contains("favicon.ico")) {
             HttpWriteCacheEnable.writeFile(request,
-                    ctx, Configuration.configuration.getHttpBasePath() + uriRequest,
-                    "XYZR66NOSESSION");
+                                           ctx, Configuration.configuration.getHttpBasePath() + uriRequest,
+                                           "XYZR66NOSESSION");
             return;
         }
         /*try {
@@ -335,48 +267,48 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
             } else {
                 // Use value 0=Active 1=Error 2=Done 3=All
                 switch (cval) {
-                    case '0':
-                        active(ctx, (int) nb);
-                        break;
-                    case '1':
-                        error(ctx, (int) nb);
-                        break;
-                    case '2':
-                        done(ctx, (int) nb);
-                        break;
-                    case '3':
-                        all(ctx, (int) nb);
-                        break;
-                    case '4':
-                        status(ctx, (int) nb);
-                        break;
-                    case '5':
-                        statusxml(ctx, nb, extraBoolean);
-                        break;
-                    case '6':
-                        String name = null;
-                        if (params.containsKey("name")) {
-                            name = getTrimValue("name");
+                case '0':
+                    active(ctx, (int) nb);
+                    break;
+                case '1':
+                    error(ctx, (int) nb);
+                    break;
+                case '2':
+                    done(ctx, (int) nb);
+                    break;
+                case '3':
+                    all(ctx, (int) nb);
+                    break;
+                case '4':
+                    status(ctx, (int) nb);
+                    break;
+                case '5':
+                    statusxml(ctx, nb, extraBoolean);
+                    break;
+                case '6':
+                    String name = null;
+                    if (params.containsKey("name")) {
+                        name = getTrimValue("name");
+                    }
+                    int istatus = 0;
+                    if (params.containsKey("status")) {
+                        String status = getTrimValue("status");
+                        try {
+                            istatus = Integer.parseInt(status);
+                        } catch (NumberFormatException e1) {
+                            istatus = 0;
                         }
-                        int istatus = 0;
-                        if (params.containsKey("status")) {
-                            String status = getTrimValue("status");
-                            try {
-                                istatus = Integer.parseInt(status);
-                            } catch (NumberFormatException e1) {
-                                istatus = 0;
-                            }
-                        }
-                        if (uriRequest.toLowerCase().startsWith("/spooleddetail")) {
-                            extraBoolean = true;
-                        }
-                        spooled(ctx, extraBoolean, name, istatus);
-                        break;
-                    case '7':
-                        statusjson(ctx, nb, extraBoolean);
-                        break;
-                    default:
-                        responseContent.append(REQUEST.index.readFileUnique(this));
+                    }
+                    if (uriRequest.toLowerCase().startsWith("/spooleddetail")) {
+                        extraBoolean = true;
+                    }
+                    spooled(ctx, extraBoolean, name, istatus);
+                    break;
+                case '7':
+                    statusjson(ctx, nb, extraBoolean);
+                    break;
+                default:
+                    responseContent.append(REQUEST.index.readFileUnique(this));
                 }
             }
             writeResponse(ctx);
@@ -405,18 +337,18 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
                 .append(DbTaskRunner.headerHtml()).append("</tr>\r\n");
 
         int i = 0;
-        for (Transfer transfer: transfers) {
+        for (Transfer transfer : transfers) {
             DbTaskRunner taskRunner = new DbTaskRunner(transfer);
-            responseContent.append("<tr><td>").append(taskRunner.isSender() ? "S" : "R").append("</td>");
+            responseContent.append("<tr><td>").append(taskRunner.isSender()? "S" : "R").append("</td>");
             LocalChannelReference lcr =
                     Configuration.configuration.getLocalTransaction().
                             getFromRequest(taskRunner.getKey());
             responseContent.append(
                     taskRunner.toHtml(
                             getAuthentHttp(),
-                            lcr != null ? Messages.getString("HttpSslHandler.Active") : Messages
+                            lcr != null? Messages.getString("HttpSslHandler.Active") : Messages
                                     .getString("HttpSslHandler.NotActive")))
-                    .append("</tr>\r\n");
+                           .append("</tr>\r\n");
             if (nb > 0) {
                 i++;
                 if (i >= nb) {
@@ -444,81 +376,81 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
 
             // Find Status = RUNNING transfer
             filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                    "=", ErrorCode.Running.getCode()));
+                                   "=", ErrorCode.Running.getCode()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, ErrorCode.Running.getMesg(), nb);
 
             transfers.clear();
             filters.clear();
             // Find UpdatedInfo = INTERUPTED transfer
             filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                    "=", UpdatedInfo.INTERRUPTED.ordinal()));
+                                   "=", UpdatedInfo.INTERRUPTED.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             filters.add(new Filter(DBTransferDAO.TRANSFER_START_FIELD,
-                    "<", new Timestamp(System.currentTimeMillis())));
+                                   "<", new Timestamp(System.currentTimeMillis())));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, UpdatedInfo.INTERRUPTED.name(), nb);
 
             transfers.clear();
             filters.clear();
             // Find UpdatedInfo = TOSUBMIT transfer
             filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                    "=", UpdatedInfo.TOSUBMIT.ordinal()));
+                                   "=", UpdatedInfo.TOSUBMIT.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             filters.add(new Filter(DBTransferDAO.TRANSFER_START_FIELD,
-                    "<", new Timestamp(System.currentTimeMillis())));
+                                   "<", new Timestamp(System.currentTimeMillis())));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, UpdatedInfo.TOSUBMIT.name(), nb);
 
             transfers.clear();
             filters.clear();
             // Find Status = INITOK transfer
             filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                    "=", ErrorCode.InitOk.getCode()));
+                                   "=", ErrorCode.InitOk.getCode()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, ErrorCode.InitOk.getMesg(), nb);
 
             transfers.clear();
             filters.clear();
             // Find Status = PREPROCESSINGOK transfer
             filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                    "=", ErrorCode.PreProcessingOk.getCode()));
+                                   "=", ErrorCode.PreProcessingOk.getCode()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, ErrorCode.PreProcessingOk.getMesg(), nb);
 
             transfers.clear();
             filters.clear();
             // Find Status = TRANSFEROK transfer
             filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                    "=", ErrorCode.TransferOk.getCode()));
+                                   "=", ErrorCode.TransferOk.getCode()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, ErrorCode.TransferOk.getMesg(), nb);
 
             transfers.clear();
             filters.clear();
             // Find Status = POSTPROCESSING transfer
             filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                    "=", ErrorCode.PostProcessingOk.getCode()));
+                                   "=", ErrorCode.PostProcessingOk.getCode()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, ErrorCode.PostProcessingOk.getMesg(), nb);
         } catch (DAOException e) {
             logger.warn("OpenR66 Web Error {}", e.getMessage());
@@ -548,40 +480,40 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
 
             // Find UpdatedInfo = INERROR transfer
             filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                    "=", UpdatedInfo.INERROR.ordinal()));
+                                   "=", UpdatedInfo.INERROR.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             filters.add(new Filter(DBTransferDAO.TRANSFER_START_FIELD,
-                    "<", new Timestamp(System.currentTimeMillis())));
+                                   "<", new Timestamp(System.currentTimeMillis())));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb/2);
-            addRunners(transfers, UpdatedInfo.INERROR.name(), nb/2);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb / 2);
+            addRunners(transfers, UpdatedInfo.INERROR.name(), nb / 2);
 
             transfers.clear();
             filters.clear();
             // Find UpdatedInfo = INTERUPTED transfer
             filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                    "=", UpdatedInfo.INTERRUPTED.ordinal()));
+                                   "=", UpdatedInfo.INTERRUPTED.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             filters.add(new Filter(DBTransferDAO.TRANSFER_START_FIELD,
-                    "<", new Timestamp(System.currentTimeMillis())));
+                                   "<", new Timestamp(System.currentTimeMillis())));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb/2);
-            addRunners(transfers, UpdatedInfo.INTERRUPTED.name(), nb/2);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb / 2);
+            addRunners(transfers, UpdatedInfo.INTERRUPTED.name(), nb / 2);
 
             transfers.clear();
             filters.clear();
             // Find GlobalStep = ERRORTASK transfer
             filters.add(new Filter(DBTransferDAO.GLOBAL_STEP_FIELD,
-                    "=", Transfer.TASKSTEP.ERRORTASK.ordinal()));
+                                   "=", Transfer.TASKSTEP.ERRORTASK.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
             filters.add(new Filter(DBTransferDAO.TRANSFER_START_FIELD,
-                    "<", new Timestamp(System.currentTimeMillis())));
+                                   "<", new Timestamp(System.currentTimeMillis())));
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb/4);
-            addRunners(transfers, TASKSTEP.ERRORTASK.name(), nb/4);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb / 4);
+            addRunners(transfers, TASKSTEP.ERRORTASK.name(), nb / 4);
         } catch (DAOException e) {
             logger.warn("OpenR66 Web Error {}", e.getMessage());
             sendError(ctx, HttpResponseStatus.SERVICE_UNAVAILABLE);
@@ -610,12 +542,12 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
 
             List<Filter> filters = new ArrayList<Filter>();
             filters.add(new Filter(DBTransferDAO.STEP_STATUS_FIELD,
-                    "=", ErrorCode.CompleteOk.getCode()));
+                                   "=", ErrorCode.CompleteOk.getCode()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
 
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, "ALL RUNNERS: " + nb, nb);
         } catch (DAOException e) {
             logger.warn("OpenR66 Web Error {}", e.getMessage());
@@ -645,10 +577,10 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
 
             List<Filter> filters = new ArrayList<Filter>();
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
 
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, nb);
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, nb);
             addRunners(transfers, "ALL RUNNERS: " + nb, nb);
         } catch (DAOException e) {
             logger.warn("OpenR66 Web Error {}", e.getMessage());
@@ -679,13 +611,13 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
 
             // Find UpdatedInfo = INERROR transfer
             filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                    "=", UpdatedInfo.INERROR.ordinal()));
+                                   "=", UpdatedInfo.INERROR.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
 
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, 1);
-            if(transfers.size() > 0) {
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, 1);
+            if (transfers.size() > 0) {
                 responseContent.append("<p>Some Transfers are in ERROR</p><br>");
                 status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
             }
@@ -694,13 +626,13 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
             transfers.clear();
             // Find UpdatedInfo = INTERUPTED transfer
             filters.add(new Filter(DBTransferDAO.UPDATED_INFO_FIELD,
-                    "=", UpdatedInfo.INTERRUPTED.ordinal()));
+                                   "=", UpdatedInfo.INTERRUPTED.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                    "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
 
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, 1);
-            if(transfers.size() > 0) {
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, 1);
+            if (transfers.size() > 0) {
                 responseContent.append("<p>Some Transfers are INTERRUPTED</p><br>");
                 status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
             }
@@ -709,13 +641,13 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
 
             // Find GLOBAL_STEP = Error transfer
             filters.add(new Filter(DBTransferDAO.GLOBAL_STEP_FIELD,
-                    "=", Transfer.TASKSTEP.ERRORTASK.ordinal()));
+                                   "=", Transfer.TASKSTEP.ERRORTASK.ordinal()));
             filters.add(new Filter(DBTransferDAO.OWNER_REQUEST_FIELD,
-                "=", Configuration.configuration.getHOST_ID()));
+                                   "=", Configuration.configuration.getHOST_ID()));
 
             transfers = transferAccess.find(filters,
-                    DBTransferDAO.TRANSFER_START_FIELD, false, 1);
-            if(transfers.size() > 0) {
+                                            DBTransferDAO.TRANSFER_START_FIELD, false, 1);
+            if (transfers.size() > 0) {
                 responseContent.append("<p>Some Transfers are in ERRORTASK</p><br>");
                 status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
             }
@@ -809,8 +741,9 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
         // Decide whether to close the connection or not.
         boolean keepAlive = HttpUtil.isKeepAlive(request);
         boolean close = HttpHeaderValues.CLOSE.contentEqualsIgnoreCase(request
-                .headers().get(HttpHeaderNames.CONNECTION)) ||
-                (!keepAlive);
+                                                                               .headers()
+                                                                               .get(HttpHeaderNames.CONNECTION)) ||
+                        (!keepAlive);
 
         // Build the response object.
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, buf);
@@ -824,7 +757,7 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
         }
         if (keepAlive) {
             response.headers().set(HttpHeaderNames.CONNECTION,
-                    HttpHeaderValues.KEEP_ALIVE);
+                                   HttpHeaderValues.KEEP_ALIVE);
         }
         if (!close) {
             // There's no need to add 'Content-Length' header
@@ -880,7 +813,7 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
         responseContent.setLength(0);
         responseContent.append(REQUEST.error.readHeader(this)).append("OpenR66 Web Failure: ")
-                .append(status.toString()).append(REQUEST.error.readEnd());
+                       .append(status.toString()).append(REQUEST.error.readEnd());
         ByteBuf buf = Unpooled.copiedBuffer(responseContent.toString(), WaarpStringUtils.UTF8);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, buf);
         response.headers().add(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
@@ -949,5 +882,62 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
      */
     public R66Session getAuthentHttp() {
         return authentHttp;
+    }
+
+    private static enum REQUEST {
+        index("index.html"),
+        active("monitoring_header.html", "monitoring_end.html"),
+        error("monitoring_header.html", "monitoring_end.html"),
+        done("monitoring_header.html", "monitoring_end.html"),
+        all("monitoring_header.html", "monitoring_end.html"),
+        status("monitoring_header.html", "monitoring_end.html"),
+        statusxml(""),
+        statusjson("");
+
+        private String header;
+        private String end;
+
+        /**
+         * Constructor for a unique file
+         *
+         * @param uniquefile
+         */
+        private REQUEST(String uniquefile) {
+            this.header = uniquefile;
+            this.end = uniquefile;
+        }
+
+        /**
+         * @param header
+         * @param end
+         */
+        private REQUEST(String header, String end) {
+            this.header = header;
+            this.end = end;
+        }
+
+        /**
+         * Reader for a unique file
+         *
+         * @return the content of the unique file
+         */
+        public String readFileUnique(HttpFormattedHandler handler) {
+            return handler.readFileHeader(Configuration.configuration.getHttpBasePath() + "monitor/"
+                                          + this.header);
+        }
+
+        public String readHeader(HttpFormattedHandler handler) {
+            return handler.readFileHeader(Configuration.configuration.getHttpBasePath() + "monitor/"
+                                          + this.header);
+        }
+
+        public String readEnd() {
+            return WaarpStringUtils.readFile(Configuration.configuration.getHttpBasePath() + "monitor/"
+                                             + this.end);
+        }
+    }
+
+    private static enum REPLACEMENT {
+        XXXHOSTIDXXX, XXXLOCACTIVEXXX, XXXNETACTIVEXXX, XXXBANDWIDTHXXX, XXXDATEXXX, XXXLANGXXX;
     }
 }

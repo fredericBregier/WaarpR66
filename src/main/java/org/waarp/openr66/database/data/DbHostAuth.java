@@ -1,30 +1,23 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.database.data;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.DbSession;
 import org.waarp.common.database.data.AbstractDbData;
@@ -50,8 +43,13 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolBusinessException;
 import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Host Authentication Table object
@@ -61,26 +59,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DbHostAuth extends AbstractDbData {
     public static final String DEFAULT_CLIENT_ADDRESS = "0.0.0.0";
-
-    /**
-     * Internal Logger
-     */
-    private static final WaarpLogger logger = WaarpLoggerFactory
-            .getLogger(DbHostAuth.class);
-
-    public static enum Columns {
-        ADDRESS,
-        PORT,
-        ISSSL,
-        HOSTKEY,
-        ADMINROLE,
-        ISCLIENT,
-        ISACTIVE,
-        ISPROXIFIED,
-        UPDATEDINFO,
-        HOSTID
-    }
-
     public static final int[] dbTypes = {
             Types.VARCHAR,
             Types.INTEGER,
@@ -93,44 +71,402 @@ public class DbHostAuth extends AbstractDbData {
             Types.INTEGER,
             Types.NVARCHAR
     };
-
     public static final String table = " HOSTS ";
-
+    // ALL TABLE SHOULD IMPLEMENT THIS
+    public static final int NBPRKEY = 1;
+    protected static final String selectAllFields =
+            Columns.ADDRESS.name() + ","
+            + Columns.PORT.name() + ","
+            + Columns.ISSSL.name() + ","
+            + Columns.HOSTKEY.name() + ","
+            + Columns.ADMINROLE.name() + ","
+            + Columns.ISCLIENT.name() + ","
+            + Columns.ISACTIVE.name() + ","
+            + Columns.ISPROXIFIED.name() + ","
+            + Columns.UPDATEDINFO.name() + ","
+            + Columns.HOSTID.name();
+    protected static final String updateAllFields =
+            Columns.ADDRESS.name() + "=?,"
+            + Columns.PORT.name() + "=?,"
+            + Columns.ISSSL.name() + "=?,"
+            + Columns.HOSTKEY.name() + "=?,"
+            + Columns.ADMINROLE.name() + "=?,"
+            + Columns.ISCLIENT.name() + "=?,"
+            + Columns.ISACTIVE.name() + "=?,"
+            + Columns.ISPROXIFIED.name() + "=?,"
+            + Columns.UPDATEDINFO.name() + "=?";
+    protected static final String insertAllValues = " (?,?,?,?,?,?,?,?,?,?) ";
+    /**
+     * Internal Logger
+     */
+    private static final WaarpLogger logger = WaarpLoggerFactory
+            .getLogger(DbHostAuth.class);
     /**
      * HashTable in case of lack of database
      */
     private static final ConcurrentHashMap<String, DbHostAuth> dbR66HostAuthHashMap =
             new ConcurrentHashMap<String, DbHostAuth>();
-
     private Host host;
 
-    // ALL TABLE SHOULD IMPLEMENT THIS
-    public static final int NBPRKEY = 1;
+    /**
+     * @param dbSession
+     * @param hostid
+     * @param address
+     * @param port
+     * @param isSSL
+     * @param hostkey
+     * @param adminrole
+     * @param isClient
+     */
+    public DbHostAuth(String hostid, String address, int port,
+                      boolean isSSL, byte[] hostkey, boolean adminrole, boolean isClient) {
+        super();
+        this.host = new Host(hostid, address, port, hostkey, isSSL, isClient,
+                             false, adminrole);
+        if (hostkey != null) {
+            try {
+                // Save as crypted with the local Key and HEX
+                host.setHostkey(Configuration.configuration.getCryptoKey().cryptToHex(hostkey)
+                                                           .getBytes(WaarpStringUtils.UTF8));
+            } catch (Exception e) {
+                logger.warn("Error while cyphering hostkey", e);
+                host.setHostkey(new byte[0]);
+            }
+        }
+        if (port < 0) {
+            host.setClient(true);
+            host.setAddress(DEFAULT_CLIENT_ADDRESS);
+        }
+        setToArray();
+        isSaved = false;
+    }
 
-    protected static final String selectAllFields =
-        Columns.ADDRESS.name() + ","
-        + Columns.PORT.name() + ","
-        + Columns.ISSSL.name() + ","
-        + Columns.HOSTKEY.name() + ","
-        + Columns.ADMINROLE.name() + ","
-        + Columns.ISCLIENT.name() + ","
-        + Columns.ISACTIVE.name() + ","
-        + Columns.ISPROXIFIED.name() + ","
-        + Columns.UPDATEDINFO.name() + ","
-        + Columns.HOSTID.name();
+    private DbHostAuth(Host host) {
+        super();
+        this.host = host;
+    }
 
-    protected static final String updateAllFields =
-        Columns.ADDRESS.name() + "=?,"
-        + Columns.PORT.name() + "=?,"
-        + Columns.ISSSL.name() + "=?,"
-        + Columns.HOSTKEY.name() + "=?,"
-        + Columns.ADMINROLE.name() + "=?,"
-        + Columns.ISCLIENT.name() + "=?,"
-        + Columns.ISACTIVE.name() + "=?,"
-        + Columns.ISPROXIFIED.name() + "=?,"
-        + Columns.UPDATEDINFO.name() + "=?";
+    public DbHostAuth(ObjectNode source) throws WaarpDatabaseSqlException {
+        super();
+        this.host = new Host();
+        setFromJson(source, false);
+    }
 
-    protected static final String insertAllValues = " (?,?,?,?,?,?,?,?,?,?) ";
+    /**
+     * @param dbSession
+     * @param hostid
+     * @throws WaarpDatabaseException
+     */
+    public DbHostAuth(String hostid) throws WaarpDatabaseException {
+        super();
+        if (hostid == null) {
+            throw new WaarpDatabaseException("No host id passed");
+        }
+        HostDAO hostAccess = null;
+        try {
+            hostAccess = DAOFactory.getInstance().getHostDAO();
+            host = hostAccess.select(hostid);
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (hostAccess != null) {
+                hostAccess.close();
+            }
+        }
+        if (host == null) {
+            throw new WaarpDatabaseNoDataException("Cannot find host");
+        }
+    }
+
+    /**
+     * Private constructor for Commander only
+     */
+    private DbHostAuth() {
+        super();
+        this.host = new Host();
+    }
+
+    /**
+     * Delete all entries (used when purge and reload)
+     *
+     * @param dbSession
+     * @return the previous existing array of DbRule
+     * @throws WaarpDatabaseException
+     */
+    public static DbHostAuth[] deleteAll() throws WaarpDatabaseException {
+        HostDAO hostAccess = null;
+        List<DbHostAuth> res = new ArrayList<DbHostAuth>();
+        List<Host> hosts = null;
+        try {
+            hostAccess = DAOFactory.getInstance().getHostDAO();
+            hosts = hostAccess.getAll();
+            hostAccess.deleteAll();
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (hostAccess != null) {
+                hostAccess.close();
+            }
+        }
+        for (Host host : hosts) {
+            res.add(new DbHostAuth(host));
+        }
+        return (DbHostAuth[]) res.toArray();
+    }
+
+    /**
+     * Get All DbHostAuth from database or from internal hashMap in case of no database support
+     *
+     * @param dbSession
+     *            may be null
+     * @return the array of DbHostAuth
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     */
+    public static DbHostAuth[] getAllHosts()
+            throws WaarpDatabaseNoConnectionException {
+        HostDAO hostAccess = null;
+        List<DbHostAuth> res = new ArrayList<DbHostAuth>();
+        List<Host> hosts = null;
+        try {
+            hostAccess = DAOFactory.getInstance().getHostDAO();
+            hosts = hostAccess.getAll();
+        } catch (DAOException e) {
+            throw new WaarpDatabaseNoConnectionException(e);
+        } finally {
+            if (hostAccess != null) {
+                hostAccess.close();
+            }
+        }
+        for (Host host : hosts) {
+            res.add(new DbHostAuth(host));
+        }
+        return res.toArray(new DbHostAuth[0]);
+    }
+
+    /**
+     * For instance from Commander when getting updated information
+     *
+     * @param preparedStatement
+     * @return the next updated DbHostAuth
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     */
+    public static DbHostAuth getFromStatement(DbPreparedStatement preparedStatement)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
+        DbHostAuth dbHostAuth = new DbHostAuth();
+        dbHostAuth.getValues(preparedStatement, dbHostAuth.allFields);
+        dbHostAuth.setFromArray();
+        dbHostAuth.isSaved = true;
+        return dbHostAuth;
+    }
+
+    public static DbHostAuth[] getUpdatedPreparedStatement()
+            throws WaarpDatabaseNoConnectionException {
+        List<Filter> filters = new ArrayList<Filter>(1);
+        filters.add(new Filter(DBHostDAO.UPDATED_INFO_FIELD, "=",
+                               org.waarp.openr66.pojo.UpdatedInfo.fromLegacy(UpdatedInfo.TOSUBMIT).ordinal()));
+        HostDAO hostAccess = null;
+        List<Host> hosts;
+        try {
+            hostAccess = DAOFactory.getInstance().getHostDAO();
+            hosts = hostAccess.find(filters);
+        } catch (DAOException e) {
+            throw new WaarpDatabaseNoConnectionException(e);
+        } finally {
+            if (hostAccess != null) {
+                hostAccess.close();
+            }
+        }
+        DbHostAuth[] res = new DbHostAuth[hosts.size()];
+        int i = 0;
+        for (Host host : hosts) {
+            res[i] = new DbHostAuth(host);
+            i++;
+        }
+        return res;
+    }
+
+    /**
+     *
+     * @param session
+     * @param host
+     * @param addr
+     * @param ssl
+     * @param active
+     * @return the DbPreparedStatement according to the filter
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     */
+    public static DbPreparedStatement getFilterPrepareStament(DbSession session,
+                                                              String host, String addr, boolean ssl, boolean active)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
+        DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
+        String request = "SELECT " + selectAllFields + " FROM " + table + " WHERE ";
+        String condition = null;
+        if (host != null) {
+            condition = Columns.HOSTID.name() + " LIKE '%" + host + "%' ";
+        }
+        if (addr != null) {
+            if (condition != null) {
+                condition += " AND ";
+            } else {
+                condition = "";
+            }
+            condition += Columns.ADDRESS.name() + " LIKE '%" + addr + "%' ";
+        }
+        if (condition != null) {
+            condition += " AND ";
+        } else {
+            condition = "";
+        }
+        condition += Columns.ISSSL.name() + " = ? AND ";
+        condition += Columns.ISACTIVE.name() + " = ? ";
+        preparedStatement.createPrepareStatement(request + condition +
+                                                 " ORDER BY " + Columns.HOSTID.name());
+        try {
+            preparedStatement.getPreparedStatement().setBoolean(1, ssl);
+            preparedStatement.getPreparedStatement().setBoolean(2, active);
+        } catch (SQLException e) {
+            preparedStatement.realClose();
+            throw new WaarpDatabaseSqlException(e);
+        }
+        return preparedStatement;
+    }
+
+    /**
+     *
+     * @param session
+     * @param host
+     * @param addr
+     * @return the DbPreparedStatement according to the filter
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     */
+    public static DbPreparedStatement getFilterPrepareStament(DbSession session,
+                                                              String host, String addr)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
+        DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
+        String request = "SELECT " + selectAllFields + " FROM " + table;
+        String condition = null;
+        if (host != null) {
+            condition = Columns.HOSTID.name() + " LIKE '%" + host + "%' ";
+        }
+        if (addr != null) {
+            if (condition != null) {
+                condition += " AND ";
+            } else {
+                condition = "";
+            }
+            condition += Columns.ADDRESS.name() + " LIKE '%" + addr + "%' ";
+        }
+        if (condition != null) {
+            condition = " WHERE " + condition;
+        } else {
+            condition = "";
+        }
+        preparedStatement.createPrepareStatement(request + condition +
+                                                 " ORDER BY " + Columns.HOSTID.name());
+        return preparedStatement;
+    }
+
+    private static String getVersion(String host) {
+        String remoteHost = host;
+        String alias = "";
+        if (Configuration.configuration.getAliases().containsKey(remoteHost)) {
+            remoteHost = Configuration.configuration.getAliases().get(remoteHost);
+            alias += "(Alias: " + remoteHost + ") ";
+        }
+        if (Configuration.configuration.getReverseAliases().containsKey(remoteHost)) {
+            String alias2 = "(ReverseAlias: ";
+            String[] list = Configuration.configuration.getReverseAliases().get(remoteHost);
+            boolean found = false;
+            for (String string : list) {
+                if (string.equals(host)) {
+                    continue;
+                }
+                found = true;
+                alias2 += string + " ";
+            }
+            if (found) {
+                alias += alias2 + ") ";
+            }
+        }
+        if (Configuration.configuration.getBusinessWhiteSet().contains(remoteHost)) {
+            alias += "(Business: Allowed) ";
+        }
+        if (Configuration.configuration.getRoles().containsKey(remoteHost)) {
+            RoleDefault item = Configuration.configuration.getRoles().get(remoteHost);
+            alias += "(Role: " + item.toString() + ") ";
+        }
+        return alias + (Configuration.configuration.getVersions().containsKey(remoteHost)?
+                Configuration.configuration.getVersions().get(remoteHost).toString() :
+                "Version Unknown");
+    }
+
+    /**
+     * Write selected DbHostAuth to a Json String
+     *
+     * @param preparedStatement
+     * @return the associated Json String
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     * @throws OpenR66ProtocolBusinessException
+     */
+    public static String getJson(DbPreparedStatement preparedStatement, int limit)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
+                   OpenR66ProtocolBusinessException {
+        ArrayNode arrayNode = JsonHandler.createArrayNode();
+        try {
+            preparedStatement.executeQuery();
+            int nb = 0;
+            while (preparedStatement.getNext()) {
+                DbHostAuth host = DbHostAuth
+                        .getFromStatement(preparedStatement);
+                ObjectNode node = host.getInternalJson();
+                arrayNode.add(node);
+                nb++;
+                if (nb >= limit) {
+                    break;
+                }
+            }
+        } finally {
+            preparedStatement.realClose();
+        }
+        return JsonHandler.writeAsString(arrayNode);
+    }
+
+    /**
+     *
+     * @param session
+     * @return True if any of the server has the isProxified property
+     */
+    public static boolean hasProxifiedHosts() {
+        List<Filter> filters = new ArrayList<Filter>();
+        filters.add(new Filter(DBHostDAO.IS_PROXIFIED_FIELD, "=", true));
+
+        HostDAO hostAccess = null;
+        try {
+            hostAccess = DAOFactory.getInstance().getHostDAO();
+            return hostAccess.find(filters).size() > 0;
+        } catch (DAOException e) {
+            logger.error("DAO Access error", e);
+            return false;
+        } finally {
+            if (hostAccess != null) {
+                hostAccess.close();
+            }
+        }
+    }
+
+    /**
+     *
+     * @return the DbValue associated with this table
+     */
+    public static DbValue[] getAllType() {
+        DbHostAuth item = new DbHostAuth();
+        return item.allFields;
+    }
 
     @Override
     protected void initObject() {
@@ -214,63 +550,21 @@ public class DbHostAuth extends AbstractDbData {
     protected void setPrimaryKey() {
         primaryKey[0].setValue(host.getHostid());
     }
-    /**
-     * @param dbSession
-     * @param hostid
-     * @param address
-     * @param port
-     * @param isSSL
-     * @param hostkey
-     * @param adminrole
-     * @param isClient
-     */
-    public DbHostAuth(String hostid, String address, int port,
-            boolean isSSL, byte[] hostkey, boolean adminrole, boolean isClient) {
-        super();
-        this.host = new Host(hostid, address, port, hostkey, isSSL, isClient,
-                false, adminrole);
-        if (hostkey != null) {
-            try {
-                // Save as crypted with the local Key and HEX
-                host.setHostkey(Configuration.configuration.getCryptoKey().cryptToHex(hostkey)
-                        .getBytes(WaarpStringUtils.UTF8));
-            } catch (Exception e) {
-                logger.warn("Error while cyphering hostkey", e);
-                host.setHostkey(new byte[0]);
-            }
-        }
-        if (port < 0) {
-            host.setClient(true);
-            host.setAddress(DEFAULT_CLIENT_ADDRESS);
-        }
-        setToArray();
-        isSaved = false;
-    }
-
-    private DbHostAuth(Host host) {
-        super();
-        this.host = host;
-    }
-
-    public DbHostAuth(ObjectNode source) throws WaarpDatabaseSqlException {
-        super();
-        this.host = new Host();
-        setFromJson(source, false);
-    }
 
     @Override
     public void setFromJson(ObjectNode node, boolean ignorePrimaryKey) throws WaarpDatabaseSqlException {
         super.setFromJson(node, ignorePrimaryKey);
-        if (host.getHostkey() == null || host.getHostkey() .length == 0 ||
-                host.getAddress() == null || host.getAddress().isEmpty() ||
-                host.getHostid()== null || host.getHostid().isEmpty()) {
+        if (host.getHostkey() == null || host.getHostkey().length == 0 ||
+            host.getAddress() == null || host.getAddress().isEmpty() ||
+            host.getHostid() == null || host.getHostid().isEmpty()) {
             throw new WaarpDatabaseSqlException("Not enough argument to create the object");
         }
         if (host.getHostkey() != null) {
             try {
                 // Save as crypted with the local Key and Base64
                 host.setHostkey(Configuration.configuration.getCryptoKey()
-                        .cryptToHex(host.getHostkey()).getBytes(WaarpStringUtils.UTF8));
+                                                           .cryptToHex(host.getHostkey())
+                                                           .getBytes(WaarpStringUtils.UTF8));
             } catch (Exception e) {
                 host.setHostkey(new byte[0]);
             }
@@ -279,60 +573,6 @@ public class DbHostAuth extends AbstractDbData {
             host.setClient(true);
             host.setAddress(DEFAULT_CLIENT_ADDRESS);
         }
-    }
-
-    /**
-     * @param dbSession
-     * @param hostid
-     * @throws WaarpDatabaseException
-     */
-    public DbHostAuth(String hostid) throws WaarpDatabaseException {
-        super();
-        if (hostid == null) {
-            throw new WaarpDatabaseException("No host id passed");
-        }
-        HostDAO hostAccess = null;
-        try {
-            hostAccess = DAOFactory.getInstance().getHostDAO();
-            host = hostAccess.select(hostid);
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (hostAccess != null) {
-                hostAccess.close();
-            }
-        }
-        if (host == null) {
-            throw new WaarpDatabaseNoDataException("Cannot find host");
-        }
-    }
-
-    /**
-     * Delete all entries (used when purge and reload)
-     *
-     * @param dbSession
-     * @return the previous existing array of DbRule
-     * @throws WaarpDatabaseException
-     */
-    public static DbHostAuth[] deleteAll() throws WaarpDatabaseException {
-        HostDAO hostAccess = null;
-        List<DbHostAuth> res = new ArrayList<DbHostAuth>();
-        List<Host> hosts = null;
-        try {
-            hostAccess = DAOFactory.getInstance().getHostDAO();
-            hosts = hostAccess.getAll();
-            hostAccess.deleteAll();
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (hostAccess != null) {
-                hostAccess.close();
-            }
-        }
-        for (Host host : hosts) {
-            res.add(new DbHostAuth(host));
-        }
-        return (DbHostAuth[]) res.toArray();
     }
 
     @Override
@@ -408,170 +648,6 @@ public class DbHostAuth extends AbstractDbData {
                 hostAccess.close();
             }
         }
-    }
-
-    /**
-     * Private constructor for Commander only
-     */
-    private DbHostAuth() {
-        super();
-        this.host = new Host();
-    }
-
-    /**
-     * Get All DbHostAuth from database or from internal hashMap in case of no database support
-     *
-     * @param dbSession
-     *            may be null
-     * @return the array of DbHostAuth
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     */
-    public static DbHostAuth[] getAllHosts()
-            throws WaarpDatabaseNoConnectionException {
-        HostDAO hostAccess = null;
-        List<DbHostAuth> res = new ArrayList<DbHostAuth>();
-        List<Host> hosts = null;
-        try {
-            hostAccess = DAOFactory.getInstance().getHostDAO();
-            hosts = hostAccess.getAll();
-        } catch (DAOException e) {
-            throw new WaarpDatabaseNoConnectionException(e);
-        } finally {
-            if (hostAccess != null) {
-                hostAccess.close();
-            }
-        }
-        for (Host host : hosts) {
-            res.add(new DbHostAuth(host));
-        }
-        return res.toArray(new DbHostAuth[0]);
-    }
-
-    /**
-     * For instance from Commander when getting updated information
-     *
-     * @param preparedStatement
-     * @return the next updated DbHostAuth
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     */
-    public static DbHostAuth getFromStatement(DbPreparedStatement preparedStatement)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
-        DbHostAuth dbHostAuth = new DbHostAuth();
-        dbHostAuth.getValues(preparedStatement, dbHostAuth.allFields);
-        dbHostAuth.setFromArray();
-        dbHostAuth.isSaved = true;
-        return dbHostAuth;
-    }
-
-    public static DbHostAuth[] getUpdatedPreparedStatement()
-            throws WaarpDatabaseNoConnectionException {
-        List<Filter> filters = new ArrayList<Filter>(1);
-        filters.add(new Filter(DBHostDAO.UPDATED_INFO_FIELD, "=",
-                org.waarp.openr66.pojo.UpdatedInfo.fromLegacy(UpdatedInfo.TOSUBMIT).ordinal()));
-        HostDAO hostAccess = null;
-        List<Host> hosts;
-        try {
-            hostAccess = DAOFactory.getInstance().getHostDAO();
-            hosts = hostAccess.find(filters);
-        } catch (DAOException e) {
-            throw new WaarpDatabaseNoConnectionException(e);
-        } finally {
-            if (hostAccess != null) {
-                hostAccess.close();
-            }
-        }
-        DbHostAuth[] res = new DbHostAuth[hosts.size()];
-        int i = 0;
-        for (Host host : hosts) {
-            res[i] = new DbHostAuth(host);
-            i++;
-        }
-        return res;
-    }
-
-    /**
-     *
-     * @param session
-     * @param host
-     * @param addr
-     * @param ssl
-     * @param active
-     * @return the DbPreparedStatement according to the filter
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     */
-    public static DbPreparedStatement getFilterPrepareStament(DbSession session,
-                String host, String addr, boolean ssl, boolean active)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
-        DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
-        String request = "SELECT " + selectAllFields + " FROM " + table + " WHERE ";
-        String condition = null;
-        if (host != null) {
-            condition = Columns.HOSTID.name() + " LIKE '%" + host + "%' ";
-        }
-        if (addr != null) {
-            if (condition != null) {
-                condition += " AND ";
-            } else {
-                condition = "";
-            }
-            condition += Columns.ADDRESS.name() + " LIKE '%" + addr + "%' ";
-        }
-        if (condition != null) {
-            condition += " AND ";
-        } else {
-            condition = "";
-        }
-        condition += Columns.ISSSL.name() + " = ? AND ";
-        condition += Columns.ISACTIVE.name() + " = ? ";
-        preparedStatement.createPrepareStatement(request + condition +
-                " ORDER BY " + Columns.HOSTID.name());
-        try {
-            preparedStatement.getPreparedStatement().setBoolean(1, ssl);
-            preparedStatement.getPreparedStatement().setBoolean(2, active);
-        } catch (SQLException e) {
-            preparedStatement.realClose();
-            throw new WaarpDatabaseSqlException(e);
-        }
-        return preparedStatement;
-    }
-
-    /**
-     *
-     * @param session
-     * @param host
-     * @param addr
-     * @return the DbPreparedStatement according to the filter
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     */
-    public static DbPreparedStatement getFilterPrepareStament(DbSession session,
-                                                              String host, String addr)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
-        DbPreparedStatement preparedStatement = new DbPreparedStatement(session);
-        String request = "SELECT " + selectAllFields + " FROM " + table;
-        String condition = null;
-        if (host != null) {
-            condition = Columns.HOSTID.name() + " LIKE '%" + host + "%' ";
-        }
-        if (addr != null) {
-            if (condition != null) {
-                condition += " AND ";
-            } else {
-                condition = "";
-            }
-            condition += Columns.ADDRESS.name() + " LIKE '%" + addr + "%' ";
-        }
-        if (condition != null) {
-            condition = " WHERE " + condition;
-        } else {
-            condition = "";
-        }
-        preparedStatement.createPrepareStatement(request + condition +
-                " ORDER BY " + Columns.HOSTID.name());
-        return preparedStatement;
     }
 
     @Override
@@ -716,82 +792,16 @@ public class DbHostAuth extends AbstractDbData {
         return host.getPort();
     }
 
-    private static String getVersion(String host) {
-        String remoteHost = host;
-        String alias = "";
-        if (Configuration.configuration.getAliases().containsKey(remoteHost)) {
-            remoteHost = Configuration.configuration.getAliases().get(remoteHost);
-            alias += "(Alias: " + remoteHost + ") ";
-        }
-        if (Configuration.configuration.getReverseAliases().containsKey(remoteHost)) {
-            String alias2 = "(ReverseAlias: ";
-            String[] list = Configuration.configuration.getReverseAliases().get(remoteHost);
-            boolean found = false;
-            for (String string : list) {
-                if (string.equals(host)) {
-                    continue;
-                }
-                found = true;
-                alias2 += string + " ";
-            }
-            if (found) {
-                alias += alias2 + ") ";
-            }
-        }
-        if (Configuration.configuration.getBusinessWhiteSet().contains(remoteHost)) {
-            alias += "(Business: Allowed) ";
-        }
-        if (Configuration.configuration.getRoles().containsKey(remoteHost)) {
-            RoleDefault item = Configuration.configuration.getRoles().get(remoteHost);
-            alias += "(Role: " + item.toString() + ") ";
-        }
-        return alias + (Configuration.configuration.getVersions().containsKey(remoteHost) ?
-                Configuration.configuration.getVersions().get(remoteHost).toString() :
-                "Version Unknown");
-    }
-
     @Override
     public String toString() {
         //System.err.println(hostid+" Version: "+Configuration.configuration.versions.get(hostid)+":"+Configuration.configuration.versions.containsKey(hostid));
         return "HostAuth: " + getHostid()
-                + " address: " + getAddress() + ":" + getPort()
-                + " isSSL: " + isSsl() + " admin: " + isAdminrole()
-                + " isClient: " + isClient() + " isActive: " + isActive()
-                + " isProxified: " + isProxified() + " ("
-                + (host.getHostkey() != null ? host.getHostkey().length : 0)
-                + ") Version: " + getVersion(getHostid());
-    }
-
-    /**
-     * Write selected DbHostAuth to a Json String
-     *
-     * @param preparedStatement
-     * @return the associated Json String
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     * @throws OpenR66ProtocolBusinessException
-     */
-    public static String getJson(DbPreparedStatement preparedStatement, int limit)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolBusinessException {
-        ArrayNode arrayNode = JsonHandler.createArrayNode();
-        try {
-            preparedStatement.executeQuery();
-            int nb = 0;
-            while (preparedStatement.getNext()) {
-                DbHostAuth host = DbHostAuth
-                        .getFromStatement(preparedStatement);
-                ObjectNode node = host.getInternalJson();
-                arrayNode.add(node);
-                nb++;
-                if (nb >= limit) {
-                    break;
-                }
-            }
-        } finally {
-            preparedStatement.realClose();
-        }
-        return JsonHandler.writeAsString(arrayNode);
+               + " address: " + getAddress() + ":" + getPort()
+               + " isSSL: " + isSsl() + " admin: " + isAdminrole()
+               + " isClient: " + isClient() + " isActive: " + isActive()
+               + " isProxified: " + isProxified() + " ("
+               + (host.getHostkey() != null? host.getHostkey().length : 0)
+               + ") Version: " + getVersion(getHostid());
     }
 
     private ObjectNode getInternalJson() {
@@ -823,6 +833,7 @@ public class DbHostAuth extends AbstractDbData {
         ObjectNode node = getInternalJson();
         return JsonHandler.writeAsString(node);
     }
+
     /**
      * @param session
      * @param body
@@ -840,17 +851,17 @@ public class DbHostAuth extends AbstractDbData {
         } else {
             try {
                 WaarpStringUtils.replace(builder, "XXXKEYXXX",
-                        Configuration.configuration.getCryptoKey().decryptHexInString(new String(
-                                this.getHostkey(), WaarpStringUtils.UTF8)));
+                                         Configuration.configuration.getCryptoKey().decryptHexInString(new String(
+                                                 this.getHostkey(), WaarpStringUtils.UTF8)));
             } catch (Exception e) {
                 WaarpStringUtils.replace(builder, "XXXKEYXXX", "BAD DECRYPT");
             }
         }
-        WaarpStringUtils.replace(builder, "XXXSSLXXX", isSsl() ? "checked" : "");
-        WaarpStringUtils.replace(builder, "XXXADMXXX", isAdminrole() ? "checked" : "");
-        WaarpStringUtils.replace(builder, "XXXISCXXX", isClient() ? "checked" : "");
-        WaarpStringUtils.replace(builder, "XXXISAXXX", isActive() ? "checked" : "");
-        WaarpStringUtils.replace(builder, "XXXISPXXX", isProxified() ? "checked" : "");
+        WaarpStringUtils.replace(builder, "XXXSSLXXX", isSsl()? "checked" : "");
+        WaarpStringUtils.replace(builder, "XXXADMXXX", isAdminrole()? "checked" : "");
+        WaarpStringUtils.replace(builder, "XXXISCXXX", isClient()? "checked" : "");
+        WaarpStringUtils.replace(builder, "XXXISAXXX", isActive()? "checked" : "");
+        WaarpStringUtils.replace(builder, "XXXISPXXX", isProxified()? "checked" : "");
         WaarpStringUtils.replace(builder, "XXXVERSIONXXX", getVersion(getHostid())
                 .replace(",", ", "));
         int nb = 0;
@@ -864,35 +875,16 @@ public class DbHostAuth extends AbstractDbData {
         return builder.toString();
     }
 
-    /**
-     *
-     * @param session
-     * @return True if any of the server has the isProxified property
-     */
-    public static boolean hasProxifiedHosts() {
-        List<Filter> filters = new ArrayList<Filter>();
-        filters.add(new Filter(DBHostDAO.IS_PROXIFIED_FIELD, "=", true));
-
-        HostDAO hostAccess = null;
-        try {
-            hostAccess = DAOFactory.getInstance().getHostDAO();
-            return hostAccess.find(filters).size() > 0;
-        } catch (DAOException e) {
-            logger.error("DAO Access error", e);
-            return false;
-        } finally {
-            if (hostAccess != null) {
-                hostAccess.close();
-            }
-        }
-    }
-
-    /**
-     *
-     * @return the DbValue associated with this table
-     */
-    public static DbValue[] getAllType() {
-        DbHostAuth item = new DbHostAuth();
-        return item.allFields;
+    public static enum Columns {
+        ADDRESS,
+        PORT,
+        ISSSL,
+        HOSTKEY,
+        ADMINROLE,
+        ISCLIENT,
+        ISACTIVE,
+        ISPROXIFIED,
+        UPDATEDINFO,
+        HOSTID
     }
 }

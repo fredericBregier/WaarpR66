@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -26,9 +25,9 @@ import org.waarp.openr66.protocol.utils.FileUtils;
 
 /**
  * Data packet
- * 
+ *
  * header = packetRank middle = data end = key
- * 
+ *
  * @author frederic bregier
  */
 public class DataPacket extends AbstractLocalPacket {
@@ -41,6 +40,18 @@ public class DataPacket extends AbstractLocalPacket {
     private ByteBuf key;
 
     /**
+     * @param packetRank
+     * @param data
+     * @param key
+     */
+    public DataPacket(int packetRank, ByteBuf data, ByteBuf key) {
+        this.packetRank = packetRank;
+        this.data = data;
+        this.key = key == null? Unpooled.EMPTY_BUFFER : key;
+        lengthPacket = data.readableBytes();
+    }
+
+    /**
      * @param headerLength
      * @param middleLength
      * @param endLength
@@ -49,7 +60,7 @@ public class DataPacket extends AbstractLocalPacket {
      * @throws OpenR66ProtocolPacketException
      */
     public static DataPacket createFromBuffer(int headerLength,
-            int middleLength, int endLength, ByteBuf buf)
+                                              int middleLength, int endLength, ByteBuf buf)
             throws OpenR66ProtocolPacketException {
         if (headerLength - 1 <= 0) {
             throw new OpenR66ProtocolPacketException("Not enough data");
@@ -68,18 +79,6 @@ public class DataPacket extends AbstractLocalPacket {
             key = Unpooled.EMPTY_BUFFER;
         }
         return new DataPacket(packetRank, data, key);
-    }
-
-    /**
-     * @param packetRank
-     * @param data
-     * @param key
-     */
-    public DataPacket(int packetRank, ByteBuf data, ByteBuf key) {
-        this.packetRank = packetRank;
-        this.data = data;
-        this.key = key == null ? Unpooled.EMPTY_BUFFER : key;
-        lengthPacket = data.readableBytes();
     }
 
     @Override
@@ -137,7 +136,7 @@ public class DataPacket extends AbstractLocalPacket {
     }
 
     /**
-     * 
+     *
      * @return True if the Hashed key is valid (or no key is set)
      */
     public boolean isKeyValid(DigestAlgo algo) {

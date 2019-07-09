@@ -22,8 +22,17 @@ package org.waarp.openr66.dao.database;
  *  limitations under the License.
  */
 
-import java.io.*;
-import java.sql.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,13 +42,12 @@ import java.util.regex.Pattern;
  */
 public class ScriptRunner {
 
-    private static final String DEFAULT_DELIMITER = ";";
     /**
-     * regex to detect delimiter.
-     * ignores spaces, allows delimiter in comment, allows an equals-sign
+     * regex to detect delimiter. ignores spaces, allows delimiter in comment, allows an equals-sign
      */
-    public static final Pattern delimP = Pattern.compile("^\\s*(--)?\\s*delimiter\\s*=?\\s*([^\\s]+)+\\s*.*$", Pattern.CASE_INSENSITIVE);
-
+    public static final Pattern delimP =
+            Pattern.compile("^\\s*(--)?\\s*delimiter\\s*=?\\s*([^\\s]+)+\\s*.*$", Pattern.CASE_INSENSITIVE);
+    private static final String DEFAULT_DELIMITER = ";";
     private final Connection connection;
 
     private final boolean stopOnError;
@@ -57,7 +65,7 @@ public class ScriptRunner {
      * Default constructor
      */
     public ScriptRunner(Connection connection, boolean autoCommit,
-            boolean stopOnError) {
+                        boolean stopOnError) {
         this.connection = connection;
         this.autoCommit = autoCommit;
         this.stopOnError = stopOnError;
@@ -69,7 +77,7 @@ public class ScriptRunner {
             } else {
                 logWriter = new PrintWriter(new FileWriter(logFile, false));
             }
-        } catch(IOException e){
+        } catch (IOException e) {
             System.err.println("Unable to access or create the db_create log");
         }
         try {
@@ -78,7 +86,7 @@ public class ScriptRunner {
             } else {
                 errorLogWriter = new PrintWriter(new FileWriter(errorLogFile, false));
             }
-        } catch(IOException e){
+        } catch (IOException e) {
             System.err.println("Unable to access or create the db_create error log");
         }
         String timeStamp = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss").format(new java.util.Date());
@@ -135,67 +143,66 @@ public class ScriptRunner {
     }
 
     /**
-     * Runs an SQL script (read in using the Reader parameter) using the
-     * connection passed in
+     * Runs an SQL script (read in using the Reader parameter) using the connection passed in
      *
      * @param conn - the connection to use for the script
      * @param reader - the source of the script
+     *
      * @throws SQLException if any SQL errors occur
      * @throws IOException if there is an error reading from the Reader
      */
     private void runScript(Connection conn, Reader reader) throws IOException,
-            SQLException {
-                StringBuffer command = null;
-                try {
-                    LineNumberReader lineReader = new LineNumberReader(reader);
-                    String line;
-                    while ((line = lineReader.readLine()) != null) {
-                        if (command == null) {
-                            command = new StringBuffer();
-                        }
-                        String trimmedLine = line.trim();
-                        final Matcher delimMatch = delimP.matcher(trimmedLine);
-                        if (trimmedLine.length() < 1
-                                || trimmedLine.startsWith("//")) {
-                            // Do nothing
-                        } else if (delimMatch.matches()) {
-                            setDelimiter(delimMatch.group(2), false);
-                        } else if (trimmedLine.startsWith("--")) {
-                            println(trimmedLine);
-                        } else if (trimmedLine.length() < 1
-                                || trimmedLine.startsWith("--")) {
-                            // Do nothing
-                        } else if (!fullLineDelimiter
-                                && trimmedLine.endsWith(getDelimiter())
-                                || fullLineDelimiter
-                                && trimmedLine.equals(getDelimiter())) {
-                            command.append(line.substring(0, line
-                                        .lastIndexOf(getDelimiter())));
-                            command.append(" ");
-                            this.execCommand(conn, command, lineReader);
-                            command = null;
-                        } else {
-                            command.append(line);
-                            command.append("\n");
-                        }
-                    }
-                    if (command != null) {
-                        this.execCommand(conn, command, lineReader);
-                    }
-                    if (!autoCommit) {
-                        conn.commit();
-                    }
+                                                                  SQLException {
+        StringBuffer command = null;
+        try {
+            LineNumberReader lineReader = new LineNumberReader(reader);
+            String line;
+            while ((line = lineReader.readLine()) != null) {
+                if (command == null) {
+                    command = new StringBuffer();
                 }
-                catch (IOException e) {
-                    throw new IOException(String.format("Error executing '%s': %s", command, e.getMessage()), e);
-                } finally {
-                    conn.rollback();
-                    flush();
+                String trimmedLine = line.trim();
+                final Matcher delimMatch = delimP.matcher(trimmedLine);
+                if (trimmedLine.length() < 1
+                    || trimmedLine.startsWith("//")) {
+                    // Do nothing
+                } else if (delimMatch.matches()) {
+                    setDelimiter(delimMatch.group(2), false);
+                } else if (trimmedLine.startsWith("--")) {
+                    println(trimmedLine);
+                } else if (trimmedLine.length() < 1
+                           || trimmedLine.startsWith("--")) {
+                    // Do nothing
+                } else if (!fullLineDelimiter
+                           && trimmedLine.endsWith(getDelimiter())
+                           || fullLineDelimiter
+                              && trimmedLine.equals(getDelimiter())) {
+                    command.append(line.substring(0, line
+                            .lastIndexOf(getDelimiter())));
+                    command.append(" ");
+                    this.execCommand(conn, command, lineReader);
+                    command = null;
+                } else {
+                    command.append(line);
+                    command.append("\n");
                 }
+            }
+            if (command != null) {
+                this.execCommand(conn, command, lineReader);
+            }
+            if (!autoCommit) {
+                conn.commit();
+            }
+        } catch (IOException e) {
+            throw new IOException(String.format("Error executing '%s': %s", command, e.getMessage()), e);
+        } finally {
+            conn.rollback();
+            flush();
+        }
     }
 
     private void execCommand(Connection conn, StringBuffer command,
-            LineNumberReader lineReader) throws SQLException {
+                             LineNumberReader lineReader) throws SQLException {
         Statement statement = conn.createStatement();
 
         println(command);
@@ -205,7 +212,7 @@ public class ScriptRunner {
             hasResults = statement.execute(command.toString());
         } catch (SQLException e) {
             final String errText = String.format("Error executing '%s' (line %d): %s",
-                    command, lineReader.getLineNumber(), e.getMessage());
+                                                 command, lineReader.getLineNumber(), e.getMessage());
             printlnError(errText);
             System.err.println(errText);
             if (stopOnError) {

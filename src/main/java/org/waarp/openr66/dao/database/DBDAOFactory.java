@@ -1,9 +1,12 @@
 package org.waarp.openr66.dao.database;
 
-import java.sql.SQLException;
-
 import org.waarp.common.database.ConnectionFactory;
-import org.waarp.common.database.properties.*;
+import org.waarp.common.database.properties.DbProperties;
+import org.waarp.common.database.properties.H2Properties;
+import org.waarp.common.database.properties.MariaDBProperties;
+import org.waarp.common.database.properties.MySQLProperties;
+import org.waarp.common.database.properties.OracleProperties;
+import org.waarp.common.database.properties.PostgreSQLProperties;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.openr66.dao.DAOFactory;
@@ -12,6 +15,8 @@ import org.waarp.openr66.dao.database.mariadb.MariaDBTransferDAO;
 import org.waarp.openr66.dao.database.oracle.OracleTransferDAO;
 import org.waarp.openr66.dao.database.postgres.PostgreSQLTransferDAO;
 import org.waarp.openr66.dao.exception.DAOException;
+
+import java.sql.SQLException;
 
 /**
  * DAOFactory for standard SQL databases
@@ -22,7 +27,7 @@ public class DBDAOFactory extends DAOFactory {
 
     private ConnectionFactory connectionFactory;
 
-    public DBDAOFactory(ConnectionFactory factory) { 
+    public DBDAOFactory(ConnectionFactory factory) {
         this.connectionFactory = factory;
     }
 
@@ -74,28 +79,27 @@ public class DBDAOFactory extends DAOFactory {
     @Override
     public DBTransferDAO getTransferDAO() throws DAOException {
         try {
-	     DbProperties prop = connectionFactory.getProperties();
-	     if (prop instanceof H2Properties) {
-                 return new H2TransferDAO(connectionFactory.getConnection());
-	     } else if (prop instanceof MariaDBProperties) {
-                 return new MariaDBTransferDAO(connectionFactory.getConnection());
-	     } else if (prop instanceof MySQLProperties) {
-                 return new MariaDBTransferDAO(connectionFactory.getConnection());
-	     } else if (prop instanceof OracleProperties) {
-                 return new OracleTransferDAO(connectionFactory.getConnection());
-	     } else if (prop instanceof PostgreSQLProperties) {
-                 return new PostgreSQLTransferDAO(connectionFactory.getConnection());
-	     } else {
-	         throw new DAOException("Unsupported database");
-	     }
+            DbProperties prop = connectionFactory.getProperties();
+            if (prop instanceof H2Properties) {
+                return new H2TransferDAO(connectionFactory.getConnection());
+            } else if (prop instanceof MariaDBProperties) {
+                return new MariaDBTransferDAO(connectionFactory.getConnection());
+            } else if (prop instanceof MySQLProperties) {
+                return new MariaDBTransferDAO(connectionFactory.getConnection());
+            } else if (prop instanceof OracleProperties) {
+                return new OracleTransferDAO(connectionFactory.getConnection());
+            } else if (prop instanceof PostgreSQLProperties) {
+                return new PostgreSQLTransferDAO(connectionFactory.getConnection());
+            } else {
+                throw new DAOException("Unsupported database");
+            }
         } catch (SQLException e) {
             throw new DAOException("data access error", e);
         }
     }
 
     /**
-     * Close the DBDAOFactory and close the ConnectionFactory
-     * Warning: You need to close the Connection yourself!
+     * Close the DBDAOFactory and close the ConnectionFactory Warning: You need to close the Connection yourself!
      */
     public void close() {
         logger.debug("Closing DAOFactory.");

@@ -1,6 +1,12 @@
 package org.waarp.openr66.dao.xml;
 
-import org.waarp.openr66.dao.*;
+import org.waarp.openr66.dao.BusinessDAO;
+import org.waarp.openr66.dao.DAOFactory;
+import org.waarp.openr66.dao.HostDAO;
+import org.waarp.openr66.dao.LimitDAO;
+import org.waarp.openr66.dao.MultipleMonitorDAO;
+import org.waarp.openr66.dao.RuleDAO;
+import org.waarp.openr66.dao.TransferDAO;
 import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
@@ -14,7 +20,8 @@ public class XMLDAOFactory extends DAOFactory {
     private String ruleFile = confDir;
     private String transferFile = Configuration.configuration.getArchivePath();
 
-    public XMLDAOFactory() {}
+    public XMLDAOFactory() {
+    }
 
 
     @Override

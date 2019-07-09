@@ -7,7 +7,6 @@ import org.w3c.dom.NodeList;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.openr66.configuration.ExtensionFilter;
-import org.waarp.openr66.dao.DAOFactory;
 import org.waarp.openr66.dao.Filter;
 import org.waarp.openr66.dao.RuleDAO;
 import org.waarp.openr66.dao.exception.DAOException;
@@ -15,24 +14,27 @@ import org.waarp.openr66.pojo.Rule;
 import org.waarp.openr66.pojo.RuleTask;
 import org.waarp.openr66.protocol.configuration.Configuration;
 import org.xml.sax.SAXException;
-import sun.security.krb5.Config;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
-import java.io.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class XMLRuleDAO implements RuleDAO {
 
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLRuleDAO.class);
-
     public static final String ROOT_LIST = "rules";
     public static final String ROOT_ELEMENT = "rule";
-
     public static final String RULENAME_FIELD = "idrule";
     public static final String HOSTIDS_LIST = "hostids";
     public static final String MODE_FIELD = "mode";
@@ -46,26 +48,30 @@ public class XMLRuleDAO implements RuleDAO {
     public static final String SPRE_TASKS_FIELD = "spretasks";
     public static final String SPOST_TASKS_FIELD = "sposttasks";
     public static final String SERROR_TASKS_FIELD = "serrortasks";
-
+    public static final String EXT_RULE = ".rule.xml";
+    public static final String EXT_RULES = ".rules.xml";
+    public static final String HOSTID_FIELD = "hostid";
+    public static final String TASK_NODE = "task";
+    public static final String TYPE_FIELD = "type";
+    public static final String PATH_FIELD = "path";
+    public static final String DELAY_FIELD = "delay";
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLRuleDAO.class);
     private static final String XML_SELECT = "//rule[idrule=$idrule]";
-    private static final String XML_GET_ALL= "//rule";
-
+    private static final String XML_GET_ALL = "//rule";
     private File file;
 
     public XMLRuleDAO(String filePath) {
         this.file = new File(filePath);
     }
 
-    public void close() {}
-
-    public static final String EXT_RULE = ".rule.xml";
-    public static final String EXT_RULES = ".rules.xml";
+    public void close() {
+    }
 
     private File[] getRuleFiles() {
         File ruleDir = new File(Configuration.configuration.getBaseDirectory() +
-                Configuration.configuration.getConfigPath());
+                                Configuration.configuration.getConfigPath());
         List<File> res = new ArrayList<File>();
-        if(ruleDir.isDirectory()) {
+        if (ruleDir.isDirectory()) {
             res.addAll(Arrays.asList(
                     ruleDir.listFiles(new ExtensionFilter(EXT_RULE))));
             res.addAll(Arrays.asList(
@@ -94,7 +100,7 @@ public class XMLRuleDAO implements RuleDAO {
                 XPath xPath = XPathFactory.newInstance().newXPath();
                 XPathExpression xpe = xPath.compile(XML_GET_ALL);
                 NodeList listNode = (NodeList) xpe.evaluate(document,
-                        XPathConstants.NODESET);
+                                                            XPathConstants.NODESET);
                 // Iterate through all found nodes
 
                 for (int i = 0; i < listNode.getLength(); i++) {
@@ -228,36 +234,34 @@ public class XMLRuleDAO implements RuleDAO {
     private Node getNode(Document doc, Rule rule) {
         Node res = doc.createElement(ROOT_ELEMENT);
         res.appendChild(XMLUtils.createNode(doc, RULENAME_FIELD,
-                rule.getName()));
+                                            rule.getName()));
         res.appendChild(XMLUtils.createNode(doc, HOSTIDS_LIST,
-                rule.getXMLHostids()));
+                                            rule.getXMLHostids()));
         res.appendChild(XMLUtils.createNode(doc, MODE_FIELD,
-                Integer.toString(rule.getMode())));
+                                            Integer.toString(rule.getMode())));
         res.appendChild(XMLUtils.createNode(doc, SEND_PATH_FIELD,
-                rule.getSendPath()));
+                                            rule.getSendPath()));
         res.appendChild(XMLUtils.createNode(doc, RECV_PATH_FIELD,
-                rule.getRecvPath()));
+                                            rule.getRecvPath()));
         res.appendChild(XMLUtils.createNode(doc, ARCH_PATH_FIELD,
-                rule.getArchivePath()));
+                                            rule.getArchivePath()));
         res.appendChild(XMLUtils.createNode(doc, WORK_PATH_FIELD,
-                rule.getWorkPath()));
+                                            rule.getWorkPath()));
         res.appendChild(XMLUtils.createNode(doc, RPRE_TASKS_FIELD,
-                rule.getXMLRPreTasks()));
+                                            rule.getXMLRPreTasks()));
         res.appendChild(XMLUtils.createNode(doc, RPOST_TASKS_FIELD,
-                rule.getXMLRPostTasks()));
+                                            rule.getXMLRPostTasks()));
         res.appendChild(XMLUtils.createNode(doc, RERROR_TASKS_FIELD,
-                rule.getXMLRErrorTasks()));
+                                            rule.getXMLRErrorTasks()));
         res.appendChild(XMLUtils.createNode(doc, SPRE_TASKS_FIELD,
-                rule.getXMLSPreTasks()));
+                                            rule.getXMLSPreTasks()));
         res.appendChild(XMLUtils.createNode(doc, SPOST_TASKS_FIELD,
-                rule.getXMLSPostTasks()));
+                                            rule.getXMLSPostTasks()));
         res.appendChild(XMLUtils.createNode(doc, SERROR_TASKS_FIELD,
-                rule.getXMLSErrorTasks()));
+                                            rule.getXMLSErrorTasks()));
 
         return res;
     }
-
-    public static final String HOSTID_FIELD = "hostid";
 
     private List<String> retrieveHostids(String xml) throws DAOException {
         ArrayList<String> res = new ArrayList<String>();
@@ -294,17 +298,12 @@ public class XMLRuleDAO implements RuleDAO {
         return res;
     }
 
-    public static final String TASK_NODE = "task";
-    public static final String TYPE_FIELD= "type";
-    public static final String PATH_FIELD = "path";
-    public static final String DELAY_FIELD = "delay";
-
     private List<RuleTask> retrieveTasks(Node src) throws DAOException {
         List<RuleTask> res = new ArrayList<RuleTask>();
         NodeList feed = src.getChildNodes();
         for (int i = 0; i < feed.getLength(); i++) {
             Node mainnode = feed.item(i);
-            if(mainnode.getNodeType() == Node.ELEMENT_NODE) {
+            if (mainnode.getNodeType() == Node.ELEMENT_NODE) {
                 Element e = (Element) mainnode;
                 NodeList tasksList = e.getElementsByTagName(TASK_NODE);
                 for (int j = 0; j < tasksList.getLength(); j++) {
@@ -312,12 +311,12 @@ public class XMLRuleDAO implements RuleDAO {
                     if (taskNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element task = (Element) taskNode;
                         String type = task.getElementsByTagName(TYPE_FIELD)
-                                .item(0).getTextContent();
+                                          .item(0).getTextContent();
                         String path = task.getElementsByTagName(PATH_FIELD)
-                                .item(0).getTextContent();
+                                          .item(0).getTextContent();
                         int delay = Integer.parseInt(
                                 task.getElementsByTagName(DELAY_FIELD)
-                                .item(0).getTextContent());
+                                    .item(0).getTextContent());
                         res.add(new RuleTask(type, path, delay));
                     }
                 }

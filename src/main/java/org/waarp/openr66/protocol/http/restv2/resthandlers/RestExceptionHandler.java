@@ -36,24 +36,24 @@ import javax.ws.rs.NotSupportedException;
 import java.util.Locale;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT;
+import static javax.ws.rs.core.HttpHeaders.*;
 
 /**
- * Handles all exceptions thrown by handlers during the processing of
- * an HTTP request.
+ * Handles all exceptions thrown by handlers during the processing of an HTTP request.
  */
 public class RestExceptionHandler extends ExceptionHandler {
 
-    /** The logger for all events. */
+    /**
+     * The logger for all events.
+     */
     private static final WaarpLogger logger =
             WaarpLoggerFactory.getLogger(RestExceptionHandler.class);
 
     /**
-     * Method called when an exception is thrown during the processing of
-     * a request.
+     * Method called when an exception is thrown during the processing of a request.
      *
-     * @param t         the exception thrown during execution
-     * @param request   the HttpRequest that failed
+     * @param t the exception thrown during execution
+     * @param request the HttpRequest that failed
      * @param responder the HttpResponder for the request
      */
     @Override
@@ -68,13 +68,11 @@ public class RestExceptionHandler extends ExceptionHandler {
                 logger.error(e);
                 responder.sendStatus(INTERNAL_SERVER_ERROR);
             }
-        }
-        else if (t instanceof NotSupportedException) {
+        } else if (t instanceof NotSupportedException) {
             DefaultHttpHeaders headers = new DefaultHttpHeaders();
             headers.add(ACCEPT, t.getMessage());
             responder.sendStatus(UNSUPPORTED_MEDIA_TYPE, headers);
-        }
-        else {
+        } else {
             logger.error(t);
             responder.sendStatus(INTERNAL_SERVER_ERROR);
         }

@@ -25,15 +25,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.waarp.common.role.RoleDefault.ROLE;
+import static org.waarp.common.role.RoleDefault.*;
 
 /**
- * This annotation specifies what minimum {@link ROLE} is required
- * in order to be allowed to call the method annotated.
+ * This annotation specifies what minimum {@link ROLE} is required in order to be allowed to call the method annotated.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiredRole {
-    /** The minimum required role. */
+    /**
+     * The minimum required role.
+     */
     ROLE value();
 }

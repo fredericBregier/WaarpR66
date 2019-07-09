@@ -1,5 +1,13 @@
 package org.waarp.openr66.dao.database;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.LimitDAO;
+import org.waarp.openr66.pojo.Limit;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
@@ -8,22 +16,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static  org.junit.Assert.*;
-
-import org.waarp.openr66.dao.LimitDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.pojo.Limit;
-import org.waarp.openr66.pojo.UpdatedInfo;
+import static org.junit.Assert.*;
 
 public abstract class DBLimitDAOIT {
 
     private Connection con;
 
     public abstract Connection getConnection() throws SQLException;
+
     public abstract void initDB() throws SQLException;
+
     public abstract void cleanDB() throws SQLException;
 
     public void runScript(String script) {
@@ -63,7 +65,7 @@ public abstract class DBLimitDAOIT {
             dao.deleteAll();
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM configuration");
+                               .executeQuery("SELECT * FROM configuration");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -77,7 +79,7 @@ public abstract class DBLimitDAOIT {
             dao.delete(new Limit("server1", 0l));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM configuration where hostid = 'server1'");
+                               .executeQuery("SELECT * FROM configuration where hostid = 'server1'");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -131,16 +133,16 @@ public abstract class DBLimitDAOIT {
         try {
             LimitDAO dao = new DBLimitDAO(getConnection());
             dao.insert(new Limit("chacha", 4l,
-                    1l, 5l, 13l, 12,
-                    UpdatedInfo.TOSUBMIT));
+                                 1l, 5l, 13l, 12,
+                                 UpdatedInfo.TOSUBMIT));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT COUNT(1) as count FROM configuration");
+                               .executeQuery("SELECT COUNT(1) as count FROM configuration");
             res.next();
             assertEquals(4, res.getInt("count"));
 
             ResultSet res2 = con.createStatement()
-                .executeQuery("SELECT * FROM configuration WHERE hostid = 'chacha'");
+                                .executeQuery("SELECT * FROM configuration WHERE hostid = 'chacha'");
             res2.next();
             assertEquals("chacha", res2.getString("hostid"));
             assertEquals(4, res2.getLong("delaylimit"));
@@ -159,11 +161,11 @@ public abstract class DBLimitDAOIT {
         try {
             LimitDAO dao = new DBLimitDAO(getConnection());
             dao.update(new Limit("server2", 4l,
-                    1l, 5l, 13l, 12l,
-                    UpdatedInfo.RUNNING));
+                                 1l, 5l, 13l, 12l,
+                                 UpdatedInfo.RUNNING));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM configuration WHERE hostid = 'server2'");
+                               .executeQuery("SELECT * FROM configuration WHERE hostid = 'server2'");
             res.next();
             assertEquals("server2", res.getString("hostid"));
             assertEquals(4, res.getLong("delaylimit"));

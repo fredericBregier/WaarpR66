@@ -1,29 +1,24 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.database.data;
 
-import java.sql.Types;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.DbSession;
 import org.waarp.common.database.data.AbstractDbData;
-import org.waarp.common.database.data.DbValue;
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.database.exception.WaarpDatabaseNoConnectionException;
 import org.waarp.common.database.exception.WaarpDatabaseSqlException;
@@ -33,52 +28,126 @@ import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.pojo.MultipleMonitor;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
+import java.sql.Types;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Configuration Table object
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class DbMultipleMonitor extends AbstractDbData {
-    public static enum Columns {
-        COUNTCONFIG,
-        COUNTHOST,
-        COUNTRULE,
-        HOSTID
-    }
-
     public static final int[] dbTypes = {
-        Types.INTEGER,
-        Types.INTEGER,
-        Types.INTEGER,
-        Types.NVARCHAR
+            Types.INTEGER,
+            Types.INTEGER,
+            Types.INTEGER,
+            Types.NVARCHAR
     };
-
     public static final String table = " MULTIPLEMONITOR ";
-
+    // ALL TABLE SHOULD IMPLEMENT THIS
+    public static final int NBPRKEY = 1;
+    protected static final String selectAllFields =
+            Columns.COUNTCONFIG.name() + ","
+            + Columns.COUNTHOST.name() + ","
+            + Columns.COUNTRULE.name() + ","
+            + Columns.HOSTID.name();
+    protected static final String updateAllFields =
+            Columns.COUNTCONFIG.name() + "=?,"
+            + Columns.COUNTHOST.name() + "=?,"
+            + Columns.COUNTRULE.name() + "=?";
+    protected static final String insertAllValues = " (?,?,?,?) ";
     /**
      * HashTable in case of lack of database
      */
     private static final ConcurrentHashMap<String, DbMultipleMonitor> dbR66MMHashMap =
             new ConcurrentHashMap<String, DbMultipleMonitor>();
-
     private MultipleMonitor multipleMonitor;
 
-    // ALL TABLE SHOULD IMPLEMENT THIS
-    public static final int NBPRKEY = 1;
+    /**
+     * @param dbSession
+     * @param hostid
+     * @param cc
+     *            count for Config
+     * @param ch
+     *            count for Host
+     * @param cr
+     *            count for Rule
+     */
+    public DbMultipleMonitor(String hostid, int cc, int ch, int cr) {
+        super();
+        multipleMonitor = new MultipleMonitor(hostid, cc, ch, cr);
+    }
 
-    protected static final String selectAllFields =
-        Columns.COUNTCONFIG.name() + ","
-        + Columns.COUNTHOST.name() + ","
-        + Columns.COUNTRULE.name() + ","
-        + Columns.HOSTID.name();
+    /**
+     * @param dbSession
+     * @param hostid
+     * @throws WaarpDatabaseException
+     */
+    public DbMultipleMonitor(String hostid) throws WaarpDatabaseException {
+        super();
+        MultipleMonitorDAO monitorAccess = null;
+        try {
+            monitorAccess = DAOFactory.getInstance().getMultipleMonitorDAO();
+            multipleMonitor = monitorAccess.select(hostid);
+        } catch (DAOException e) {
+            throw new WaarpDatabaseException(e);
+        } finally {
+            if (monitorAccess != null) {
+                monitorAccess.close();
+            }
+        }
+    }
 
-    protected static final String updateAllFields =
-        Columns.COUNTCONFIG.name() + "=?,"
-        + Columns.COUNTHOST.name() + "=?,"
-        + Columns.COUNTRULE.name() + "=?";
+    /**
+     * Private constructor for Commander only
+     */
+    private DbMultipleMonitor() {
+        super();
+        multipleMonitor = new MultipleMonitor();
+    }
 
-    protected static final String insertAllValues = " (?,?,?,?) ";
+    /**
+     * For instance from Commander when getting updated information
+     *
+     * @param preparedStatement
+     * @return the next updated Configuration
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     */
+    public static DbMultipleMonitor getFromStatement(DbPreparedStatement preparedStatement)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
+        DbMultipleMonitor dbMm = new DbMultipleMonitor();
+        dbMm.getValues(preparedStatement, dbMm.allFields);
+        dbMm.setFromArray();
+        dbMm.isSaved = true;
+        return dbMm;
+    }
+
+    /**
+     *
+     * @return the DbPreparedStatement for getting Updated Object in "FOR UPDATE" mode
+     * @throws WaarpDatabaseNoConnectionException
+     * @throws WaarpDatabaseSqlException
+     */
+    public static DbPreparedStatement getUpdatedPrepareStament(DbSession session)
+            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
+        DbMultipleMonitor multipleMonitor = new DbMultipleMonitor(
+                Configuration.configuration.getHOST_ID(), 0, 0, 0);
+        try {
+            if (!multipleMonitor.exist()) {
+                multipleMonitor.insert();
+                session.commit();
+            }
+        } catch (WaarpDatabaseException e1) {
+        }
+        String request = "SELECT " + selectAllFields;
+        request += " FROM " + table + " WHERE " + Columns.HOSTID.name() + " = '"
+                   + Configuration.configuration.getHOST_ID() + "'" +
+                   " FOR UPDATE ";
+        DbPreparedStatement prep = new DbPreparedStatement(session, request);
+        return prep;
+    }
 
     @Override
     protected void initObject() {
@@ -138,41 +207,6 @@ public class DbMultipleMonitor extends AbstractDbData {
     @Override
     protected void setPrimaryKey() {
         primaryKey[0].setValue(multipleMonitor.getHostid());
-    }
-
-    /**
-     * @param dbSession
-     * @param hostid
-     * @param cc
-     *            count for Config
-     * @param ch
-     *            count for Host
-     * @param cr
-     *            count for Rule
-     */
-    public DbMultipleMonitor(String hostid, int cc, int ch, int cr) {
-        super();
-        multipleMonitor = new MultipleMonitor(hostid, cc, ch, cr);
-    }
-
-    /**
-     * @param dbSession
-     * @param hostid
-     * @throws WaarpDatabaseException
-     */
-    public DbMultipleMonitor(String hostid) throws WaarpDatabaseException {
-        super();
-        MultipleMonitorDAO monitorAccess = null;
-        try {
-            monitorAccess = DAOFactory.getInstance().getMultipleMonitorDAO();
-            multipleMonitor = monitorAccess.select(hostid);
-        } catch (DAOException e) {
-            throw new WaarpDatabaseException(e);
-        } finally {
-            if (monitorAccess != null) {
-                monitorAccess.close();
-            }
-        }
     }
 
     @Override
@@ -251,58 +285,8 @@ public class DbMultipleMonitor extends AbstractDbData {
     }
 
     /**
-     * Private constructor for Commander only
-     */
-    private DbMultipleMonitor() {
-        super();
-        multipleMonitor = new MultipleMonitor();
-    }
-
-    /**
-     * For instance from Commander when getting updated information
-     * 
-     * @param preparedStatement
-     * @return the next updated Configuration
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     */
-    public static DbMultipleMonitor getFromStatement(DbPreparedStatement preparedStatement)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
-        DbMultipleMonitor dbMm = new DbMultipleMonitor();
-        dbMm.getValues(preparedStatement, dbMm.allFields);
-        dbMm.setFromArray();
-        dbMm.isSaved = true;
-        return dbMm;
-    }
-
-    /**
-     * 
-     * @return the DbPreparedStatement for getting Updated Object in "FOR UPDATE" mode
-     * @throws WaarpDatabaseNoConnectionException
-     * @throws WaarpDatabaseSqlException
-     */
-    public static DbPreparedStatement getUpdatedPrepareStament(DbSession session)
-            throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException {
-        DbMultipleMonitor multipleMonitor = new DbMultipleMonitor(
-                Configuration.configuration.getHOST_ID(), 0, 0, 0);
-        try {
-            if (!multipleMonitor.exist()) {
-                multipleMonitor.insert();
-                session.commit();
-            }
-        } catch (WaarpDatabaseException e1) {
-        }
-        String request = "SELECT " + selectAllFields;
-        request += " FROM " + table + " WHERE " + Columns.HOSTID.name() + " = '"
-                + Configuration.configuration.getHOST_ID() + "'" +
-                " FOR UPDATE ";
-        DbPreparedStatement prep = new DbPreparedStatement(session, request);
-        return prep;
-    }
-
-    /**
      * On Commander side
-     * 
+     *
      * @return True if this is the last update
      */
     public boolean checkUpdateConfig() {
@@ -319,7 +303,7 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     /**
      * On Commander side
-     * 
+     *
      * @return True if this is the last update
      */
     public boolean checkUpdateHost() {
@@ -336,7 +320,7 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     /**
      * On Commander side
-     * 
+     *
      * @return True if this is the last update
      */
     public boolean checkUpdateRule() {
@@ -402,5 +386,12 @@ public class DbMultipleMonitor extends AbstractDbData {
      */
     private void setCountRule(int countRule) {
         multipleMonitor.setCountRule(countRule);
+    }
+
+    public static enum Columns {
+        COUNTCONFIG,
+        COUNTHOST,
+        COUNTRULE,
+        HOSTID
     }
 }

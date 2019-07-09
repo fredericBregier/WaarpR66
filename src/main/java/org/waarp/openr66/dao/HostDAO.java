@@ -1,9 +1,9 @@
 package org.waarp.openr66.dao;
 
-import java.util.List;
-
 import org.waarp.openr66.dao.exception.DAOException;
 import org.waarp.openr66.pojo.Host;
+
+import java.util.List;
 
 /**
  * Interface to interact with Host objects in the persistance layer
@@ -18,28 +18,31 @@ public interface HostDAO {
     List<Host> getAll() throws DAOException;
 
     /**
-     * Retrieve all Host objects corresponding to the given filters
-     * in a List from the persistance lsayer
+     * Retrieve all Host objects corresponding to the given filters in a List from the persistance lsayer
      *
      * @param filters List of filter
+     *
      * @throws DAOException If data access error occurs
      */
     List<Host> find(List<Filter> filters) throws DAOException;
+
     /**
      * Retrieve the Host object with the specified hostid from the persistance layer
      *
      * @param hostid Hostid of the Host object requested
+     *
      * @throws DAOException If a data access error occurs
      */
     Host select(String hostid) throws DAOException;
 
     /**
-     * Verify if a Host object with the specified hostid exists in
-     * the persistance layer
+     * Verify if a Host object with the specified hostid exists in the persistance layer
      *
      * @param hostid Hostid of the Host object verified
-     * @return true if a Host object with the specified hostid exist; false
-     * if no Host object correspond to the specified hostid.
+     *
+     * @return true if a Host object with the specified hostid exist; false if no Host object correspond to the
+     * specified hostid.
+     *
      * @throws DAOException If a data access error occurs
      */
     boolean exist(String hostid) throws DAOException;
@@ -48,6 +51,7 @@ public interface HostDAO {
      * Insert the specified Host object in the persistance layer
      *
      * @param host Host object to insert
+     *
      * @throws DAOException If a data access error occurs
      */
     void insert(Host host) throws DAOException;
@@ -56,6 +60,7 @@ public interface HostDAO {
      * Update the specified Host object in the persistance layer
      *
      * @param host Host object to update
+     *
      * @throws DAOException If a data access error occurs
      */
     void update(Host host) throws DAOException;
@@ -64,6 +69,7 @@ public interface HostDAO {
      * Remove the specified Host object from the persistance layer
      *
      * @param host Host object to insert
+     *
      * @throws DAOException If a data access error occurs
      */
     void delete(Host host) throws DAOException;

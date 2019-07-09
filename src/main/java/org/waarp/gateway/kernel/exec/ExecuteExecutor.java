@@ -1,23 +1,20 @@
 /**
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation; either version 3.0 of the
- * License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this
- * software; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
- * Boston, MA 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either version 3.0 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * <p>
+ * You should have received a copy of the GNU Lesser General Public License along with this software; if not, write to
+ * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site:
+ * http://www.fsf.org.
  */
 package org.waarp.gateway.kernel.exec;
-
-import java.io.File;
-import java.io.IOException;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -28,6 +25,9 @@ import org.waarp.common.command.exception.Reply421Exception;
 import org.waarp.common.future.WaarpFuture;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * ExecuteExecutor class. The given argument will be executed after replacements.
@@ -97,7 +97,8 @@ public class ExecuteExecutor extends AbstractExecutor {
         PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(null, null);
         defaultExecutor.setStreamHandler(pumpStreamHandler);
         int[] correctValues = {
-                0, 1 };
+                0, 1
+        };
         defaultExecutor.setExitValues(correctValues);
         ExecuteWatchdog watchdog = null;
         if (delay > 0) {
@@ -122,7 +123,7 @@ public class ExecuteExecutor extends AbstractExecutor {
                     } catch (IOException e1) {
                     }
                     logger.error("System Exception: " + e.getMessage() +
-                            "\n    Exec cannot execute command " + commandLine.toString());
+                                 "\n    Exec cannot execute command " + commandLine.toString());
                     throw new Reply421Exception("Cannot execute Pre command");
                 } catch (IOException e2) {
                     try {
@@ -130,18 +131,18 @@ public class ExecuteExecutor extends AbstractExecutor {
                     } catch (IOException e1) {
                     }
                     logger.error("Exception: " + e.getMessage() +
-                            "\n    Exec in error with " + commandLine.toString());
+                                 "\n    Exec in error with " + commandLine.toString());
                     throw new Reply421Exception("Cannot execute Pre command");
                 }
                 logger.info("System Exception: " + e.getMessage() +
-                        " but finally get the command executed " + commandLine.toString());
+                            " but finally get the command executed " + commandLine.toString());
             } else {
                 try {
                     pumpStreamHandler.stop();
                 } catch (IOException e1) {
                 }
                 logger.error("Exception: " + e.getMessage() +
-                        "\n    Exec in error with " + commandLine.toString());
+                             "\n    Exec in error with " + commandLine.toString());
                 throw new Reply421Exception("Cannot execute Pre command");
             }
         } catch (IOException e) {
@@ -150,7 +151,7 @@ public class ExecuteExecutor extends AbstractExecutor {
             } catch (IOException e1) {
             }
             logger.error("Exception: " + e.getMessage() +
-                    "\n    Exec in error with " + commandLine.toString());
+                         "\n    Exec in error with " + commandLine.toString());
             throw new Reply421Exception("Cannot execute Pre command");
         }
         try {
@@ -158,7 +159,7 @@ public class ExecuteExecutor extends AbstractExecutor {
         } catch (IOException e1) {
         }
         if (watchdog != null &&
-                watchdog.killedProcess()) {
+            watchdog.killedProcess()) {
             // kill by the watchdoc (time out)
             logger.error("Exec is in Time Out");
             status = -1;
@@ -170,9 +171,9 @@ public class ExecuteExecutor extends AbstractExecutor {
             logger.warn("Exec in warning with {}", commandLine);
             futureCompletion.setSuccess();
         } else {
-            logger.debug("Status: " + status + (status == -1 ? " Tiemout" : "")
-                    + " Exec in error with " +
-                    commandLine.toString());
+            logger.debug("Status: " + status + (status == -1? " Tiemout" : "")
+                         + " Exec in error with " +
+                         commandLine.toString());
             throw new Reply421Exception("Pre command executed in error");
         }
     }

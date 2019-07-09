@@ -1,24 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.test;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.logging.WaarpLoggerFactory;
@@ -31,14 +27,25 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Test class for multiple DirectTransfer
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class TestTransferNoDb extends DirectTransfer {
     static int nb = 100;
+
+    public TestTransferNoDb(R66Future future, String remoteHost,
+                            String filename, String rulename, String fileinfo, boolean isMD5, int blocksize,
+                            long id,
+                            NetworkTransaction networkTransaction) {
+        super(future, remoteHost, filename, rulename, fileinfo, isMD5, blocksize, id,
+              networkTransaction);
+    }
 
     /**
      * @param args
@@ -56,14 +63,6 @@ public class TestTransferNoDb extends DirectTransfer {
             }
         }
         return true;
-    }
-
-    public TestTransferNoDb(R66Future future, String remoteHost,
-            String filename, String rulename, String fileinfo, boolean isMD5, int blocksize,
-            long id,
-            NetworkTransaction networkTransaction) {
-        super(future, remoteHost, filename, rulename, fileinfo, isMD5, blocksize, id,
-                networkTransaction);
     }
 
     public static void main(String[] args) {
@@ -92,9 +91,9 @@ public class TestTransferNoDb extends DirectTransfer {
             for (int i = 0; i < nb; i++) {
                 arrayFuture[i] = new R66Future(true);
                 TestTransferNoDb transaction = new TestTransferNoDb(arrayFuture[i],
-                        rhost, localFilename, rule, fileInfo, ismd5, block,
-                        DbConstant.ILLEGALVALUE,
-                        networkTransaction);
+                                                                    rhost, localFilename, rule, fileInfo, ismd5, block,
+                                                                    DbConstant.ILLEGALVALUE,
+                                                                    networkTransaction);
                 transaction.normalInfoAsWarn = snormalInfoAsWarn;
                 executorService.execute(transaction);
                 try {
@@ -116,7 +115,7 @@ public class TestTransferNoDb extends DirectTransfer {
                     }
                 } else {
                     if (result.getRunner() != null &&
-                            result.getRunner().getErrorInfo() == ErrorCode.Warning) {
+                        result.getRunner().getErrorInfo() == ErrorCode.Warning) {
                         warn++;
                     } else {
                         error++;
@@ -128,9 +127,9 @@ public class TestTransferNoDb extends DirectTransfer {
             // Get the first result as testing only
             R66Result result = arrayFuture[0].getResult();
             logger.warn("Final file: " +
-                    (result.getFile() != null ? result.getFile().toString() : "no file"));
+                        (result.getFile() != null? result.getFile().toString() : "no file"));
             try {
-                length = result.getFile() != null ? result.getFile().length() : 0L;
+                length = result.getFile() != null? result.getFile().length() : 0L;
             } catch (CommandAbstractException e) {
             }
             long delay = time2 - time1;
@@ -138,7 +137,7 @@ public class TestTransferNoDb extends DirectTransfer {
             nbs /= delay;
             float mbs = nbs * length / 1024;
             logger.warn("Success: " + success + " Warning: " + warn + " Error: " +
-                    error + " delay: " + delay + " NB/s: " + nbs + " KB/s: " + mbs);
+                        error + " delay: " + delay + " NB/s: " + nbs + " KB/s: " + mbs);
             executorService.shutdown();
         } finally {
             networkTransaction.closeAll();

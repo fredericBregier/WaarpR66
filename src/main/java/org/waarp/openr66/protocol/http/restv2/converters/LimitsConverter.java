@@ -25,29 +25,31 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.waarp.openr66.pojo.Limit;
-import org.waarp.openr66.protocol.http.restv2.errors.RestErrorException;
 import org.waarp.openr66.protocol.http.restv2.errors.RestError;
+import org.waarp.openr66.protocol.http.restv2.errors.RestErrorException;
 import org.waarp.openr66.protocol.http.restv2.errors.RestErrors;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.SERVER_NAME;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.LimitsFields.*;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ILLEGAL_PARAMETER_VALUE;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 
 /**
- * A collection of utility methods to convert {@link Limit} objects
- * to their corresponding {@link ObjectNode} and vice-versa.
+ * A collection of utility methods to convert {@link Limit} objects to their corresponding {@link ObjectNode} and
+ * vice-versa.
  */
 public final class LimitsConverter {
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private LimitsConverter() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
     //########################### PUBLIC METHODS ###############################
@@ -56,12 +58,13 @@ public final class LimitsConverter {
      * Converts the given {@link Limit} object into an {@link ObjectNode}.
      *
      * @param limits the limits object to convert
-     * @return       the converted ObjectNode
+     *
+     * @return the converted ObjectNode
      */
     public static ObjectNode limitToNode(Limit limits) {
         ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
         node.put(READ_GLOBAL_LIMIT, limits.getReadGlobalLimit());
-        node.put(WRITE_GLOBAL_LIMIT,limits.getWriteGlobalLimit());
+        node.put(WRITE_GLOBAL_LIMIT, limits.getWriteGlobalLimit());
         node.put(READ_SESSION_LIMIT, limits.getReadSessionLimit());
         node.put(WRITE_SESSION_LIMIT, limits.getWriteSessionLimit());
         node.put(DELAY_LIMIT, limits.getDelayLimit());
@@ -73,9 +76,10 @@ public final class LimitsConverter {
      * Converts the given {@link ObjectNode} into a {@link Limit} object.
      *
      * @param object the ObjectNode to convert
-     * @return       the corresponding Limit object
-     * @throws RestErrorException if the given ObjectNode does not represent a
-     *                            Limit object
+     *
+     * @return the corresponding Limit object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Limit object
      */
     public static Limit nodeToNewLimit(ObjectNode object) {
         Limit emptyLimits = new Limit(SERVER_NAME, 0, 0, 0, 0, 0);
@@ -83,15 +87,15 @@ public final class LimitsConverter {
     }
 
     /**
-     * Returns the given {@link Limit} object updated with the values defined
-     * in the {@link ObjectNode} parameter. All fields missing in the JSON
-     * object will stay unchanged in the updated limit object.
+     * Returns the given {@link Limit} object updated with the values defined in the {@link ObjectNode} parameter. All
+     * fields missing in the JSON object will stay unchanged in the updated limit object.
      *
-     * @param object    the ObjectNode to convert
+     * @param object the ObjectNode to convert
      * @param oldLimits the Limit object to update
-     * @return          the updated Limit object
-     * @throws RestErrorException if the given ObjectNode does not represent
-     *                            a Limit object
+     *
+     * @return the updated Limit object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Limit object
      */
     public static Limit nodeToUpdatedLimit(ObjectNode object, Limit oldLimits) {
         List<RestError> errors = new ArrayList<RestError>();
@@ -107,36 +111,31 @@ public final class LimitsConverter {
                 } else {
                     errors.add(ILLEGAL_PARAMETER_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(WRITE_GLOBAL_LIMIT)) {
+            } else if (name.equalsIgnoreCase(WRITE_GLOBAL_LIMIT)) {
                 if (value.canConvertToLong() && value.asLong() >= 0) {
                     oldLimits.setWriteGlobalLimit(value.asLong());
                 } else {
                     errors.add(ILLEGAL_PARAMETER_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(READ_SESSION_LIMIT)) {
+            } else if (name.equalsIgnoreCase(READ_SESSION_LIMIT)) {
                 if (value.canConvertToLong() && value.asLong() >= 0) {
                     oldLimits.setReadSessionLimit(value.asLong());
                 } else {
                     errors.add(ILLEGAL_PARAMETER_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(WRITE_SESSION_LIMIT)) {
+            } else if (name.equalsIgnoreCase(WRITE_SESSION_LIMIT)) {
                 if (value.canConvertToLong() && value.asLong() >= 0) {
                     oldLimits.setWriteSessionLimit(value.asLong());
                 } else {
                     errors.add(ILLEGAL_PARAMETER_VALUE(name, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(DELAY_LIMIT)) {
+            } else if (name.equalsIgnoreCase(DELAY_LIMIT)) {
                 if (value.canConvertToLong() && value.asLong() >= 0) {
                     oldLimits.setDelayLimit(value.asLong());
                 } else {
                     errors.add(ILLEGAL_PARAMETER_VALUE(name, value.toString()));
                 }
-            }
-            else {
+            } else {
                 errors.add(RestErrors.UNKNOWN_FIELD(name));
             }
         }

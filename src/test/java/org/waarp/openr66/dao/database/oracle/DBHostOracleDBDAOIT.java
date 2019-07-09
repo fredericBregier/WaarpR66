@@ -10,12 +10,11 @@ import java.sql.SQLException;
 
 public class DBHostOracleDBDAOIT extends DBHostDAOIT {
 
+    @ClassRule
+    public static OracleContainer db = new OracleContainer("epiclabs/docker-oracle-xe-11g");
     private String createScript = "oracle/create.sql";
     private String populateScript = "oracle/populate.sql";
     private String cleanScript = "oracles/clean.sql";
-
-    @ClassRule
-    public static OracleContainer db = new OracleContainer("epiclabs/docker-oracle-xe-11g");
 
     @Override
     public Connection getConnection() throws SQLException {

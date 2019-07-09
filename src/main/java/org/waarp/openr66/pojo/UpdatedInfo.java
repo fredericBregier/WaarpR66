@@ -35,16 +35,16 @@ public enum UpdatedInfo {
      */
     DONE(6);
 
-    private int id;
-
     private static Map<Integer, UpdatedInfo> map
             = new HashMap<Integer, UpdatedInfo>();
 
     static {
-        for (UpdatedInfo updatedInfo: UpdatedInfo.values()) {
+        for (UpdatedInfo updatedInfo : UpdatedInfo.values()) {
             map.put(updatedInfo.id, updatedInfo);
         }
     }
+
+    private int id;
 
     UpdatedInfo(final int updatedInfo) {
         id = updatedInfo;
@@ -57,12 +57,12 @@ public enum UpdatedInfo {
         return map.get(updatedInfo);
     }
 
-    public boolean equals(AbstractDbData.UpdatedInfo legacy) {
-        return this.ordinal() == legacy.ordinal();
-    }
-
     public static UpdatedInfo fromLegacy(AbstractDbData.UpdatedInfo info) {
         return valueOf(info.name());
+    }
+
+    public boolean equals(AbstractDbData.UpdatedInfo legacy) {
+        return this.ordinal() == legacy.ordinal();
     }
 
     public AbstractDbData.UpdatedInfo getLegacy() {

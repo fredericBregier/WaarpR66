@@ -1,27 +1,22 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.commons.exec.CommandLine;
-
 import org.waarp.common.digest.FilesystemBasedDigest;
 import org.waarp.common.digest.FilesystemBasedDigest.DigestAlgo;
 import org.waarp.common.logging.WaarpLogger;
@@ -33,9 +28,12 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.context.task.exception.OpenR66RunnerErrorException;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Ftp Transfer task: synchronous<br>
- * 
+ *
  * Result of arguments will be as FTP command.<br>
  * Format is the following:<br>
  * "-file filepath <br>
@@ -71,9 +69,9 @@ import org.waarp.openr66.protocol.configuration.Configuration;
  * 12) if post => extraCommand2 with ',' replaced by ' ' (note: do not use standard commands from FTP like
  * ACCT,PASS,REIN,USER,APPE,STOR,STOU,RETR,RMD,RNFR,RNTO,ABOR,CWD,CDUP,MODE,PASV,PORT,STRU,TYPE,MDTM,MLSD,MLST,SIZE,AUTH)<br>
  * 13) QUIT<br>
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class FtpTransferTask extends AbstractTask {
     /**
@@ -89,14 +87,14 @@ public class FtpTransferTask extends AbstractTask {
      * @param session
      */
     public FtpTransferTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                           R66Session session) {
         super(TaskType.FTP, delay, argRule, argTransfer, session);
     }
 
     @Override
     public void run() {
         logger.info("FtpTransfer with " + argRule + ":" + argTransfer + " and {}",
-                session);
+                    session);
         String finalname = argRule;
         Object[] argFormat = argTransfer.split(" ");
         if (argFormat != null && argFormat.length > 0) {
@@ -104,7 +102,7 @@ public class FtpTransferTask extends AbstractTask {
                 finalname = String.format(finalname, argFormat);
             } catch (Exception e) {
                 // ignored error since bad argument in static rule info
-                logger.error("Bad format in Rule: {"+finalname+"} " + e.getMessage());
+                logger.error("Bad format in Rule: {" + finalname + "} " + e.getMessage());
             }
         }
 
@@ -223,13 +221,13 @@ public class FtpTransferTask extends AbstractTask {
             }
         }
         if (filepath == null || requested == null || port <= 0 || user == null || pwd == null ||
-                codeCommand == 0) {
+            codeCommand == 0) {
             OpenR66RunnerErrorException exception = new OpenR66RunnerErrorException("Not enough argument in Transfer");
             R66Result result = new R66Result(exception, session, false, ErrorCode.CommandNotFound, session.getRunner());
             int code = 0 +
-                    (filepath == null ? 1 : 0) + (requested == null ? 10 : 0) +
-                    (port <= 0 ? 100 : 0) + (user == null ? 1000 : 0) + (pwd == null ? 10000 : 0) +
-                    (codeCommand == 0 ? 100000 : 0);
+                       (filepath == null? 1 : 0) + (requested == null? 10 : 0) +
+                       (port <= 0? 100 : 0) + (user == null? 1000 : 0) + (pwd == null? 10000 : 0) +
+                       (codeCommand == 0? 100000 : 0);
             logger.error("Not enough arguments: " + code);
             futureCompletion.setResult(result);
             futureCompletion.setFailure(exception);
@@ -237,7 +235,7 @@ public class FtpTransferTask extends AbstractTask {
         }
         WaarpFtp4jClient ftpClient =
                 new WaarpFtp4jClient(requested, port, user, pwd, acct, isPassive, ssl,
-                        5000, (int) Configuration.configuration.getTIMEOUTCON());
+                                     5000, (int) Configuration.configuration.getTIMEOUTCON());
         boolean status = false;
         for (int i = 0; i < Configuration.RETRYNB; i++) {
             if (ftpClient.connect()) {
@@ -246,9 +244,10 @@ public class FtpTransferTask extends AbstractTask {
             }
         }
         if (!status) {
-            OpenR66RunnerErrorException exception = new OpenR66RunnerErrorException("Cannot connect to remote FTP host");
+            OpenR66RunnerErrorException exception =
+                    new OpenR66RunnerErrorException("Cannot connect to remote FTP host");
             R66Result result = new R66Result(exception, session, false, ErrorCode.ConnectionImpossible,
-                    session.getRunner());
+                                             session.getRunner());
             futureCompletion.setResult(result);
             futureCompletion.setFailure(exception);
             logger.error(ftpClient.getResult());
@@ -271,7 +270,7 @@ public class FtpTransferTask extends AbstractTask {
                 OpenR66RunnerErrorException exception = new OpenR66RunnerErrorException(
                         "Cannot transfert file from/to remote FTP host");
                 R66Result result = new R66Result(exception, session, false, ErrorCode.TransferError,
-                        session.getRunner());
+                                                 session.getRunner());
                 futureCompletion.setResult(result);
                 futureCompletion.setFailure(exception);
                 logger.error(ftpClient.getResult());
@@ -282,32 +281,32 @@ public class FtpTransferTask extends AbstractTask {
                 String params = null;
                 DigestAlgo algo = null;
                 switch (digest) {
-                    case 1: // CRC
-                        params = "XCRC ";
-                        algo = DigestAlgo.CRC32;
-                        break;
-                    case 2: // MD5
-                        params = "XMD5 ";
-                        algo = DigestAlgo.MD5;
-                        break;
-                    case 3: // SHA1
-                    default:
-                        params = "XSHA1 ";
-                        algo = DigestAlgo.SHA1;
-                        break;
+                case 1: // CRC
+                    params = "XCRC ";
+                    algo = DigestAlgo.CRC32;
+                    break;
+                case 2: // MD5
+                    params = "XMD5 ";
+                    algo = DigestAlgo.MD5;
+                    break;
+                case 3: // SHA1
+                default:
+                    params = "XSHA1 ";
+                    algo = DigestAlgo.SHA1;
+                    break;
                 }
                 params += filename;
                 String[] values = ftpClient.executeCommand(params);
                 String hashresult = null;
                 if (values != null) {
                     values = values[0].split(" ");
-                    hashresult = (values.length > 3 ? values[1] : values[0]);
+                    hashresult = (values.length > 3? values[1] : values[0]);
                 }
                 if (hashresult == null) {
                     OpenR66RunnerErrorException exception = new OpenR66RunnerErrorException(
                             "Hash cannot be computed while FTP transfer is done");
                     R66Result result = new R66Result(exception, session, false, ErrorCode.TransferError,
-                            session.getRunner());
+                                                     session.getRunner());
                     futureCompletion.setResult(result);
                     futureCompletion.setFailure(exception);
                     logger.error("Hash cannot be computed: " + ftpClient.getResult());
@@ -325,7 +324,7 @@ public class FtpTransferTask extends AbstractTask {
                     OpenR66RunnerErrorException exception = new OpenR66RunnerErrorException(
                             "Hash not equal while FTP transfer is done");
                     R66Result result = new R66Result(exception, session, false, ErrorCode.TransferError,
-                            session.getRunner());
+                                                     session.getRunner());
                     futureCompletion.setResult(result);
                     futureCompletion.setFailure(exception);
                     logger.error("Hash not equal: " + ftpClient.getResult());
@@ -344,7 +343,7 @@ public class FtpTransferTask extends AbstractTask {
         R66Result result = new R66Result(session, false, ErrorCode.TransferOk, session.getRunner());
         futureCompletion.setResult(result);
         logger.info("FTP transfer in     SUCCESS     " + session.getRunner().toShortString() +
-                "     <REMOTE>" + requested + "</REMOTE>");
+                    "     <REMOTE>" + requested + "</REMOTE>");
         futureCompletion.setSuccess();
     }
 

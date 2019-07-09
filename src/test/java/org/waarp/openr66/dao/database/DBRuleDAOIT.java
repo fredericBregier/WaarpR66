@@ -1,5 +1,13 @@
 package org.waarp.openr66.dao.database;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.waarp.openr66.dao.Filter;
+import org.waarp.openr66.dao.RuleDAO;
+import org.waarp.openr66.pojo.Rule;
+import org.waarp.openr66.pojo.UpdatedInfo;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
@@ -8,22 +16,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static  org.junit.Assert.*;
-
-import org.waarp.openr66.dao.RuleDAO;
-import org.waarp.openr66.dao.Filter;
-import org.waarp.openr66.pojo.Rule;
-import org.waarp.openr66.pojo.UpdatedInfo;
+import static org.junit.Assert.*;
 
 public abstract class DBRuleDAOIT {
 
     private Connection con;
 
     public abstract Connection getConnection() throws SQLException;
+
     public abstract void initDB() throws SQLException;
+
     public abstract void cleanDB() throws SQLException;
 
     public void runScript(String script) {
@@ -63,7 +65,7 @@ public abstract class DBRuleDAOIT {
             dao.deleteAll();
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM rules");
+                               .executeQuery("SELECT * FROM rules");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -77,7 +79,7 @@ public abstract class DBRuleDAOIT {
             dao.delete(new Rule("default", 1));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM rules where idrule = 'default'");
+                               .executeQuery("SELECT * FROM rules where idrule = 'default'");
             assertEquals(false, res.next());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -140,12 +142,12 @@ public abstract class DBRuleDAOIT {
             dao.insert(new Rule("chacha", 2));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT COUNT(1) as count FROM rules");
+                               .executeQuery("SELECT COUNT(1) as count FROM rules");
             res.next();
             assertEquals(4, res.getInt("count"));
 
             ResultSet res2 = con.createStatement()
-                .executeQuery("SELECT * FROM rules WHERE idrule = 'chacha'");
+                                .executeQuery("SELECT * FROM rules WHERE idrule = 'chacha'");
             res2.next();
             assertEquals("chacha", res2.getString("idrule"));
             assertEquals(2, res2.getInt("modetrans"));
@@ -173,7 +175,7 @@ public abstract class DBRuleDAOIT {
             dao.update(new Rule("dummy", 2));
 
             ResultSet res = con.createStatement()
-                .executeQuery("SELECT * FROM rules WHERE idrule = 'dummy'");
+                               .executeQuery("SELECT * FROM rules WHERE idrule = 'dummy'");
             res.next();
             assertEquals("dummy", res.getString("idrule"));
             assertEquals(2, res.getInt("modetrans"));

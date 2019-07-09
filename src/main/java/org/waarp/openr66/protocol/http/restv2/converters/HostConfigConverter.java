@@ -43,23 +43,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.waarp.common.role.RoleDefault.ROLE;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.DAO_FACTORY;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.SERVER_NAME;
+import static org.waarp.common.role.RoleDefault.*;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.HostConfigFields.*;
 import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 
 /**
- * A collection of utility methods to convert {@link Business}
- * objects to their corresponding {@link ObjectNode} and vice-versa.
+ * A collection of utility methods to convert {@link Business} objects to their corresponding {@link ObjectNode} and
+ * vice-versa.
  */
 public final class HostConfigConverter {
 
-    /** Makes the default constructor of this utility class inaccessible. */
+    /**
+     * Makes the default constructor of this utility class inaccessible.
+     */
     private HostConfigConverter() throws InstantiationException {
         throw new InstantiationException(this.getClass().getName() +
-                " cannot be instantiated.");
+                                         " cannot be instantiated.");
     }
 
     //########################### PUBLIC METHODS ###############################
@@ -68,7 +69,8 @@ public final class HostConfigConverter {
      * Converts the given {@link Business} object into an {@link ObjectNode}.
      *
      * @param hostConfig the HostConfig object to convert
-     * @return           the converted ObjectNode
+     *
+     * @return the converted ObjectNode
      */
     public static ObjectNode businessToNode(Business hostConfig) {
         ArrayNode business = getBusinessArray(hostConfig);
@@ -88,28 +90,28 @@ public final class HostConfigConverter {
      * Converts the given {@link ObjectNode} into a {@link Business} object.
      *
      * @param object the ObjectNode to convert
-     * @return       the corresponding HostConfig object
-     * @throws RestErrorException if the given ObjectNode does not represent a
-     *                            Business object
+     *
+     * @return the corresponding HostConfig object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Business object
      */
     public static Business nodeToNewBusiness(ObjectNode object) {
         Business emptyBusiness = new Business(SERVER_NAME, "", "<roles></roles>",
-                "<aliases></aliases>", "<root><version></version></root>");
+                                              "<aliases></aliases>", "<root><version></version></root>");
 
         return nodeToUpdatedBusiness(object, emptyBusiness);
     }
 
     /**
-     * Returns the given {@link Business} object updated with the values
-     * defined in the {@link ObjectNode} parameter. All fields missing from
-     * the ObjectNode parameter will stay unchanged in the returned Business
-     * object.
+     * Returns the given {@link Business} object updated with the values defined in the {@link ObjectNode} parameter.
+     * All fields missing from the ObjectNode parameter will stay unchanged in the returned Business object.
      *
-     * @param object      the ObjectNode to convert.
+     * @param object the ObjectNode to convert.
      * @param oldBusiness the Business object to update.
-     * @return            the updated Business object
-     * @throws RestErrorException if the given ObjectNode does not represent a
-     *                            Business object
+     *
+     * @return the updated Business object
+     *
+     * @throws RestErrorException if the given ObjectNode does not represent a Business object
      */
     public static Business nodeToUpdatedBusiness(ObjectNode object, Business oldBusiness) {
         List<RestError> errors = new ArrayList<RestError>();
@@ -130,15 +132,14 @@ public final class HostConfigConverter {
                             businessList.business.add(businessName.asText());
                         } else {
                             errors.add(ILLEGAL_FIELD_VALUE(BUSINESS,
-                                    businessName.toString()));
+                                                           businessName.toString()));
                         }
                     }
                     oldBusiness.setBusiness(XmlUtils.objectToXml(businessList));
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(BUSINESS, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(ROLES)) {
+            } else if (name.equalsIgnoreCase(ROLES)) {
                 if (value.isArray()) {
                     try {
                         Roles roles = nodeToRoles((ArrayNode) value);
@@ -149,8 +150,7 @@ public final class HostConfigConverter {
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(ROLES, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(ALIASES)) {
+            } else if (name.equalsIgnoreCase(ALIASES)) {
                 if (value.isArray()) {
                     try {
                         Aliases aliases = nodeToAliasList((ArrayNode) value);
@@ -161,17 +161,15 @@ public final class HostConfigConverter {
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(ALIASES, value.toString()));
                 }
-            }
-            else if (name.equalsIgnoreCase(OTHERS)) {
+            } else if (name.equalsIgnoreCase(OTHERS)) {
                 if (value.isTextual() && value.asText()
-                        .matches("<root><version>.+</version></root>")) {
+                                              .matches("<root><version>.+</version></root>")) {
                     oldBusiness.setOthers(value.asText());
 
                 } else {
                     errors.add(ILLEGAL_FIELD_VALUE(ALIASES, value.toString()));
                 }
-            }
-            else {
+            } else {
                 errors.add(UNKNOWN_FIELD(name));
             }
         }
@@ -186,9 +184,11 @@ public final class HostConfigConverter {
 
     /**
      * Returns the requested host's list of roles on the server.
-     * 
+     *
      * @param hostName the desired host's name
-     * @return         the host's list of roles
+     *
+     * @return the host's list of roles
+     *
      * @throws InternalServerErrorException if an unexpected error occurred
      */
     public static List<ROLE> getRoles(String hostName) {
@@ -220,11 +220,11 @@ public final class HostConfigConverter {
     //########################## PRIVATE METHODS ###############################
 
     /**
-     * Converts and returns the list of aliases of the given {@link Business}
-     * object into an {@link ArrayNode}.
+     * Converts and returns the list of aliases of the given {@link Business} object into an {@link ArrayNode}.
      *
      * @param hostConfig the server's HostConfig object
-     * @return           the server's list of known aliases
+     *
+     * @return the server's list of known aliases
      */
     private static ArrayNode getAliasArray(Business hostConfig) {
         ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
@@ -249,11 +249,11 @@ public final class HostConfigConverter {
     }
 
     /**
-     * Converts and returns the list of roles of the given {@link Business}
-     * object into an {@link ArrayNode}.
+     * Converts and returns the list of roles of the given {@link Business} object into an {@link ArrayNode}.
      *
      * @param hostConfig the server's HostConfig object
-     * @return           the server's list of known aliases
+     *
+     * @return the server's list of known aliases
      */
     private static ArrayNode getRolesArray(Business hostConfig) {
         ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
@@ -278,11 +278,12 @@ public final class HostConfigConverter {
     }
 
     /**
-     * Converts and returns the list of business partners of the given
-     * {@link Business} object into an {@link ArrayNode}.
+     * Converts and returns the list of business partners of the given {@link Business} object into an {@link
+     * ArrayNode}.
      *
      * @param hostConfig the server's HostConfig object
-     * @return           the server's list of known aliases
+     *
+     * @return the server's list of known aliases
      */
     private static ArrayNode getBusinessArray(Business hostConfig) {
         ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
@@ -298,9 +299,10 @@ public final class HostConfigConverter {
      * Converts the given {@link ArrayNode} into an {@link Aliases} object.
      *
      * @param array the JSON array of aliases
-     * @return      the XML serializable list of aliases
-     * @throws RestErrorException if the given ArrayNode does not represent a
-     *                            list of aliases
+     *
+     * @return the XML serializable list of aliases
+     *
+     * @throws RestErrorException if the given ArrayNode does not represent a list of aliases
      */
     private static Aliases nodeToAliasList(ArrayNode array) {
         List<AliasEntry> aliases = new ArrayList<AliasEntry>();
@@ -328,8 +330,7 @@ public final class HostConfigConverter {
                     } else {
                         errors.add(ILLEGAL_PARAMETER_VALUE(HOST_NAME, value.toString()));
                     }
-                }
-                else if (name.equalsIgnoreCase(ALIAS_LIST)) {
+                } else if (name.equalsIgnoreCase(ALIAS_LIST)) {
                     if (value.isArray()) {
                         Iterator<JsonNode> aliasList = value.elements();
                         while (aliasList.hasNext()) {
@@ -338,14 +339,13 @@ public final class HostConfigConverter {
                                 alias.aliasList.add(aliasId.asText());
                             } else {
                                 errors.add(ILLEGAL_PARAMETER_VALUE(ALIAS_LIST,
-                                        aliasId.toString()));
+                                                                   aliasId.toString()));
                             }
                         }
                     } else {
                         errors.add(ILLEGAL_PARAMETER_VALUE(ALIAS_LIST, value.toString()));
                     }
-                }
-                else {
+                } else {
                     errors.add(UNKNOWN_FIELD(name));
                 }
             }
@@ -370,9 +370,10 @@ public final class HostConfigConverter {
      * Converts the given {@link ArrayNode} into an {@link Roles} object.
      *
      * @param array the JSON list of roles
-     * @return      the XML serializable list of roles
-     * @throws RestErrorException if the given ArrayNode does not represent
-     *                            a list of roles
+     *
+     * @return the XML serializable list of roles
+     *
+     * @throws RestErrorException if the given ArrayNode does not represent a list of roles
      */
     private static Roles nodeToRoles(ArrayNode array) {
         List<RoleEntry> roles = new ArrayList<RoleEntry>();
@@ -400,8 +401,7 @@ public final class HostConfigConverter {
                     } else {
                         errors.add(ILLEGAL_PARAMETER_VALUE(HOST_NAME, value.toString()));
                     }
-                }
-                else if (name.equalsIgnoreCase(ROLE_LIST)) {
+                } else if (name.equalsIgnoreCase(ROLE_LIST)) {
                     if (value.isArray()) {
                         Iterator<JsonNode> roleTypes = value.elements();
                         while (roleTypes.hasNext()) {
@@ -411,18 +411,17 @@ public final class HostConfigConverter {
                                     role.roleList.add(ROLE.valueOf(roleType.asText()));
                                 } catch (IllegalArgumentException e) {
                                     errors.add(ILLEGAL_PARAMETER_VALUE(ROLE_LIST,
-                                            roleType.toString()));
+                                                                       roleType.toString()));
                                 }
                             } else {
                                 errors.add(ILLEGAL_PARAMETER_VALUE(ROLE_LIST,
-                                        roleType.toString()));
+                                                                   roleType.toString()));
                             }
                         }
                     } else {
                         errors.add(ILLEGAL_PARAMETER_VALUE(ROLE_LIST, value.toString()));
                     }
-                }
-                else {
+                } else {
                     errors.add(UNKNOWN_FIELD(name));
                 }
             }

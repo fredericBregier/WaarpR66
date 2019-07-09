@@ -1,23 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.server;
-
-import java.net.SocketAddress;
 
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.logging.WaarpLogger;
@@ -43,19 +40,17 @@ import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.net.SocketAddress;
+
 /**
  * Config Import from a local client without database connection
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class ConfigImport implements Runnable {
-    /**
-     * Internal Logger
-     */
-    static volatile WaarpLogger logger;
-
-    protected static String _INFO_ARGS = "Need at least the configuration file as first argument then at least one from\n"
+    protected static String _INFO_ARGS =
+            "Need at least the configuration file as first argument then at least one from\n"
             +
             "    -hosts file\n" +
             "    -rules file\n" +
@@ -73,164 +68,6 @@ public class ConfigImport implements Runnable {
             "    -aliasid file transfer id (if compatible)\n" +
             "    -roleid file transfer id (if compatible)\n" +
             "    -host host (optional)";
-
-    protected final R66Future future;
-    protected final String host;
-    protected final boolean hostPurge;
-    protected final String rule;
-    protected final boolean rulePurge;
-    protected final String business;
-    protected final boolean businessPurge;
-    protected final String alias;
-    protected final boolean aliasPurge;
-    protected final String role;
-    protected final boolean rolePurge;
-    protected long hostid = DbConstant.ILLEGALVALUE, ruleid = DbConstant.ILLEGALVALUE,
-            businessid = DbConstant.ILLEGALVALUE, aliasid = DbConstant.ILLEGALVALUE,
-            roleid = DbConstant.ILLEGALVALUE;
-    protected final NetworkTransaction networkTransaction;
-    protected DbHostAuth dbhost;
-
-    public ConfigImport(R66Future future, boolean hostPurge, boolean rulePurge,
-            String host, String rule,
-            NetworkTransaction networkTransaction) {
-        this.future = future;
-        this.host = host;
-        this.rule = rule;
-        this.hostPurge = hostPurge;
-        this.rulePurge = rulePurge;
-        this.business = null;
-        this.businessPurge = false;
-        this.alias = null;
-        this.aliasPurge = false;
-        this.role = null;
-        this.rolePurge = false;
-        this.networkTransaction = networkTransaction;
-        this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
-    }
-
-    public ConfigImport(R66Future future, boolean hostPurge, boolean rulePurge,
-            boolean businessPurge, boolean aliasPurge, boolean rolePurge,
-            String host, String rule,
-            String business, String alias, String role,
-            NetworkTransaction networkTransaction) {
-        this.future = future;
-        this.host = host;
-        this.rule = rule;
-        this.hostPurge = hostPurge;
-        this.rulePurge = rulePurge;
-        this.business = business;
-        this.businessPurge = businessPurge;
-        this.alias = alias;
-        this.aliasPurge = aliasPurge;
-        this.role = role;
-        this.rolePurge = rolePurge;
-        this.networkTransaction = networkTransaction;
-        this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
-    }
-
-    /**
-     * Used when the filenames are not compliant with remote filenames.
-     * 
-     * @param hostid
-     * @param ruleid
-     * @param businessid
-     * @param aliasid
-     * @param roleid
-     */
-    public void setSpecialIds(long hostid, long ruleid, long businessid, long aliasid, long roleid) {
-        this.hostid = hostid;
-        this.ruleid = ruleid;
-        this.businessid = businessid;
-        this.aliasid = aliasid;
-        this.roleid = roleid;
-    }
-
-    public void setHost(DbHostAuth host) {
-        this.dbhost = host;
-    }
-
-    /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
-     */
-    public void run() {
-        if (logger == null) {
-            logger = WaarpLoggerFactory.getLogger(ConfigImport.class);
-        }
-        SocketAddress socketAddress;
-        try {
-            socketAddress = dbhost.getSocketAddress();
-        } catch (IllegalArgumentException e) {
-            logger.error("Cannot Connect to " + dbhost.getHostid());
-            future.setResult(new R66Result(
-                    new OpenR66ProtocolNoConnectionException("Cannot connect to server " + dbhost.getHostid()),
-                    null, true, ErrorCode.ConnectionImpossible, null));
-            dbhost = null;
-            future.setFailure(future.getResult().getException());
-            return;
-        }
-        boolean isSSL = dbhost.isSsl();
-
-        LocalChannelReference localChannelReference = networkTransaction
-                .createConnectionWithRetry(socketAddress, isSSL, future);
-        socketAddress = null;
-        if (localChannelReference == null) {
-            logger.error("Cannot Connect to " + dbhost.getHostid());
-            future.setResult(new R66Result(
-                    new OpenR66ProtocolNoConnectionException("Cannot connect to server " + dbhost.getHostid()),
-                    null, true, ErrorCode.ConnectionImpossible, null));
-            dbhost = null;
-            future.setFailure(future.getResult().getException());
-            return;
-        }
-        localChannelReference.sessionNewState(R66FiniteDualStates.VALIDOTHER);
-        boolean useJson = PartnerConfiguration.useJson(dbhost.getHostid());
-        logger.debug("UseJson: " + useJson);
-        AbstractLocalPacket valid = null;
-        if (useJson) {
-            ConfigImportJsonPacket node = new ConfigImportJsonPacket();
-            node.setHost(host);
-            node.setRule(rule);
-            node.setBusiness(business);
-            node.setAlias(alias);
-            node.setRoles(role);
-            node.setPurgehost(hostPurge);
-            node.setPurgerule(rulePurge);
-            node.setPurgebusiness(businessPurge);
-            node.setPurgealias(aliasPurge);
-            node.setPurgeroles(rolePurge);
-            node.setHostid(hostid);
-            node.setRuleid(ruleid);
-            node.setBusinessid(businessid);
-            node.setAliasid(aliasid);
-            node.setRolesid(roleid);
-            valid = new JsonCommandPacket(node, LocalPacketFactory.CONFIMPORTPACKET);
-        } else {
-            valid = new ValidPacket((hostPurge ? "1 " : "0 ") + host,
-                    (rulePurge ? "1 " : "0 ") + rule,
-                    LocalPacketFactory.CONFIMPORTPACKET);
-        }
-        try {
-            ChannelUtils.writeAbstractLocalPacket(localChannelReference, valid, false);
-        } catch (OpenR66ProtocolPacketException e) {
-            logger.error("Bad Protocol", e);
-            localChannelReference.getLocalChannel().close();
-            localChannelReference = null;
-            dbhost = null;
-            valid = null;
-            future.setResult(new R66Result(e, null, true,
-                    ErrorCode.TransferError, null));
-            future.setFailure(e);
-            return;
-        }
-        dbhost = null;
-        future.awaitUninterruptibly();
-        logger.debug("Request done with " + (future.isSuccess() ? "success" : "error"));
-        localChannelReference.getLocalChannel().close();
-        localChannelReference = null;
-    }
-
     protected static String shost = null;
     protected static String srule = null;
     protected static String sbusiness = null;
@@ -247,6 +84,62 @@ public class ConfigImport implements Runnable {
     protected static long lbusiness = DbConstant.ILLEGALVALUE;
     protected static long lalias = DbConstant.ILLEGALVALUE;
     protected static long lrole = DbConstant.ILLEGALVALUE;
+    /**
+     * Internal Logger
+     */
+    static volatile WaarpLogger logger;
+    protected final R66Future future;
+    protected final String host;
+    protected final boolean hostPurge;
+    protected final String rule;
+    protected final boolean rulePurge;
+    protected final String business;
+    protected final boolean businessPurge;
+    protected final String alias;
+    protected final boolean aliasPurge;
+    protected final String role;
+    protected final boolean rolePurge;
+    protected final NetworkTransaction networkTransaction;
+    protected long hostid = DbConstant.ILLEGALVALUE, ruleid = DbConstant.ILLEGALVALUE,
+            businessid = DbConstant.ILLEGALVALUE, aliasid = DbConstant.ILLEGALVALUE,
+            roleid = DbConstant.ILLEGALVALUE;
+    protected DbHostAuth dbhost;
+    public ConfigImport(R66Future future, boolean hostPurge, boolean rulePurge,
+                        String host, String rule,
+                        NetworkTransaction networkTransaction) {
+        this.future = future;
+        this.host = host;
+        this.rule = rule;
+        this.hostPurge = hostPurge;
+        this.rulePurge = rulePurge;
+        this.business = null;
+        this.businessPurge = false;
+        this.alias = null;
+        this.aliasPurge = false;
+        this.role = null;
+        this.rolePurge = false;
+        this.networkTransaction = networkTransaction;
+        this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
+    }
+    public ConfigImport(R66Future future, boolean hostPurge, boolean rulePurge,
+                        boolean businessPurge, boolean aliasPurge, boolean rolePurge,
+                        String host, String rule,
+                        String business, String alias, String role,
+                        NetworkTransaction networkTransaction) {
+        this.future = future;
+        this.host = host;
+        this.rule = rule;
+        this.hostPurge = hostPurge;
+        this.rulePurge = rulePurge;
+        this.business = business;
+        this.businessPurge = businessPurge;
+        this.alias = alias;
+        this.aliasPurge = aliasPurge;
+        this.role = role;
+        this.rolePurge = rolePurge;
+        this.networkTransaction = networkTransaction;
+        this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
+    }
 
     protected static boolean getParams(String[] args) {
         if (args.length < 3) {
@@ -376,8 +269,8 @@ public class ConfigImport implements Runnable {
         NetworkTransaction networkTransaction = new NetworkTransaction();
         try {
             ConfigImport transaction = new ConfigImport(future, shostpurge, srulepurge,
-                    sbusinesspurge, saliaspurge, srolepurge, shost, srule,
-                    sbusiness, salias, srole, networkTransaction);
+                                                        sbusinesspurge, saliaspurge, srolepurge, shost, srule,
+                                                        sbusiness, salias, srole, networkTransaction);
             transaction.setSpecialIds(lhost, lrule, lbusiness, lalias, lrole);
             if (stohost != null) {
                 try {
@@ -400,20 +293,20 @@ public class ConfigImport implements Runnable {
                 logger.debug("UseJson: " + useJson);
                 String message = null;
                 if (useJson) {
-                    message = (result.getOther() != null ? ((JsonCommandPacket) result.getOther()).getRequest() :
+                    message = (result.getOther() != null? ((JsonCommandPacket) result.getOther()).getRequest() :
                             "no file");
                 } else {
-                    message = (result.getOther() != null ? ((ValidPacket) result.getOther()).getSheader() :
+                    message = (result.getOther() != null? ((ValidPacket) result.getOther()).getSheader() :
                             "no file");
                 }
                 if (result.getCode() == ErrorCode.Warning) {
                     logger.warn("WARNED on import:     " +
-                            message
-                            + "     delay: " + delay);
+                                message
+                                + "     delay: " + delay);
                 } else {
                     logger.warn("SUCCESS on import:     " +
-                            message
-                            + "     delay: " + delay);
+                                message
+                                + "     delay: " + delay);
                 }
             } else {
                 if (result.getCode() == ErrorCode.Warning) {
@@ -430,6 +323,108 @@ public class ConfigImport implements Runnable {
             networkTransaction.closeAll();
             System.exit(0);
         }
+    }
+
+    /**
+     * Used when the filenames are not compliant with remote filenames.
+     *
+     * @param hostid
+     * @param ruleid
+     * @param businessid
+     * @param aliasid
+     * @param roleid
+     */
+    public void setSpecialIds(long hostid, long ruleid, long businessid, long aliasid, long roleid) {
+        this.hostid = hostid;
+        this.ruleid = ruleid;
+        this.businessid = businessid;
+        this.aliasid = aliasid;
+        this.roleid = roleid;
+    }
+
+    public void setHost(DbHostAuth host) {
+        this.dbhost = host;
+    }
+
+    /**
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
+     * is the responsibility of the caller to finish all network resources.
+     */
+    public void run() {
+        if (logger == null) {
+            logger = WaarpLoggerFactory.getLogger(ConfigImport.class);
+        }
+        SocketAddress socketAddress;
+        try {
+            socketAddress = dbhost.getSocketAddress();
+        } catch (IllegalArgumentException e) {
+            logger.error("Cannot Connect to " + dbhost.getHostid());
+            future.setResult(new R66Result(
+                    new OpenR66ProtocolNoConnectionException("Cannot connect to server " + dbhost.getHostid()),
+                    null, true, ErrorCode.ConnectionImpossible, null));
+            dbhost = null;
+            future.setFailure(future.getResult().getException());
+            return;
+        }
+        boolean isSSL = dbhost.isSsl();
+
+        LocalChannelReference localChannelReference = networkTransaction
+                .createConnectionWithRetry(socketAddress, isSSL, future);
+        socketAddress = null;
+        if (localChannelReference == null) {
+            logger.error("Cannot Connect to " + dbhost.getHostid());
+            future.setResult(new R66Result(
+                    new OpenR66ProtocolNoConnectionException("Cannot connect to server " + dbhost.getHostid()),
+                    null, true, ErrorCode.ConnectionImpossible, null));
+            dbhost = null;
+            future.setFailure(future.getResult().getException());
+            return;
+        }
+        localChannelReference.sessionNewState(R66FiniteDualStates.VALIDOTHER);
+        boolean useJson = PartnerConfiguration.useJson(dbhost.getHostid());
+        logger.debug("UseJson: " + useJson);
+        AbstractLocalPacket valid = null;
+        if (useJson) {
+            ConfigImportJsonPacket node = new ConfigImportJsonPacket();
+            node.setHost(host);
+            node.setRule(rule);
+            node.setBusiness(business);
+            node.setAlias(alias);
+            node.setRoles(role);
+            node.setPurgehost(hostPurge);
+            node.setPurgerule(rulePurge);
+            node.setPurgebusiness(businessPurge);
+            node.setPurgealias(aliasPurge);
+            node.setPurgeroles(rolePurge);
+            node.setHostid(hostid);
+            node.setRuleid(ruleid);
+            node.setBusinessid(businessid);
+            node.setAliasid(aliasid);
+            node.setRolesid(roleid);
+            valid = new JsonCommandPacket(node, LocalPacketFactory.CONFIMPORTPACKET);
+        } else {
+            valid = new ValidPacket((hostPurge? "1 " : "0 ") + host,
+                                    (rulePurge? "1 " : "0 ") + rule,
+                                    LocalPacketFactory.CONFIMPORTPACKET);
+        }
+        try {
+            ChannelUtils.writeAbstractLocalPacket(localChannelReference, valid, false);
+        } catch (OpenR66ProtocolPacketException e) {
+            logger.error("Bad Protocol", e);
+            localChannelReference.getLocalChannel().close();
+            localChannelReference = null;
+            dbhost = null;
+            valid = null;
+            future.setResult(new R66Result(e, null, true,
+                                           ErrorCode.TransferError, null));
+            future.setFailure(e);
+            return;
+        }
+        dbhost = null;
+        future.awaitUninterruptibly();
+        logger.debug("Request done with " + (future.isSuccess()? "success" : "error"));
+        localChannelReference.getLocalChannel().close();
+        localChannelReference = null;
     }
 
 }

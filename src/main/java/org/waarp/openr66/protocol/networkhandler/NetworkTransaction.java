@@ -1,33 +1,20 @@
 /**
  * This file is part of Waarp Project.
- *
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- *
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.protocol.networkhandler;
-
-import static org.waarp.openr66.context.R66FiniteDualStates.AUTHENTR;
-
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -41,7 +28,6 @@ import io.netty.channel.local.LocalChannel;
 import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 import io.netty.util.internal.ConcurrentSet;
-
 import org.waarp.common.crypto.ssl.WaarpSslUtility;
 import org.waarp.common.database.DbAdmin;
 import org.waarp.common.digest.FilesystemBasedDigest;
@@ -57,7 +43,6 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.context.task.exception.OpenR66RunnerErrorException;
 import org.waarp.openr66.database.data.DbHostAuth;
 import org.waarp.openr66.protocol.configuration.Configuration;
-import org.waarp.openr66.protocol.exception.OpenR66Exception;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolNetworkException;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolNoConnectionException;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolNoDataException;
@@ -75,6 +60,18 @@ import org.waarp.openr66.protocol.networkhandler.ssl.NetworkSslServerInitializer
 import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66Future;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
+
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static org.waarp.openr66.context.R66FiniteDualStates.*;
 
 /**
  * This class handles Network Transaction connections
@@ -103,18 +100,21 @@ public class NetworkTransaction {
     /**
      * Hashmap for Currently Shutdown remote host based on socketAddress.hashCode()
      */
-    private static final ConcurrentHashMap<Integer, NetworkChannelReference> networkChannelShutdownOnSocketAddressConcurrentHashMap =
+    private static final ConcurrentHashMap<Integer, NetworkChannelReference>
+            networkChannelShutdownOnSocketAddressConcurrentHashMap =
             new ConcurrentHashMap<Integer, NetworkChannelReference>();
     /**
      * Hashmap for Currently blacklisted remote host based on IP address(String).hashCode()
      */
-    private static final ConcurrentHashMap<Integer, NetworkChannelReference> networkChannelBlacklistedOnInetSocketAddressConcurrentHashMap =
+    private static final ConcurrentHashMap<Integer, NetworkChannelReference>
+            networkChannelBlacklistedOnInetSocketAddressConcurrentHashMap =
             new ConcurrentHashMap<Integer, NetworkChannelReference>();
 
     /**
      * Hashmap for currently active remote host based on socketAddress.hashCode()
      */
-    private static final ConcurrentHashMap<Integer, NetworkChannelReference> networkChannelOnSocketAddressConcurrentHashMap =
+    private static final ConcurrentHashMap<Integer, NetworkChannelReference>
+            networkChannelOnSocketAddressConcurrentHashMap =
             new ConcurrentHashMap<Integer, NetworkChannelReference>();
     /**
      * Remote Client NetworkChannels: used to centralize remote requester hosts (possible different address used)
@@ -139,18 +139,18 @@ public class NetworkTransaction {
 
     public NetworkTransaction() {
         networkChannelGroup = new DefaultChannelGroup("NetworkChannels", Configuration.configuration.getSubTaskGroup()
-                .next());
+                                                                                                    .next());
         NetworkServerInitializer networkServerInitializer = new NetworkServerInitializer(false);
         clientBootstrap = new Bootstrap();
         WaarpNettyUtil.setBootstrap(clientBootstrap, Configuration.configuration.getNetworkWorkerGroup(),
-                (int) Configuration.configuration.getTIMEOUTCON());
+                                    (int) Configuration.configuration.getTIMEOUTCON());
         clientBootstrap.handler(networkServerInitializer);
         Configuration.configuration.setupLimitHandler();
         clientSslBootstrap = new Bootstrap();
         if (Configuration.configuration.isUseSSL() && Configuration.configuration.getHOST_SSLID() != null) {
             NetworkSslServerInitializer networkSslServerInitializer = new NetworkSslServerInitializer(true);
             WaarpNettyUtil.setBootstrap(clientSslBootstrap, Configuration.configuration.getNetworkWorkerGroup(),
-                    (int) Configuration.configuration.getTIMEOUTCON());
+                                        (int) Configuration.configuration.getTIMEOUTCON());
             clientSslBootstrap.handler(networkSslServerInitializer);
         } else {
             if (Configuration.configuration.isWarnOnStartup()) {
@@ -163,10 +163,10 @@ public class NetworkTransaction {
 
     public static String hashStatus() {
         String partial = "NetworkTransaction: [InShutdown: "
-                + networkChannelShutdownOnSocketAddressConcurrentHashMap.size() +
-                " Blacklisted: " + networkChannelBlacklistedOnInetSocketAddressConcurrentHashMap.size() +
-                "\n RetrieveRunner: " + retrieveRunnerConcurrentHashMap.size() +
-                " ClientNetworkChannels: " + clientNetworkChannelsPerHostId.size();
+                         + networkChannelShutdownOnSocketAddressConcurrentHashMap.size() +
+                         " Blacklisted: " + networkChannelBlacklistedOnInetSocketAddressConcurrentHashMap.size() +
+                         "\n RetrieveRunner: " + retrieveRunnerConcurrentHashMap.size() +
+                         " ClientNetworkChannels: " + clientNetworkChannelsPerHostId.size();
         int nb = 0;
         for (ClientNetworkChannels clientNetworkChannels : clientNetworkChannelsPerHostId.values()) {
             nb += clientNetworkChannels.size();
@@ -177,8 +177,8 @@ public class NetworkTransaction {
             nb += ncr.nbLocalChannels();
         }
         partial += "\n NetworkChannels: " + networkChannelOnSocketAddressConcurrentHashMap.size() +
-                " LockOnSocketAddress: " + reentrantLockOnSocketAddressConcurrentHashMap.size() +
-                " Sum of NetworkChannels LocalClients: " + nb + "] ";
+                   " LockOnSocketAddress: " + reentrantLockOnSocketAddressConcurrentHashMap.size() +
+                   " Sum of NetworkChannels LocalClients: " + nb + "] ";
         return partial;
     }
 
@@ -283,217 +283,6 @@ public class NetworkTransaction {
     }
 
     /**
-     * Create a connection to the specified socketAddress with multiple retries
-     *
-     * @param socketAddress
-     * @param isSSL
-     * @param futureRequest
-     * @return the LocalChannelReference
-     */
-    public LocalChannelReference createConnectionWithRetry(SocketAddress socketAddress,
-            boolean isSSL, R66Future futureRequest) {
-        LocalChannelReference localChannelReference = null;
-        for (int i = 0; i < Configuration.RETRYNB; i++) {
-            if (R66ShutdownHook.isShutdownStarting()) {
-                logger.error("Cannot connect : Local system in shutdown");
-                break;
-            }
-            try {
-                localChannelReference =
-                        createConnection(socketAddress, isSSL, futureRequest);
-                break;
-            } catch (OpenR66ProtocolRemoteShutdownException e) {
-                logger.error("Cannot connect : {}", e.getMessage());
-                logger.debug(e);
-                break;
-            } catch (OpenR66ProtocolNoConnectionException e) {
-                logger.error("Cannot connect : {}", e.getMessage());
-                logger.debug(e);
-                break;
-            } catch (OpenR66ProtocolNetworkException e) {
-                // Can retry
-                logger.error("Cannot connect : {}. Will retry", e.getMessage());
-                logger.debug(e);
-                try {
-                    Thread.sleep(Configuration.configuration.getDelayRetry());
-                } catch (InterruptedException e1) {
-                    break;
-                }
-            }
-        }
-        if (localChannelReference != null) {
-            logger.info("Connected");
-        }
-        return localChannelReference;
-    }
-
-    /**
-     * Create a connection to the specified socketAddress
-     *
-     * @param socketAddress
-     * @param isSSL
-     * @param futureRequest
-     * @return the LocalChannelReference
-     * @throws OpenR66ProtocolNetworkException
-     * @throws OpenR66ProtocolRemoteShutdownException
-     * @throws OpenR66ProtocolNoConnectionException
-     */
-    private LocalChannelReference createConnection(SocketAddress socketAddress, boolean isSSL,
-            R66Future futureRequest)
-            throws OpenR66ProtocolNetworkException,
-            OpenR66ProtocolRemoteShutdownException,
-            OpenR66ProtocolNoConnectionException {
-        NetworkChannelReference networkChannelReference = null;
-        LocalChannelReference localChannelReference = null;
-        boolean ok = false;
-        // check valid limit on server side only (could be the initiator but not a client)
-        DbHostAuth auth = isSSL ? Configuration.configuration.getHOST_SSLAUTH() : Configuration.configuration.getHOST_AUTH();
-        if (!auth.isClient()) {
-            boolean valid = false;
-            for (int i = 0; i < Configuration.RETRYNB * 2; i++) {
-                if (Configuration.configuration.getConstraintLimitHandler().checkConstraintsSleep(i)) {
-                    logger.debug("Constraints exceeded: " + i);
-                } else {
-                    logger.debug("Constraints NOT exceeded");
-                    valid = true;
-                    break;
-                }
-            }
-            if (!valid) {
-                // Limit is locally exceeded
-                throw new OpenR66ProtocolNetworkException(
-                        "Cannot connect to remote server due to local overload");
-            }
-        }
-        try {
-            networkChannelReference = createNewConnection(socketAddress, isSSL);
-            try {
-                localChannelReference = Configuration.configuration
-                        .getLocalTransaction().createNewClient(networkChannelReference,
-                                ChannelUtils.NOCHANNEL, futureRequest, isSSL);
-            } catch (OpenR66ProtocolSystemException e) {
-                throw new OpenR66ProtocolNetworkException(e);
-            } catch (NullPointerException e) {
-                throw new OpenR66ProtocolNetworkException(e);
-            }
-            ok = true;
-        } finally {
-            if (!ok) {
-                if (networkChannelReference != null) {
-                    checkClosingNetworkChannel(networkChannelReference, null);
-                }
-            }
-        }
-        if (localChannelReference.getFutureValidateStartup().isDone() &&
-                localChannelReference.getFutureValidateStartup().isSuccess()) {
-            sendValidationConnection(localChannelReference);
-        } else {
-            OpenR66ProtocolNetworkException exc =
-                    new OpenR66ProtocolNetworkException("Startup is invalid");
-            logger.debug("Startup is Invalid", exc);
-            R66Result finalValue = new R66Result(
-                    exc, null, true, ErrorCode.ConnectionImpossible, null);
-            localChannelReference.invalidateRequest(finalValue);
-            localChannelReference.getLocalChannel().close();
-            throw exc;
-        }
-        return localChannelReference;
-    }
-
-    /**
-     *
-     * @param socketServerAddress
-     * @param isSSL
-     * @return the NetworkChannelReference
-     * @throws OpenR66ProtocolNetworkException
-     * @throws OpenR66ProtocolRemoteShutdownException
-     * @throws OpenR66ProtocolNoConnectionException
-     */
-    private NetworkChannelReference createNewConnection(SocketAddress socketServerAddress, boolean isSSL)
-            throws OpenR66ProtocolNetworkException,
-            OpenR66ProtocolRemoteShutdownException,
-            OpenR66ProtocolNoConnectionException {
-        WaarpLock socketLock = getChannelLock(socketServerAddress);
-        NetworkChannelReference networkChannelReference;
-        socketLock.lock();
-        try {
-            try {
-                networkChannelReference = getRemoteChannel(socketServerAddress);
-            } catch (OpenR66ProtocolNoDataException e1) {
-                networkChannelReference = null;
-            }
-            if (networkChannelReference != null) {
-                networkChannelReference.use();
-                logger.info("Already Connected: {}", networkChannelReference);
-                return networkChannelReference;
-            }
-            logger.debug("NEW PHYSICAL CONNECTION REQUIRED");
-            ChannelFuture channelFuture = null;
-            for (int i = 0; i < Configuration.RETRYNB; i++) {
-                if (R66ShutdownHook.isShutdownStarting()) {
-                    throw new OpenR66ProtocolNoConnectionException("Local system in shutdown");
-                }
-                try {
-                    if (isSSL) {
-                        if (Configuration.configuration.getHOST_SSLID() != null) {
-                            channelFuture = clientSslBootstrap.connect(socketServerAddress);
-                        } else {
-                            throw new OpenR66ProtocolNoConnectionException("No SSL support");
-                        }
-                    } else {
-                        channelFuture = clientBootstrap.connect(socketServerAddress);
-                    }
-                } catch (ChannelPipelineException e) {
-                    throw new OpenR66ProtocolNoConnectionException(
-                            "Cannot connect to remote server due to a channel exception");
-                }
-                try {
-                    channelFuture.await(Configuration.configuration.getTIMEOUTCON() / 3);
-                } catch (InterruptedException e1) {
-                }
-                if (channelFuture.isSuccess()) {
-                    final Channel channel = channelFuture.channel();
-                    if (isSSL) {
-                        if (!NetworkSslServerHandler.isSslConnectedChannel(channel)) {
-                            logger.debug("KO CONNECT since SSL handshake is over");
-                            channel.close();
-                            throw new OpenR66ProtocolNoConnectionException(
-                                    "Cannot finish connect to remote server");
-                        }
-                    }
-                    networkChannelGroup.add(channel);
-                    networkChannelReference = new NetworkChannelReference(channel, socketLock);
-                    addNCR(networkChannelReference);
-                    return networkChannelReference;
-                } else {
-                    try {
-                        Thread.sleep(Configuration.RETRYINMS);
-                    } catch (InterruptedException e) {
-                    }
-                    if (!channelFuture.isDone()) {
-                        throw new OpenR66ProtocolNoConnectionException(
-                                "Cannot connect to remote server due to interruption");
-                    }
-                    if (channelFuture.cause() instanceof ConnectException) {
-                        logger.debug("KO CONNECT:" +
-                                channelFuture.cause().getMessage());
-                        throw new OpenR66ProtocolNoConnectionException(
-                                channelFuture.cause().getMessage(),
-                                channelFuture.cause());
-                    } else {
-                        logger.debug("KO CONNECT but retry", channelFuture
-                                .cause());
-                    }
-                }
-            }
-            throw new OpenR66ProtocolNetworkException(
-                    "Cannot connect to remote server", channelFuture.cause());
-        } finally {
-            socketLock.unlock();
-        }
-    }
-
-    /**
      * Create the LocalChannelReference when a remote local channel starts its connection
      *
      * @param networkChannelReference
@@ -504,147 +293,9 @@ public class NetworkTransaction {
             NetworkPacket packet, boolean isSsl) {
         CreateConnectionFromNetworkChannel ccfnc =
                 new CreateConnectionFromNetworkChannel(networkChannelReference,
-                        packet, isSsl);
+                                                       packet, isSsl);
         ccfnc.setDaemon(true);
         Configuration.configuration.getExecutorService().execute(ccfnc);
-    }
-
-    private static class CreateConnectionFromNetworkChannel extends Thread {
-        final NetworkChannelReference networkChannelReference;
-        final NetworkPacket startupPacket;
-        final boolean fromSsl;
-
-        private CreateConnectionFromNetworkChannel(NetworkChannelReference networkChannelReference,
-                NetworkPacket packet, boolean fromSsl) {
-            this.networkChannelReference = networkChannelReference;
-            this.startupPacket = packet;
-            this.fromSsl = fromSsl;
-        }
-
-        @Override
-        public void run() {
-            setName("Connect_" + startupPacket.getRemoteId());
-            Channel channel = networkChannelReference.channel();
-            LocalChannelReference lcr = null;
-            try {
-                lcr = Configuration.configuration
-                        .getLocalTransaction().createNewClient(networkChannelReference,
-                                startupPacket.getRemoteId(), null, fromSsl);
-            } catch (OpenR66ProtocolSystemException e1) {
-                logger.error("Cannot create LocalChannel for: " + startupPacket + " due to "
-                        + e1.getMessage());
-                final ConnectionErrorPacket error = new ConnectionErrorPacket(
-                        "Cannot connect to localChannel since cannot create it", null);
-                NetworkServerHandler
-                        .writeError(channel, startupPacket.getRemoteId(), startupPacket.getLocalId(), error);
-                NetworkTransaction.checkClosingNetworkChannel(this.networkChannelReference, null);
-                startupPacket.clear();
-                return;
-            } catch (OpenR66ProtocolRemoteShutdownException e1) {
-                logger.info("Will Close Local from Network Channel");
-                WaarpSslUtility.closingSslChannel(channel);
-                startupPacket.clear();
-                return;
-            } catch (OpenR66ProtocolNoConnectionException e1) {
-                logger.error("Cannot create LocalChannel for: " + startupPacket + " due to "
-                        + e1.getMessage());
-                final ConnectionErrorPacket error = new ConnectionErrorPacket(
-                        "Cannot connect to localChannel since cannot create it", null);
-                NetworkServerHandler
-                        .writeError(channel, startupPacket.getRemoteId(), startupPacket.getLocalId(), error);
-                NetworkTransaction.checkClosingNetworkChannel(this.networkChannelReference, null);
-                startupPacket.clear();
-                return;
-            }
-            ByteBuf buf = startupPacket.getBuffer();
-            lcr.getLocalChannel().writeAndFlush(buf);
-        }
-    }
-
-    /**
-     * Send a validation of connection with Authentication
-     *
-     * @param localChannelReference
-     * @throws OpenR66ProtocolNetworkException
-     * @throws OpenR66ProtocolRemoteShutdownException
-     */
-    private void sendValidationConnection(
-            LocalChannelReference localChannelReference)
-            throws OpenR66ProtocolNetworkException,
-            OpenR66ProtocolRemoteShutdownException {
-        AuthentPacket authent;
-
-        try {
-            DbHostAuth auth = localChannelReference.getNetworkServerHandler().isSsl() ?
-                    Configuration.configuration.getHOST_SSLAUTH() : Configuration.configuration.getHOST_AUTH();
-            authent = new AuthentPacket(
-                    Configuration.configuration.getHostId(
-                            localChannelReference.getNetworkServerHandler().isSsl()),
-                    FilesystemBasedDigest.passwdCrypt(
-                            auth.getHostkey()),
-                    localChannelReference.getLocalId());
-        } catch (OpenR66ProtocolNoSslException e1) {
-            R66Result finalValue = new R66Result(
-                    new OpenR66ProtocolSystemException("No SSL support", e1),
-                    localChannelReference.getSession(), true, ErrorCode.ConnectionImpossible, null);
-            logger.error("Authent is Invalid due to no SSL: {}", e1.getMessage());
-            if (localChannelReference.getRemoteId().compareTo(ChannelUtils.NOCHANNEL) == 0) {
-                ConnectionErrorPacket error = new ConnectionErrorPacket(
-                        "Cannot connect to localChannel since SSL is not supported", null);
-                try {
-                    ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
-                } catch (OpenR66ProtocolPacketException e) {
-                }
-            }
-            localChannelReference.invalidateRequest(finalValue);
-            localChannelReference.getLocalChannel().close();
-            throw new OpenR66ProtocolNetworkException(e1);
-        }
-        logger.debug("Will send request of connection validation");
-        localChannelReference.sessionNewState(AUTHENTR);
-        try {
-            ChannelUtils.writeAbstractLocalPacket(localChannelReference, authent, true);
-        } catch (OpenR66ProtocolPacketException e) {
-            R66Result finalValue = new R66Result(
-                    new OpenR66ProtocolSystemException("Wrong Authent Protocol", e),
-                    localChannelReference.getSession(), true, ErrorCode.ConnectionImpossible, null);
-            logger.error("Authent is Invalid due to protocol: {}", e.getMessage());
-            localChannelReference.invalidateRequest(finalValue);
-            if (localChannelReference.getRemoteId() != ChannelUtils.NOCHANNEL) {
-                ConnectionErrorPacket error = new ConnectionErrorPacket(
-                        "Cannot connect to localChannel since Authent Protocol is invalid", null);
-                try {
-                    ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
-                } catch (OpenR66ProtocolPacketException e1) {
-                }
-            }
-            localChannelReference.getLocalChannel().close();
-            throw new OpenR66ProtocolNetworkException("Bad packet", e);
-        }
-        R66Future future = localChannelReference.getFutureValidateConnection();
-        if (future.isFailed()) {
-            logger.debug("Will close NETWORK channel since Future cancelled: {}",
-                    future);
-            R66Result finalValue = new R66Result(
-                    new OpenR66ProtocolSystemException(
-                            "Out of time or Connection invalid during Authentication"),
-                    localChannelReference.getSession(), true, ErrorCode.ConnectionImpossible, null);
-            logger.info("Authent is Invalid due to: {} {}", finalValue.getException().getMessage(),
-                    future.toString());
-            localChannelReference.invalidateRequest(finalValue);
-            if (localChannelReference.getRemoteId() != ChannelUtils.NOCHANNEL) {
-                ConnectionErrorPacket error = new ConnectionErrorPacket(
-                        "Cannot connect to localChannel with Out of Time", null);
-                try {
-                    ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
-                } catch (OpenR66ProtocolPacketException e) {
-                }
-            }
-            localChannelReference.getLocalChannel().close().awaitUninterruptibly(Configuration.RETRYINMS * 2);
-            throw new OpenR66ProtocolNetworkException(
-                    "Cannot validate connection: " + future.getResult(), future
-                            .getCause());
-        }
     }
 
     /**
@@ -710,7 +361,8 @@ public class NetworkTransaction {
             try {
                 timerTask = new R66ShutdownNetworkChannelTimerTask(networkChannelReference, false);
                 Configuration.configuration.getTimerClose().newTimeout(timerTask,
-                        Configuration.configuration.getTIMEOUTCON() * 3, TimeUnit.MILLISECONDS);
+                                                                       Configuration.configuration.getTIMEOUTCON() * 3,
+                                                                       TimeUnit.MILLISECONDS);
             } catch (OpenR66RunnerErrorException e) {
                 // ignore
             }
@@ -741,7 +393,8 @@ public class NetworkTransaction {
             try {
                 timerTask = new R66ShutdownNetworkChannelTimerTask(networkChannelReference, false);
                 Configuration.configuration.getTimerClose().newTimeout(timerTask,
-                        Configuration.configuration.getTIMEOUTCON() * 3, TimeUnit.MILLISECONDS);
+                                                                       Configuration.configuration.getTIMEOUTCON() * 3,
+                                                                       TimeUnit.MILLISECONDS);
             } catch (OpenR66RunnerErrorException e) {
                 // ignore
             }
@@ -776,7 +429,8 @@ public class NetworkTransaction {
         try {
             timerTask = new R66ShutdownNetworkChannelTimerTask(networkChannelReference, true);
             Configuration.configuration.getTimerClose().newTimeout(timerTask,
-                    Configuration.configuration.getTIMEOUTCON() * 10, TimeUnit.MILLISECONDS);
+                                                                   Configuration.configuration.getTIMEOUTCON() * 10,
+                                                                   TimeUnit.MILLISECONDS);
         } catch (OpenR66RunnerErrorException e) {
             // ignore
         }
@@ -847,7 +501,7 @@ public class NetworkTransaction {
     }
 
     private static void removeClient(NetworkChannelReference networkChannelReference, String requester,
-            ClientNetworkChannels clientNetworkChannels) {
+                                     ClientNetworkChannels clientNetworkChannels) {
         if (networkChannelReference != null && clientNetworkChannels != null && requester != null) {
             clientNetworkChannels.remove(networkChannelReference);
             logger.debug("removeClient: remove for :" + requester + " still " + clientNetworkChannels.size());
@@ -915,56 +569,6 @@ public class NetworkTransaction {
     }
 
     /**
-     * Class to close the Network Channel if after some delays it has really no Local Channel
-     * attached
-     *
-     * @author Frederic Bregier
-     *
-     */
-    private static class CloseFutureChannel implements TimerTask {
-
-        private static final ConcurrentSet<ChannelId> inCloseRunning = new ConcurrentSet<ChannelId>();
-        private final NetworkChannelReference networkChannelReference;
-
-        /**
-         * @param networkChannelReference
-         * @param requester
-         * @throws OpenR66RunnerErrorException
-         */
-        private CloseFutureChannel(NetworkChannelReference networkChannelReference)
-                throws OpenR66RunnerErrorException {
-            if (!inCloseRunning.add(networkChannelReference.channel.id()))
-                throw new OpenR66RunnerErrorException("Already scheduled");
-            this.networkChannelReference = networkChannelReference;
-        }
-
-        public void run(Timeout timeout) throws Exception {
-            networkChannelReference.lock.lock(Configuration.WAITFORNETOP, TimeUnit.MILLISECONDS);
-            try {
-                logger.debug("NC count: {}", networkChannelReference);
-                if (networkChannelReference.nbLocalChannels() <= 0) {
-                    long time = networkChannelReference.checkLastTime(Configuration.configuration.getTIMEOUTCON() * 2);
-                    if (time > Configuration.RETRYINMS) {
-                        logger.debug("NC reschedule at " + time + " : {}", networkChannelReference);
-                        // will re execute this request later on
-                        time = (time / 10) * 10 + 100; // round to 10
-                        Configuration.configuration.getTimerClose().newTimeout(this, time,
-                                TimeUnit.MILLISECONDS);
-                        return;
-                    }
-                    logger.info("Closing NETWORK channel {}", networkChannelReference);
-                    networkChannelReference.isShuttingDown = true;
-                    WaarpSslUtility.closingSslChannel(networkChannelReference.channel);
-                }
-                inCloseRunning.remove(networkChannelReference.channel.id());
-            } finally {
-                networkChannelReference.lock.unlock();
-            }
-        }
-
-    }
-
-    /**
      * Check if closing of the localChannel will bring future closing of NetworkChannel
      *
      * @param networkChannelReference
@@ -972,7 +576,7 @@ public class NetworkTransaction {
      * @return the number of local channel still connected to this channel
      */
     public static int checkClosingNetworkChannel(NetworkChannelReference networkChannelReference,
-            LocalChannelReference localChannelReference) {
+                                                 LocalChannelReference localChannelReference) {
         networkChannelReference.lock.lock(Configuration.WAITFORNETOP, TimeUnit.MILLISECONDS);
         try {
             logger.debug("Close con: " + networkChannelReference);
@@ -986,7 +590,7 @@ public class NetworkTransaction {
                     cfc = new CloseFutureChannel(networkChannelReference);
                     Configuration.configuration.getTimerClose().
                             newTimeout(cfc, Configuration.configuration.getTIMEOUTCON() * 2,
-                                    TimeUnit.MILLISECONDS);
+                                       TimeUnit.MILLISECONDS);
                 } catch (OpenR66RunnerErrorException e) {
                 } catch (IllegalStateException e) {
                 }
@@ -1006,11 +610,11 @@ public class NetworkTransaction {
      */
     public static int nbAttachedConnection(SocketAddress address, String host) {
         logger.debug("nbAttachedConnection: "
-                + networkChannelOnSocketAddressConcurrentHashMap.containsKey(address.hashCode()) + ":"
-                + getNumberClients(host));
-        return (networkChannelOnSocketAddressConcurrentHashMap.containsKey(address.hashCode()) ? 1
+                     + networkChannelOnSocketAddressConcurrentHashMap.containsKey(address.hashCode()) + ":"
+                     + getNumberClients(host));
+        return (networkChannelOnSocketAddressConcurrentHashMap.containsKey(address.hashCode())? 1
                 : 0)
-                + getNumberClients(host);
+               + getNumberClients(host);
     }
 
     /**
@@ -1050,7 +654,7 @@ public class NetworkTransaction {
      */
     private static NetworkChannelReference getRemoteChannel(SocketAddress address)
             throws OpenR66ProtocolRemoteShutdownException,
-            OpenR66ProtocolNoDataException {
+                   OpenR66ProtocolNoDataException {
         if (R66ShutdownHook.isShutdownStarting()) {
             logger.debug("IS IN SHUTDOWN");
             throw new OpenR66ProtocolRemoteShutdownException(
@@ -1095,6 +699,487 @@ public class NetworkTransaction {
             return getNCR(channel.remoteAddress());
         }
         return null;
+    }
+
+    public static ExecutorService getRetrieveExecutor() {
+        return retrieveExecutor;
+    }
+
+    public static ConcurrentHashMap<Integer, RetrieveRunner> getRetrieveRunnerConcurrentHashMap() {
+        return retrieveRunnerConcurrentHashMap;
+    }
+
+    /**
+     * Start retrieve operation
+     *
+     * @param session
+     * @param channel
+     */
+    public static void runRetrieve(R66Session session, LocalChannel channel) {
+        RetrieveRunner retrieveRunner = new RetrieveRunner(session, channel);
+        retrieveRunnerConcurrentHashMap.put(session.getLocalChannelReference().getLocalId(),
+                                            retrieveRunner);
+        retrieveRunner.setDaemon(true);
+        Configuration.configuration.getLocalWorkerGroup().execute(retrieveRunner);
+    }
+
+    /**
+     * Stop a retrieve operation
+     *
+     * @param localChannelReference
+     */
+    public static void stopRetrieve(LocalChannelReference localChannelReference) {
+        RetrieveRunner retrieveRunner =
+                retrieveRunnerConcurrentHashMap.remove(localChannelReference.getLocalId());
+        if (retrieveRunner != null) {
+            retrieveRunner.stopRunner();
+        }
+    }
+
+    /**
+     * Normal end of a Retrieve Operation
+     *
+     * @param localChannelReference
+     */
+    public static void normalEndRetrieve(LocalChannelReference localChannelReference) {
+        retrieveRunnerConcurrentHashMap.remove(localChannelReference.getLocalId());
+    }
+
+    /**
+     * Stop all Retrieve Executors
+     */
+    public static void closeRetrieveExecutors() {
+        retrieveExecutor.shutdownNow();
+    }
+
+    /**
+     * Create a connection to the specified socketAddress with multiple retries
+     *
+     * @param socketAddress
+     * @param isSSL
+     * @param futureRequest
+     * @return the LocalChannelReference
+     */
+    public LocalChannelReference createConnectionWithRetry(SocketAddress socketAddress,
+                                                           boolean isSSL, R66Future futureRequest) {
+        LocalChannelReference localChannelReference = null;
+        for (int i = 0; i < Configuration.RETRYNB; i++) {
+            if (R66ShutdownHook.isShutdownStarting()) {
+                logger.error("Cannot connect : Local system in shutdown");
+                break;
+            }
+            try {
+                localChannelReference =
+                        createConnection(socketAddress, isSSL, futureRequest);
+                break;
+            } catch (OpenR66ProtocolRemoteShutdownException e) {
+                logger.error("Cannot connect : {}", e.getMessage());
+                logger.debug(e);
+                break;
+            } catch (OpenR66ProtocolNoConnectionException e) {
+                logger.error("Cannot connect : {}", e.getMessage());
+                logger.debug(e);
+                break;
+            } catch (OpenR66ProtocolNetworkException e) {
+                // Can retry
+                logger.error("Cannot connect : {}. Will retry", e.getMessage());
+                logger.debug(e);
+                try {
+                    Thread.sleep(Configuration.configuration.getDelayRetry());
+                } catch (InterruptedException e1) {
+                    break;
+                }
+            }
+        }
+        if (localChannelReference != null) {
+            logger.info("Connected");
+        }
+        return localChannelReference;
+    }
+
+    /**
+     * Create a connection to the specified socketAddress
+     *
+     * @param socketAddress
+     * @param isSSL
+     * @param futureRequest
+     * @return the LocalChannelReference
+     * @throws OpenR66ProtocolNetworkException
+     * @throws OpenR66ProtocolRemoteShutdownException
+     * @throws OpenR66ProtocolNoConnectionException
+     */
+    private LocalChannelReference createConnection(SocketAddress socketAddress, boolean isSSL,
+                                                   R66Future futureRequest)
+            throws OpenR66ProtocolNetworkException,
+                   OpenR66ProtocolRemoteShutdownException,
+                   OpenR66ProtocolNoConnectionException {
+        NetworkChannelReference networkChannelReference = null;
+        LocalChannelReference localChannelReference = null;
+        boolean ok = false;
+        // check valid limit on server side only (could be the initiator but not a client)
+        DbHostAuth auth =
+                isSSL? Configuration.configuration.getHOST_SSLAUTH() : Configuration.configuration.getHOST_AUTH();
+        if (!auth.isClient()) {
+            boolean valid = false;
+            for (int i = 0; i < Configuration.RETRYNB * 2; i++) {
+                if (Configuration.configuration.getConstraintLimitHandler().checkConstraintsSleep(i)) {
+                    logger.debug("Constraints exceeded: " + i);
+                } else {
+                    logger.debug("Constraints NOT exceeded");
+                    valid = true;
+                    break;
+                }
+            }
+            if (!valid) {
+                // Limit is locally exceeded
+                throw new OpenR66ProtocolNetworkException(
+                        "Cannot connect to remote server due to local overload");
+            }
+        }
+        try {
+            networkChannelReference = createNewConnection(socketAddress, isSSL);
+            try {
+                localChannelReference = Configuration.configuration
+                        .getLocalTransaction().createNewClient(networkChannelReference,
+                                                               ChannelUtils.NOCHANNEL, futureRequest, isSSL);
+            } catch (OpenR66ProtocolSystemException e) {
+                throw new OpenR66ProtocolNetworkException(e);
+            } catch (NullPointerException e) {
+                throw new OpenR66ProtocolNetworkException(e);
+            }
+            ok = true;
+        } finally {
+            if (!ok) {
+                if (networkChannelReference != null) {
+                    checkClosingNetworkChannel(networkChannelReference, null);
+                }
+            }
+        }
+        if (localChannelReference.getFutureValidateStartup().isDone() &&
+            localChannelReference.getFutureValidateStartup().isSuccess()) {
+            sendValidationConnection(localChannelReference);
+        } else {
+            OpenR66ProtocolNetworkException exc =
+                    new OpenR66ProtocolNetworkException("Startup is invalid");
+            logger.debug("Startup is Invalid", exc);
+            R66Result finalValue = new R66Result(
+                    exc, null, true, ErrorCode.ConnectionImpossible, null);
+            localChannelReference.invalidateRequest(finalValue);
+            localChannelReference.getLocalChannel().close();
+            throw exc;
+        }
+        return localChannelReference;
+    }
+
+    /**
+     *
+     * @param socketServerAddress
+     * @param isSSL
+     * @return the NetworkChannelReference
+     * @throws OpenR66ProtocolNetworkException
+     * @throws OpenR66ProtocolRemoteShutdownException
+     * @throws OpenR66ProtocolNoConnectionException
+     */
+    private NetworkChannelReference createNewConnection(SocketAddress socketServerAddress, boolean isSSL)
+            throws OpenR66ProtocolNetworkException,
+                   OpenR66ProtocolRemoteShutdownException,
+                   OpenR66ProtocolNoConnectionException {
+        WaarpLock socketLock = getChannelLock(socketServerAddress);
+        NetworkChannelReference networkChannelReference;
+        socketLock.lock();
+        try {
+            try {
+                networkChannelReference = getRemoteChannel(socketServerAddress);
+            } catch (OpenR66ProtocolNoDataException e1) {
+                networkChannelReference = null;
+            }
+            if (networkChannelReference != null) {
+                networkChannelReference.use();
+                logger.info("Already Connected: {}", networkChannelReference);
+                return networkChannelReference;
+            }
+            logger.debug("NEW PHYSICAL CONNECTION REQUIRED");
+            ChannelFuture channelFuture = null;
+            for (int i = 0; i < Configuration.RETRYNB; i++) {
+                if (R66ShutdownHook.isShutdownStarting()) {
+                    throw new OpenR66ProtocolNoConnectionException("Local system in shutdown");
+                }
+                try {
+                    if (isSSL) {
+                        if (Configuration.configuration.getHOST_SSLID() != null) {
+                            channelFuture = clientSslBootstrap.connect(socketServerAddress);
+                        } else {
+                            throw new OpenR66ProtocolNoConnectionException("No SSL support");
+                        }
+                    } else {
+                        channelFuture = clientBootstrap.connect(socketServerAddress);
+                    }
+                } catch (ChannelPipelineException e) {
+                    throw new OpenR66ProtocolNoConnectionException(
+                            "Cannot connect to remote server due to a channel exception");
+                }
+                try {
+                    channelFuture.await(Configuration.configuration.getTIMEOUTCON() / 3);
+                } catch (InterruptedException e1) {
+                }
+                if (channelFuture.isSuccess()) {
+                    final Channel channel = channelFuture.channel();
+                    if (isSSL) {
+                        if (!NetworkSslServerHandler.isSslConnectedChannel(channel)) {
+                            logger.debug("KO CONNECT since SSL handshake is over");
+                            channel.close();
+                            throw new OpenR66ProtocolNoConnectionException(
+                                    "Cannot finish connect to remote server");
+                        }
+                    }
+                    networkChannelGroup.add(channel);
+                    networkChannelReference = new NetworkChannelReference(channel, socketLock);
+                    addNCR(networkChannelReference);
+                    return networkChannelReference;
+                } else {
+                    try {
+                        Thread.sleep(Configuration.RETRYINMS);
+                    } catch (InterruptedException e) {
+                    }
+                    if (!channelFuture.isDone()) {
+                        throw new OpenR66ProtocolNoConnectionException(
+                                "Cannot connect to remote server due to interruption");
+                    }
+                    if (channelFuture.cause() instanceof ConnectException) {
+                        logger.debug("KO CONNECT:" +
+                                     channelFuture.cause().getMessage());
+                        throw new OpenR66ProtocolNoConnectionException(
+                                channelFuture.cause().getMessage(),
+                                channelFuture.cause());
+                    } else {
+                        logger.debug("KO CONNECT but retry", channelFuture
+                                .cause());
+                    }
+                }
+            }
+            throw new OpenR66ProtocolNetworkException(
+                    "Cannot connect to remote server", channelFuture.cause());
+        } finally {
+            socketLock.unlock();
+        }
+    }
+
+    /**
+     * Send a validation of connection with Authentication
+     *
+     * @param localChannelReference
+     * @throws OpenR66ProtocolNetworkException
+     * @throws OpenR66ProtocolRemoteShutdownException
+     */
+    private void sendValidationConnection(
+            LocalChannelReference localChannelReference)
+            throws OpenR66ProtocolNetworkException,
+                   OpenR66ProtocolRemoteShutdownException {
+        AuthentPacket authent;
+
+        try {
+            DbHostAuth auth = localChannelReference.getNetworkServerHandler().isSsl()?
+                    Configuration.configuration.getHOST_SSLAUTH() : Configuration.configuration.getHOST_AUTH();
+            authent = new AuthentPacket(
+                    Configuration.configuration.getHostId(
+                            localChannelReference.getNetworkServerHandler().isSsl()),
+                    FilesystemBasedDigest.passwdCrypt(
+                            auth.getHostkey()),
+                    localChannelReference.getLocalId());
+        } catch (OpenR66ProtocolNoSslException e1) {
+            R66Result finalValue = new R66Result(
+                    new OpenR66ProtocolSystemException("No SSL support", e1),
+                    localChannelReference.getSession(), true, ErrorCode.ConnectionImpossible, null);
+            logger.error("Authent is Invalid due to no SSL: {}", e1.getMessage());
+            if (localChannelReference.getRemoteId().compareTo(ChannelUtils.NOCHANNEL) == 0) {
+                ConnectionErrorPacket error = new ConnectionErrorPacket(
+                        "Cannot connect to localChannel since SSL is not supported", null);
+                try {
+                    ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
+                } catch (OpenR66ProtocolPacketException e) {
+                }
+            }
+            localChannelReference.invalidateRequest(finalValue);
+            localChannelReference.getLocalChannel().close();
+            throw new OpenR66ProtocolNetworkException(e1);
+        }
+        logger.debug("Will send request of connection validation");
+        localChannelReference.sessionNewState(AUTHENTR);
+        try {
+            ChannelUtils.writeAbstractLocalPacket(localChannelReference, authent, true);
+        } catch (OpenR66ProtocolPacketException e) {
+            R66Result finalValue = new R66Result(
+                    new OpenR66ProtocolSystemException("Wrong Authent Protocol", e),
+                    localChannelReference.getSession(), true, ErrorCode.ConnectionImpossible, null);
+            logger.error("Authent is Invalid due to protocol: {}", e.getMessage());
+            localChannelReference.invalidateRequest(finalValue);
+            if (localChannelReference.getRemoteId() != ChannelUtils.NOCHANNEL) {
+                ConnectionErrorPacket error = new ConnectionErrorPacket(
+                        "Cannot connect to localChannel since Authent Protocol is invalid", null);
+                try {
+                    ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
+                } catch (OpenR66ProtocolPacketException e1) {
+                }
+            }
+            localChannelReference.getLocalChannel().close();
+            throw new OpenR66ProtocolNetworkException("Bad packet", e);
+        }
+        R66Future future = localChannelReference.getFutureValidateConnection();
+        if (future.isFailed()) {
+            logger.debug("Will close NETWORK channel since Future cancelled: {}",
+                         future);
+            R66Result finalValue = new R66Result(
+                    new OpenR66ProtocolSystemException(
+                            "Out of time or Connection invalid during Authentication"),
+                    localChannelReference.getSession(), true, ErrorCode.ConnectionImpossible, null);
+            logger.info("Authent is Invalid due to: {} {}", finalValue.getException().getMessage(),
+                        future.toString());
+            localChannelReference.invalidateRequest(finalValue);
+            if (localChannelReference.getRemoteId() != ChannelUtils.NOCHANNEL) {
+                ConnectionErrorPacket error = new ConnectionErrorPacket(
+                        "Cannot connect to localChannel with Out of Time", null);
+                try {
+                    ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
+                } catch (OpenR66ProtocolPacketException e) {
+                }
+            }
+            localChannelReference.getLocalChannel().close().awaitUninterruptibly(Configuration.RETRYINMS * 2);
+            throw new OpenR66ProtocolNetworkException(
+                    "Cannot validate connection: " + future.getResult(), future
+                    .getCause());
+        }
+    }
+
+    /**
+     * Close all Network Ttransaction
+     */
+    public void closeAll() {
+        closeAll(true);
+    }
+
+    /**
+     * Close all Network Ttransaction
+     */
+    public void closeAll(boolean quickShutdown) {
+        logger.debug("close All Network Channels");
+        if (!Configuration.configuration.isServer()) {
+            R66ShutdownHook.shutdownHook.launchFinalExit();
+        }
+        closeRetrieveExecutors();
+        networkChannelGroup.close();
+        try {
+            Thread.sleep(Configuration.WAITFORNETOP);
+        } catch (InterruptedException e) {
+        }
+        DbAdmin.closeAllConnection();
+        Configuration.configuration.clientStop(quickShutdown);
+        if (!Configuration.configuration.isServer()) {
+            logger.debug("Last action before exit");
+            ChannelUtils.stopLogger();
+        }
+    }
+
+    private static class CreateConnectionFromNetworkChannel extends Thread {
+        final NetworkChannelReference networkChannelReference;
+        final NetworkPacket startupPacket;
+        final boolean fromSsl;
+
+        private CreateConnectionFromNetworkChannel(NetworkChannelReference networkChannelReference,
+                                                   NetworkPacket packet, boolean fromSsl) {
+            this.networkChannelReference = networkChannelReference;
+            this.startupPacket = packet;
+            this.fromSsl = fromSsl;
+        }
+
+        @Override
+        public void run() {
+            setName("Connect_" + startupPacket.getRemoteId());
+            Channel channel = networkChannelReference.channel();
+            LocalChannelReference lcr = null;
+            try {
+                lcr = Configuration.configuration
+                        .getLocalTransaction().createNewClient(networkChannelReference,
+                                                               startupPacket.getRemoteId(), null, fromSsl);
+            } catch (OpenR66ProtocolSystemException e1) {
+                logger.error("Cannot create LocalChannel for: " + startupPacket + " due to "
+                             + e1.getMessage());
+                final ConnectionErrorPacket error = new ConnectionErrorPacket(
+                        "Cannot connect to localChannel since cannot create it", null);
+                NetworkServerHandler
+                        .writeError(channel, startupPacket.getRemoteId(), startupPacket.getLocalId(), error);
+                NetworkTransaction.checkClosingNetworkChannel(this.networkChannelReference, null);
+                startupPacket.clear();
+                return;
+            } catch (OpenR66ProtocolRemoteShutdownException e1) {
+                logger.info("Will Close Local from Network Channel");
+                WaarpSslUtility.closingSslChannel(channel);
+                startupPacket.clear();
+                return;
+            } catch (OpenR66ProtocolNoConnectionException e1) {
+                logger.error("Cannot create LocalChannel for: " + startupPacket + " due to "
+                             + e1.getMessage());
+                final ConnectionErrorPacket error = new ConnectionErrorPacket(
+                        "Cannot connect to localChannel since cannot create it", null);
+                NetworkServerHandler
+                        .writeError(channel, startupPacket.getRemoteId(), startupPacket.getLocalId(), error);
+                NetworkTransaction.checkClosingNetworkChannel(this.networkChannelReference, null);
+                startupPacket.clear();
+                return;
+            }
+            ByteBuf buf = startupPacket.getBuffer();
+            lcr.getLocalChannel().writeAndFlush(buf);
+        }
+    }
+
+    /**
+     * Class to close the Network Channel if after some delays it has really no Local Channel
+     * attached
+     *
+     * @author Frederic Bregier
+     *
+     */
+    private static class CloseFutureChannel implements TimerTask {
+
+        private static final ConcurrentSet<ChannelId> inCloseRunning = new ConcurrentSet<ChannelId>();
+        private final NetworkChannelReference networkChannelReference;
+
+        /**
+         * @param networkChannelReference
+         * @param requester
+         * @throws OpenR66RunnerErrorException
+         */
+        private CloseFutureChannel(NetworkChannelReference networkChannelReference)
+                throws OpenR66RunnerErrorException {
+            if (!inCloseRunning.add(networkChannelReference.channel.id())) {
+                throw new OpenR66RunnerErrorException("Already scheduled");
+            }
+            this.networkChannelReference = networkChannelReference;
+        }
+
+        public void run(Timeout timeout) throws Exception {
+            networkChannelReference.lock.lock(Configuration.WAITFORNETOP, TimeUnit.MILLISECONDS);
+            try {
+                logger.debug("NC count: {}", networkChannelReference);
+                if (networkChannelReference.nbLocalChannels() <= 0) {
+                    long time = networkChannelReference.checkLastTime(Configuration.configuration.getTIMEOUTCON() * 2);
+                    if (time > Configuration.RETRYINMS) {
+                        logger.debug("NC reschedule at " + time + " : {}", networkChannelReference);
+                        // will re execute this request later on
+                        time = (time / 10) * 10 + 100; // round to 10
+                        Configuration.configuration.getTimerClose().newTimeout(this, time,
+                                                                               TimeUnit.MILLISECONDS);
+                        return;
+                    }
+                    logger.info("Closing NETWORK channel {}", networkChannelReference);
+                    networkChannelReference.isShuttingDown = true;
+                    WaarpSslUtility.closingSslChannel(networkChannelReference.channel);
+                }
+                inCloseRunning.remove(networkChannelReference.channel.id());
+            } finally {
+                networkChannelReference.lock.unlock();
+            }
+        }
+
     }
 
     /**
@@ -1149,85 +1234,6 @@ public class NetworkTransaction {
             if (ncr.channel != null) {
                 inShutdownRunning.remove(ncr.channel.id());
             }
-        }
-    }
-
-    public static ExecutorService getRetrieveExecutor() {
-        return retrieveExecutor;
-    }
-
-    public static ConcurrentHashMap<Integer, RetrieveRunner> getRetrieveRunnerConcurrentHashMap() {
-        return retrieveRunnerConcurrentHashMap;
-    }
-
-    /**
-     * Start retrieve operation
-     *
-     * @param session
-     * @param channel
-     */
-    public static void runRetrieve(R66Session session, LocalChannel channel) {
-        RetrieveRunner retrieveRunner = new RetrieveRunner(session, channel);
-        retrieveRunnerConcurrentHashMap.put(session.getLocalChannelReference().getLocalId(),
-                retrieveRunner);
-        retrieveRunner.setDaemon(true);
-        Configuration.configuration.getLocalWorkerGroup().execute(retrieveRunner);
-    }
-
-    /**
-     * Stop a retrieve operation
-     *
-     * @param localChannelReference
-     */
-    public static void stopRetrieve(LocalChannelReference localChannelReference) {
-        RetrieveRunner retrieveRunner =
-                retrieveRunnerConcurrentHashMap.remove(localChannelReference.getLocalId());
-        if (retrieveRunner != null) {
-            retrieveRunner.stopRunner();
-        }
-    }
-
-    /**
-     * Normal end of a Retrieve Operation
-     *
-     * @param localChannelReference
-     */
-    public static void normalEndRetrieve(LocalChannelReference localChannelReference) {
-        retrieveRunnerConcurrentHashMap.remove(localChannelReference.getLocalId());
-    }
-
-    /**
-     * Stop all Retrieve Executors
-     */
-    public static void closeRetrieveExecutors() {
-        retrieveExecutor.shutdownNow();
-    }
-
-    /**
-     * Close all Network Ttransaction
-     */
-    public void closeAll() {
-        closeAll(true);
-    }
-    /**
-     * Close all Network Ttransaction
-     */
-    public void closeAll(boolean quickShutdown) {
-        logger.debug("close All Network Channels");
-        if (!Configuration.configuration.isServer()) {
-            R66ShutdownHook.shutdownHook.launchFinalExit();
-        }
-        closeRetrieveExecutors();
-        networkChannelGroup.close();
-        try {
-            Thread.sleep(Configuration.WAITFORNETOP);
-        } catch (InterruptedException e) {
-        }
-        DbAdmin.closeAllConnection();
-        Configuration.configuration.clientStop(quickShutdown);
-        if (!Configuration.configuration.isServer()) {
-            logger.debug("Last action before exit");
-            ChannelUtils.stopLogger();
         }
     }
 }

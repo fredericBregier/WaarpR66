@@ -1,26 +1,20 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package org.waarp.openr66.context.task;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -37,17 +31,22 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.context.task.localexec.LocalExecClient;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
 /**
  * Execute an external command and Rename the file (using the new name from the result).<br>
- * 
+ *
  * The move of the file (if any) should be done by the external command itself.<br>
  * <br>
- * 
+ *
  * waitForValidation (#NOWAIT#) must not be set since it will prevent to have the MOVE TASK to occur
  * normally. So even if set, the #NOWAIT# will be ignored.
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class ExecMoveTask extends AbstractExecTask {
     /**
@@ -63,7 +62,7 @@ public class ExecMoveTask extends AbstractExecTask {
      * @param session
      */
     public ExecMoveTask(String argRule, int delay, String argTransfer,
-            R66Session session) {
+                        R66Session session) {
         super(TaskType.EXECMOVE, delay, argRule, argTransfer, session);
     }
 
@@ -78,9 +77,9 @@ public class ExecMoveTask extends AbstractExecTask {
          * the status is 1, no change is made to the file.
          */
         logger.info("ExecMove with " + argRule + ":" + argTransfer + " and {}",
-                session);
+                    session);
         String finalname = applyTransferSubstitutions(argRule);
-        
+
         // Force the WaitForValidation
         waitForValidation = true;
         if (Configuration.configuration.isUseLocalExec() && useLocalExec) {
@@ -111,7 +110,7 @@ public class ExecMoveTask extends AbstractExecTask {
             } catch (IOException e) {
             }
             logger.error("Exception: " + e1.getMessage() +
-                    " Exec in error with " + commandLine.toString(), e1);
+                         " Exec in error with " + commandLine.toString(), e1);
             futureCompletion.setFailure(e1);
             return;
         }
@@ -119,7 +118,8 @@ public class ExecMoveTask extends AbstractExecTask {
                 outputStream, null);
         defaultExecutor.setStreamHandler(pumpStreamHandler);
         int[] correctValues = {
-                0, 1 };
+                0, 1
+        };
         defaultExecutor.setExitValues(correctValues);
         ExecuteWatchdog watchdog = null;
 
@@ -129,7 +129,7 @@ public class ExecMoveTask extends AbstractExecTask {
         }
         LastLineReader lastLineReader = new LastLineReader(inputStream);
         Thread thread = new Thread(lastLineReader, "ExecRename"
-                + session.getRunner().getSpecialId());
+                                                   + session.getRunner().getSpecialId());
         thread.setDaemon(true);
         Configuration.configuration.getExecutorService().execute(thread);
         int status = -1;
@@ -159,7 +159,7 @@ public class ExecMoveTask extends AbstractExecTask {
                     } catch (IOException e2) {
                     }
                     logger.error("ExecuteException: " + e.getMessage() +
-                            " . Exec in error with " + commandLine.toString());
+                                 " . Exec in error with " + commandLine.toString());
                     futureCompletion.setFailure(e);
                     return;
                 } catch (IOException e1) {
@@ -177,7 +177,7 @@ public class ExecMoveTask extends AbstractExecTask {
                     } catch (IOException e2) {
                     }
                     logger.error("IOException: " + e.getMessage() +
-                            " . Exec in error with " + commandLine.toString());
+                                 " . Exec in error with " + commandLine.toString());
                     futureCompletion.setFailure(e);
                     return;
                 }
@@ -196,7 +196,7 @@ public class ExecMoveTask extends AbstractExecTask {
                 } catch (IOException e2) {
                 }
                 logger.error("ExecuteException: " + e.getMessage() +
-                        " . Exec in error with " + commandLine.toString());
+                             " . Exec in error with " + commandLine.toString());
                 futureCompletion.setFailure(e);
                 return;
             }
@@ -215,7 +215,7 @@ public class ExecMoveTask extends AbstractExecTask {
             } catch (IOException e2) {
             }
             logger.error("IOException: " + e.getMessage() +
-                    " . Exec in error with " + commandLine.toString());
+                         " . Exec in error with " + commandLine.toString());
             futureCompletion.setFailure(e);
             return;
         }
@@ -246,7 +246,7 @@ public class ExecMoveTask extends AbstractExecTask {
         }
         String newname = null;
         if (defaultExecutor.isFailure(status) && watchdog != null &&
-                watchdog.killedProcess()) {
+            watchdog.killedProcess()) {
             // kill by the watchdoc (time out)
             status = -1;
             newname = "TimeOut";
@@ -264,7 +264,7 @@ public class ExecMoveTask extends AbstractExecTask {
         if (status == 0) {
             if (newname.indexOf(' ') > 0) {
                 logger.warn("Exec returns a multiple string in final line: " +
-                        newname);
+                            newname);
                 // XXX FIXME: should not split String[] args = newname.split(" ");
                 //newname = args[args.length - 1];
             }
@@ -279,7 +279,7 @@ public class ExecMoveTask extends AbstractExecTask {
             } catch (CommandAbstractException e) {
                 logger
                         .warn("Exec in warning with " + commandLine,
-                                e);
+                              e);
             }
             session.getRunner().setFileMoved(newname, true);
             R66Result result = new R66Result(session, true, ErrorCode.CompleteOk, this.session.getRunner());
@@ -287,10 +287,10 @@ public class ExecMoveTask extends AbstractExecTask {
             futureCompletion.setResult(result);
             futureCompletion.setSuccess();
             logger.info("Exec OK with {} returns {}", commandLine,
-                    newname);
+                        newname);
         } else if (status == 1) {
             logger.warn("Exec in warning with " + commandLine +
-                    " returns " + newname);
+                        " returns " + newname);
             session.getRunner().setErrorExecutionStatus(ErrorCode.Warning);
             R66Result result = new R66Result(session, true, ErrorCode.Warning, this.session.getRunner());
             result.setOther(newname);
@@ -298,7 +298,7 @@ public class ExecMoveTask extends AbstractExecTask {
             futureCompletion.setSuccess();
         } else {
             logger.error("Status: " + status + " Exec in error with " +
-                    commandLine + " returns " + newname);
+                         commandLine + " returns " + newname);
             futureCompletion.cancel();
         }
     }

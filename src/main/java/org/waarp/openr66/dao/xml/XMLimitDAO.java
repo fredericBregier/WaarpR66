@@ -1,7 +1,6 @@
 package org.waarp.openr66.dao.xml;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.waarp.common.logging.WaarpLogger;
@@ -15,17 +14,18 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 //TODO
 public class XMLimitDAO implements LimitDAO {
-
-    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLimitDAO.class);
 
     public static final String HOSTID_FIELD = "hostid";
     public static final String SESSION_LIMIT_FILED = "sessionlimit";
@@ -34,7 +34,7 @@ public class XMLimitDAO implements LimitDAO {
     public static final String RUN_LIMIT_FILED = "runlimit";
     public static final String DELAY_COMMAND_LIMIT_FILED = "delaycommand";
     public static final String DELAY_RETRY_LIMIT_FILED = "delayretry";
-
+    private static final WaarpLogger logger = WaarpLoggerFactory.getLogger(XMLimitDAO.class);
     private static final String XML_SELECT = "/config/identity[hostid=$hostid]";
 
     private File file;
@@ -43,7 +43,8 @@ public class XMLimitDAO implements LimitDAO {
         this.file = new File(filePath);
     }
 
-    public void close() {}
+    public void close() {
+    }
 
     public void delete(Limit limit) throws DAOException {
         throw new DAOException("Operation not supported on XML DAO");
@@ -89,7 +90,7 @@ public class XMLimitDAO implements LimitDAO {
             xPath.setXPathVariableResolver(resolver);
             XPathExpression xpe = xPath.compile(XML_SELECT);
             // Query will return "" if nothing is found
-            return(!"".equals(xpe.evaluate(document)));
+            return (!"".equals(xpe.evaluate(document)));
         } catch (SAXException e) {
             throw new DAOException(e);
         } catch (XPathExpressionException e) {
@@ -161,7 +162,7 @@ public class XMLimitDAO implements LimitDAO {
         Node res = doc.createElement("config");
         Node tmp = res.appendChild(doc.createElement("identity"));
         tmp.appendChild(XMLUtils.createNode(doc, HOSTID_FIELD,
-                limit.getHostid()));
+                                            limit.getHostid()));
         tmp = res.appendChild(doc.createElement("limit"));
         return res;
     }

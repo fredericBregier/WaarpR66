@@ -75,44 +75,45 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static java.lang.Boolean.TRUE;
-import static javax.ws.rs.core.HttpHeaders.ALLOW;
-import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
-import static javax.ws.rs.core.MediaType.WILDCARD;
+import static java.lang.Boolean.*;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.*;
 import static org.waarp.common.role.RoleDefault.ROLE.*;
-import static org.waarp.gateway.kernel.rest.RestConfiguration.CRUD;
+import static org.waarp.gateway.kernel.rest.RestConfiguration.*;
 import static org.waarp.openr66.dao.database.DBTransferDAO.*;
-import static org.waarp.openr66.protocol.configuration.Configuration.configuration;
+import static org.waarp.openr66.protocol.configuration.Configuration.*;
 import static org.waarp.openr66.protocol.http.rest.HttpRestR66Handler.RESTHANDLERS.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.ExportConfigParams.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.GetLogsParams.*;
-import static org.waarp.openr66.protocol.http.restv2.RestConstants.GetStatusParams.PERIOD;
+import static org.waarp.openr66.protocol.http.restv2.RestConstants.GetStatusParams.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.ImportConfigParams.*;
 import static org.waarp.openr66.protocol.http.restv2.RestConstants.ServerCommandsURI.*;
-import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.ILLEGAL_PARAMETER_VALUE;
+import static org.waarp.openr66.protocol.http.restv2.errors.RestErrors.*;
 
 /**
- * This is the {@link AbstractRestDbHandler} handling all requests made on
- * the server commands REST entry point.
+ * This is the {@link AbstractRestDbHandler} handling all requests made on the server commands REST entry point.
  */
 
 @Path(SERVER_HANDLER_URI)
 public class ServerHandler extends AbstractRestDbHandler {
 
-    /** Stores the path to the archive directory. */
+    /**
+     * Stores the path to the archive directory.
+     */
     private static final String ARCH_PATH =
             configuration.getBaseDirectory() +
-                    configuration.getArchivePath();
-
-    /** Stores the path to the configuration directory. */
-    private static final String CONFIGS_PATH =
-            configuration.getBaseDirectory() +
-                    configuration.getConfigPath();
+            configuration.getArchivePath();
 
     /**
-     * Stores a {@link Map} associating each sub-path of the handler to their
-     * respective CRUD configuration.
+     * Stores the path to the configuration directory.
+     */
+    private static final String CONFIGS_PATH =
+            configuration.getBaseDirectory() +
+            configuration.getConfigPath();
+
+    /**
+     * Stores a {@link Map} associating each sub-path of the handler to their respective CRUD configuration.
      */
     private final Map<String, Byte> serverCRUD = new HashMap<String, Byte>();
 
@@ -132,12 +133,11 @@ public class ServerHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Checks if the request can be made in consideration to the handler's CRUD
-     * configuration.
+     * Checks if the request can be made in consideration to the handler's CRUD configuration.
      *
-     * @param request  the HttpRequest made to the handler
-     * @return         {@code true} if the request is valid, {@code false}
-     *                 if the CRUD configuration does not allow this request
+     * @param request the HttpRequest made to the handler
+     *
+     * @return {@code true} if the request is valid, {@code false} if the CRUD configuration does not allow this request
      */
     @Override
     public boolean checkCRUD(HttpRequest request) {
@@ -167,14 +167,16 @@ public class ServerHandler extends AbstractRestDbHandler {
             return CRUD.DELETE.isValid(crud);
         } else if (method.equals(HttpMethod.PUT)) {
             return CRUD.UPDATE.isValid(crud);
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
 
     /**
      * Get the general status of the server.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @Path(STATUS_URI)
@@ -197,10 +199,10 @@ public class ServerHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on the '/server/status'
-     * entry point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on the '/server/status' entry point. The HTTP methods are
+     * sent as an array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request.
      */
     @Path(STATUS_URI)
@@ -219,7 +221,7 @@ public class ServerHandler extends AbstractRestDbHandler {
     /**
      * Deactivates the server so that it doesn't accept any new transfer request.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @Path(DEACTIVATE_URI)
@@ -249,7 +251,7 @@ public class ServerHandler extends AbstractRestDbHandler {
     /**
      * Shut down the server.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @Path(SHUTDOWN_URI)
@@ -263,10 +265,10 @@ public class ServerHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on the '/server/shutdown'
-     * entry point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on the '/server/shutdown' entry point. The HTTP methods
+     * are sent as an array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request.
      */
     @Path(SHUTDOWN_URI)
@@ -285,7 +287,7 @@ public class ServerHandler extends AbstractRestDbHandler {
     /**
      * Restart the server.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request
      */
     @Path(RESTART_URI)
@@ -300,19 +302,18 @@ public class ServerHandler extends AbstractRestDbHandler {
 
 
     /**
-     * Export the server logs to a file. Only the entries that satisfy
-     * the desired filters will be exported.
+     * Export the server logs to a file. Only the entries that satisfy the desired filters will be exported.
      *
-     * @param request    the HttpRequest made on the resource
-     * @param responder  the HttpResponder which sends the reply to the request
-     * @param purge_str  states whether to delete exported entries or not
-     * @param clean_str  states whether to fix the incoherent entries
+     * @param request the HttpRequest made on the resource
+     * @param responder the HttpResponder which sends the reply to the request
+     * @param purge_str states whether to delete exported entries or not
+     * @param clean_str states whether to fix the incoherent entries
      * @param status_str only transfers with this status will be exported
-     * @param rule       only transfers using this rule will be exported
-     * @param start      lower bound for the date of the transfer
-     * @param stop       upper bound for the date of the transfer
-     * @param startID    lower bound for the transfer's ID
-     * @param stopID     upper bound for the transfer's ID
+     * @param rule only transfers using this rule will be exported
+     * @param start lower bound for the date of the transfer
+     * @param stop upper bound for the date of the transfer
+     * @param startID lower bound for the transfer's ID
+     * @param stopID upper bound for the transfer's ID
      */
     @Path(LOGS_URI)
     @GET
@@ -333,7 +334,7 @@ public class ServerHandler extends AbstractRestDbHandler {
         Locale lang = RestUtils.getLocale(request);
         List<Filter> filters = new ArrayList<Filter>();
         String filePath = ARCH_PATH + File.separator + SERVER_NAME +
-                "_export_" + DateTime.now().toString() + ".xml";
+                          "_export_" + DateTime.now().toString() + ".xml";
 
 
         boolean purge = false, clean = false;
@@ -352,7 +353,7 @@ public class ServerHandler extends AbstractRestDbHandler {
             try {
                 DateTime lowerDate = DateTime.parse(start);
                 filters.add(new Filter(TRANSFER_START_FIELD, ">=", lowerDate));
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 errors.add(ILLEGAL_PARAMETER_VALUE(START, start));
             }
         }
@@ -360,7 +361,7 @@ public class ServerHandler extends AbstractRestDbHandler {
             try {
                 DateTime upperDate = DateTime.parse(stop);
                 filters.add(new Filter(TRANSFER_START_FIELD, "<=", upperDate));
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 errors.add(ILLEGAL_PARAMETER_VALUE(STOP, stop));
             }
         }
@@ -418,7 +419,7 @@ public class ServerHandler extends AbstractRestDbHandler {
             if (clean) {
                 for (Transfer transfer : transfers.transfers) {
                     if (transfer.getGlobalStep() == Transfer.TASKSTEP.ALLDONETASK &&
-                            transfer.getInfoStatus() == ErrorCode.CompleteOk) {
+                        transfer.getInfoStatus() == ErrorCode.CompleteOk) {
                         transfer.setUpdatedInfo(UpdatedInfo.DONE);
                         transferDAO.update(transfer);
                     }
@@ -442,22 +443,16 @@ public class ServerHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Exports parts of the current server configuration to multiple XML files,
-     * depending on the parameters of
-     * the request.
+     * Exports parts of the current server configuration to multiple XML files, depending on the parameters of the
+     * request.
      *
-     * @param request      the HttpRequest made on the resource
-     * @param responder    the HttpResponder which sends the reply to the request
-     * @param host_str     states whether to export
-     *                     the host database or not.
-     * @param rule_str     states whether to export
-     *                     the rules database or not.
-     * @param business_str states whether to export
-     *                     the host's business or not.
-     * @param alias_str    states whether to export
-     *                     the host's aliases or not.
-     * @param role_str     states whether to export
-     *                     the host's permission database or not.
+     * @param request the HttpRequest made on the resource
+     * @param responder the HttpResponder which sends the reply to the request
+     * @param host_str states whether to export the host database or not.
+     * @param rule_str states whether to export the rules database or not.
+     * @param business_str states whether to export the host's business or not.
+     * @param alias_str states whether to export the host's aliases or not.
+     * @param role_str states whether to export the host's permission database or not.
      */
     @Path(CONFIG_URI)
     @GET
@@ -510,15 +505,15 @@ public class ServerHandler extends AbstractRestDbHandler {
         }
 
         String hostsFilePath = CONFIGS_PATH + File.separator + SERVER_NAME +
-                "_hosts.xml";
+                               "_hosts.xml";
         String rulesFilePath = CONFIGS_PATH + File.separator + SERVER_NAME +
-                "_rules.xml";
+                               "_rules.xml";
         String businessFilePath = CONFIGS_PATH + File.separator + SERVER_NAME +
-                "_business.xml";
+                                  "_business.xml";
         String aliasFilePath = CONFIGS_PATH + File.separator + SERVER_NAME +
-                "_aliases.xml";
+                               "_aliases.xml";
         String rolesFilePath = CONFIGS_PATH + File.separator + SERVER_NAME +
-                "_roles.xml";
+                               "_roles.xml";
 
         ObjectNode responseObject = new ObjectNode(JsonNodeFactory.instance);
 
@@ -569,29 +564,34 @@ public class ServerHandler extends AbstractRestDbHandler {
         } catch (DAOException e) {
             throw new InternalServerErrorException(e);
         } finally {
-            if (hostDAO != null) { hostDAO.close(); }
-            if (ruleDAO != null) { ruleDAO.close(); }
-            if (businessDAO != null) { businessDAO.close(); }
+            if (hostDAO != null) {
+                hostDAO.close();
+            }
+            if (ruleDAO != null) {
+                ruleDAO.close();
+            }
+            if (businessDAO != null) {
+                businessDAO.close();
+            }
         }
     }
 
     /**
-     * Imports different parts of the server configuration from the XML files
-     * given as parameters of the request. These imported values will replace
-     * those already present in the database.
+     * Imports different parts of the server configuration from the XML files given as parameters of the request. These
+     * imported values will replace those already present in the database.
      *
-     * @param request           the HttpRequest made on the resource
-     * @param responder         the HttpResponder which sends the reply to the request
-     * @param purgeHost_str     states if a new host database should be imported.
-     * @param purgeRule_str     states if a new transfer rule database should be imported
+     * @param request the HttpRequest made on the resource
+     * @param responder the HttpResponder which sends the reply to the request
+     * @param purgeHost_str states if a new host database should be imported.
+     * @param purgeRule_str states if a new transfer rule database should be imported
      * @param purgeBusiness_str states if a new business database should be imported
-     * @param purgeAlias_str    states if a new alias database should be imported
-     * @param purgeRole_str     states if a new role database should be imported
-     * @param hostFile          path to the XML file containing the host database to import
-     * @param ruleFile          path to the XML file containing the rule database to import
-     * @param businessFile      path to the XML file containing the business database to import
-     * @param aliasFile         path to the XML file containing the alias database to import
-     * @param roleFile          path to the XML file containing the role database to import
+     * @param purgeAlias_str states if a new alias database should be imported
+     * @param purgeRole_str states if a new role database should be imported
+     * @param hostFile path to the XML file containing the host database to import
+     * @param ruleFile path to the XML file containing the rule database to import
+     * @param businessFile path to the XML file containing the business database to import
+     * @param aliasFile path to the XML file containing the alias database to import
+     * @param roleFile path to the XML file containing the role database to import
      */
     @Path(CONFIG_URI)
     @PUT
@@ -622,7 +622,7 @@ public class ServerHandler extends AbstractRestDbHandler {
         List<RestError> errors = new ArrayList<RestError>();
         Locale lang = RestUtils.getLocale(request);
 
-        boolean purgeHost = false, purgeRule = false, purgeBusiness =false,
+        boolean purgeHost = false, purgeRule = false, purgeBusiness = false,
                 purgeAlias = false, purgeRole = false;
 
         try {
@@ -734,17 +734,23 @@ public class ServerHandler extends AbstractRestDbHandler {
         } catch (DAOException e) {
             throw new InternalServerErrorException(e);
         } finally {
-            if (hostDAO != null) { hostDAO.close(); }
-            if (ruleDAO != null) { ruleDAO.close(); }
-            if (businessDAO != null) { businessDAO.close(); }
+            if (hostDAO != null) {
+                hostDAO.close();
+            }
+            if (ruleDAO != null) {
+                ruleDAO.close();
+            }
+            if (businessDAO != null) {
+                businessDAO.close();
+            }
         }
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on the '/server'
-     * entry point. The HTTP methods are sent as an array in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on the '/server' entry point. The HTTP methods are sent
+     * as an array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request.
      */
     @OPTIONS
@@ -757,11 +763,10 @@ public class ServerHandler extends AbstractRestDbHandler {
     }
 
     /**
-     * Method called to get a list of all allowed HTTP methods on all sub entry
-     * points of the '/server' entry point. The HTTP methods are sent as an array
-     * in the reply's headers.
+     * Method called to get a list of all allowed HTTP methods on all sub entry points of the '/server' entry point. The
+     * HTTP methods are sent as an array in the reply's headers.
      *
-     * @param request   the HttpRequest made on the resource
+     * @param request the HttpRequest made on the resource
      * @param responder the HttpResponder which sends the reply to the request.
      */
     @Path("{ep}")

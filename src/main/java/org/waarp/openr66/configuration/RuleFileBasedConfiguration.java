@@ -1,17 +1,16 @@
 /**
  * This file is part of Waarp Project.
- * 
- * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
- * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
- * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
+ * <p>
+ * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the COPYRIGHT.txt in the
+ * distribution for a full listing of individual contributors.
+ * <p>
+ * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * <p>
+ * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -50,17 +49,11 @@ import java.util.List;
 
 /**
  * Rule File Based Configuration
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class RuleFileBasedConfiguration {
-    /**
-     * Internal Logger
-     */
-    private static final WaarpLogger logger = WaarpLoggerFactory
-            .getLogger(RuleFileBasedConfiguration.class);
-
     public static final String MULTIPLEROOT = "rules";
     public static final String ROOT = "rule";
     public static final String XIDRULE = "idrule";
@@ -79,12 +72,27 @@ public class RuleFileBasedConfiguration {
     public static final String XSERRORTASKS = "serrortasks";
     public static final String XTASKS = "tasks";
     public static final String XTASK = "task";
-
+    /**
+     * Extension of rule files
+     */
+    public static final String EXT_RULE = ".rule.xml";
+    /**
+     * Extension of multiple rules in one file
+     */
+    public static final String EXT_RULES = ".rules.xml";
+    /**
+     * Internal Logger
+     */
+    private static final WaarpLogger logger = WaarpLoggerFactory
+            .getLogger(RuleFileBasedConfiguration.class);
     private static final String HOSTIDS_HOSTID = "/" + XHOSTIDS + "/"
-            + XHOSTID;
-
+                                                 + XHOSTID;
+    public static final XmlDecl[] hostsDecls = {
+            new XmlDecl(XHOSTIDS,
+                        XmlType.STRING,
+                        HOSTIDS_HOSTID, true),
+    };
     private static final String TASK = "/tasks/task";
-
     private static final XmlDecl[] taskDecl = {
             new XmlDecl(XmlType.STRING, DbRule.TASK_TYPE),
             new XmlDecl(XmlType.STRING, DbRule.TASK_PATH),
@@ -93,8 +101,8 @@ public class RuleFileBasedConfiguration {
     };
     public static final XmlDecl[] tasksDecl = {
             new XmlDecl(XTASK,
-                    XmlType.XVAL, TASK,
-                    taskDecl, true)
+                        XmlType.XVAL, TASK,
+                        taskDecl, true)
     };
     private static final XmlDecl[] subruleDecls = {
             new XmlDecl(XmlType.STRING, XIDRULE),
@@ -113,34 +121,20 @@ public class RuleFileBasedConfiguration {
     };
     private static final XmlDecl[] ruleDecls = {
             new XmlDecl(ROOT, XmlType.XVAL,
-                    ROOT, subruleDecls,
-                    false)
+                        ROOT, subruleDecls,
+                        false)
     };
     private static final XmlDecl[] multipleruleDecls = {
             new XmlDecl(MULTIPLEROOT,
-                    XmlType.XVAL, "/"
-                            + MULTIPLEROOT
-                            + "/" + ROOT,
-                    subruleDecls, true)
+                        XmlType.XVAL, "/"
+                                      + MULTIPLEROOT
+                                      + "/" + ROOT,
+                        subruleDecls, true)
     };
-    public static final XmlDecl[] hostsDecls = {
-            new XmlDecl(XHOSTIDS,
-                    XmlType.STRING,
-                    HOSTIDS_HOSTID, true),
-    };
-
-    /**
-     * Extension of rule files
-     */
-    public static final String EXT_RULE = ".rule.xml";
-    /**
-     * Extension of multiple rules in one file
-     */
-    public static final String EXT_RULES = ".rules.xml";
 
     /**
      * Import all Rule files into the HashTable of Rules
-     * 
+     *
      * @param configDirectory
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseException
@@ -148,13 +142,13 @@ public class RuleFileBasedConfiguration {
     public static void importRules(File configDirectory)
             throws OpenR66ProtocolSystemException, WaarpDatabaseException {
         File[] files = FileUtils.getFiles(configDirectory,
-                new ExtensionFilter(EXT_RULE));
+                                          new ExtensionFilter(EXT_RULE));
         for (File file : files) {
             DbRule rule = getFromFile(file);
             logger.debug(rule.toString());
         }
         files = FileUtils.getFiles(configDirectory,
-                new ExtensionFilter(EXT_RULES));
+                                   new ExtensionFilter(EXT_RULES));
         for (File file : files) {
             getMultipleFromFile(file);
         }
@@ -162,7 +156,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Utility function
-     * 
+     *
      * @param value
      * @return the array of tasks or empty array if in error.
      */
@@ -229,7 +223,7 @@ public class RuleFileBasedConfiguration {
     }
 
     /**
-     * 
+     *
      * @param value
      *            the XmlValue hosting hostids/hostid
      * @return the array of HostIds allowed for the current rule
@@ -259,7 +253,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Load and update a Rule from a file
-     * 
+     *
      * @param file
      * @return the newly created R66Rule from XML File
      * @throws OpenR66ProtocolSystemException
@@ -271,7 +265,7 @@ public class RuleFileBasedConfiguration {
      */
     public static DbRule getFromFile(File file)
             throws OpenR66ProtocolSystemException, WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException, WaarpDatabaseNoDataException, WaarpDatabaseException {
+                   WaarpDatabaseSqlException, WaarpDatabaseNoDataException, WaarpDatabaseException {
         DbRule newRule = null;
         Document document = null;
         // Open config file
@@ -279,7 +273,7 @@ public class RuleFileBasedConfiguration {
             document = new SAXReader().read(file);
         } catch (DocumentException e) {
             logger.error("Unable to read the XML Rule file: " + file.getName(),
-                    e);
+                         e);
             throw new OpenR66ProtocolSystemException(
                     "Unable to read the XML Rule file", e);
         }
@@ -296,7 +290,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Load and update multiple Rules from one file
-     * 
+     *
      * @param file
      * @return a list of newly created R66Rule from XML File
      * @throws OpenR66ProtocolSystemException
@@ -308,14 +302,14 @@ public class RuleFileBasedConfiguration {
      */
     public static List<DbRule> getMultipleFromFile(File file)
             throws OpenR66ProtocolSystemException, WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException, WaarpDatabaseNoDataException, WaarpDatabaseException {
+                   WaarpDatabaseSqlException, WaarpDatabaseNoDataException, WaarpDatabaseException {
         Document document = null;
         // Open config file
         try {
             document = new SAXReader().read(file);
         } catch (DocumentException e) {
             logger.error("Unable to read the XML Rule file: " + file.getName(),
-                    e);
+                         e);
             throw new OpenR66ProtocolSystemException(
                     "Unable to read the XML Rule file", e);
         }
@@ -341,7 +335,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Load and update one Rule from a XmlValue
-     * 
+     *
      * @param root
      * @return the newly created R66Rule from XML File
      * @throws OpenR66ProtocolSystemException
@@ -353,7 +347,7 @@ public class RuleFileBasedConfiguration {
      */
     private static DbRule getFromXmlValue(XmlValue[] root)
             throws OpenR66ProtocolSystemException, WaarpDatabaseNoConnectionException,
-            WaarpDatabaseSqlException, WaarpDatabaseNoDataException, WaarpDatabaseException {
+                   WaarpDatabaseSqlException, WaarpDatabaseNoDataException, WaarpDatabaseException {
         DbRule newRule = null;
         XmlHash hash = new XmlHash(root);
         XmlValue value = hash.get(XIDRULE);
@@ -449,8 +443,8 @@ public class RuleFileBasedConfiguration {
         }
 
         newRule = new DbRule(idrule, idsArray, mode, recvpath, sendpath,
-                archivepath, workpath, rpretasks, rposttasks, rerrortasks,
-                spretasks, sposttasks, serrortasks);
+                             archivepath, workpath, rpretasks, rposttasks, rerrortasks,
+                             spretasks, sposttasks, serrortasks);
         if (DbConstant.admin != null && DbConstant.admin.getSession() != null) {
             if (newRule.exist()) {
                 newRule.update();
@@ -467,7 +461,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Construct a new Element with value
-     * 
+     *
      * @param name
      * @param value
      * @return the new Element
@@ -480,7 +474,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Add a rule from root element (ROOT = rule)
-     * 
+     *
      * @param element
      * @param rule
      */
@@ -632,7 +626,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Write the rule to a file from filename
-     * 
+     *
      * @param filename
      * @param rule
      * @throws OpenR66ProtocolSystemException
@@ -651,7 +645,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Write to directory files prefixed by hostname all Rules from database
-     * 
+     *
      * @param directory
      * @param hostname
      * @throws WaarpDatabaseNoConnectionException
@@ -660,7 +654,7 @@ public class RuleFileBasedConfiguration {
      */
     public static final void writeXml(String directory, String hostname)
             throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolSystemException {
+                   OpenR66ProtocolSystemException {
         File dir = new File(directory);
         if (!dir.isDirectory()) {
             dir.mkdirs();
@@ -668,8 +662,8 @@ public class RuleFileBasedConfiguration {
         DbRule[] rules = DbRule.getAllRules();
         for (DbRule rule : rules) {
             String filename = dir.getAbsolutePath() + File.separator + hostname + "_" + rule.getIdRule()
-                    +
-                    RuleFileBasedConfiguration.EXT_RULE;
+                              +
+                              RuleFileBasedConfiguration.EXT_RULE;
             logger.debug("Will write Rule: " + rule.getIdRule() + " in " + filename);
             RuleFileBasedConfiguration.writeXML(filename, rule);
         }
@@ -677,7 +671,7 @@ public class RuleFileBasedConfiguration {
 
     /**
      * Write to directory 1 file prefixed by hostname all Rules from database
-     * 
+     *
      * @param directory
      * @param hostname
      * @return the filename
@@ -687,14 +681,14 @@ public class RuleFileBasedConfiguration {
      */
     public static String writeOneXml(String directory, String hostname)
             throws WaarpDatabaseNoConnectionException, WaarpDatabaseSqlException,
-            OpenR66ProtocolSystemException {
+                   OpenR66ProtocolSystemException {
         File dir = new File(directory);
         if (!dir.isDirectory()) {
             dir.mkdirs();
         }
         DbRule[] rules = DbRule.getAllRules();
         String filename = dir.getAbsolutePath() + File.separator + hostname +
-                RuleFileBasedConfiguration.EXT_RULES;
+                          RuleFileBasedConfiguration.EXT_RULES;
         Document document = DocumentHelper.createDocument();
         Element root = document.addElement(MULTIPLEROOT);
         for (DbRule rule : rules) {
