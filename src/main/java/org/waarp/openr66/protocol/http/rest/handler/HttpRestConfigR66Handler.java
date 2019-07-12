@@ -43,10 +43,10 @@ import org.waarp.openr66.protocol.localhandler.packet.json.ConfigImportResponseJ
 import org.waarp.openr66.protocol.localhandler.packet.json.JsonPacket;
 
 /**
- * Configuration Http REST interface: http://host/config?... + ConfigExportJsonPacket or ConfigImportJsonPacket as GET or PUT
+ * Configuration Http REST interface: http://host/config?... + ConfigExportJsonPacket or ConfigImportJsonPacket as GET
+ * or PUT
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestConfigR66Handler extends HttpRestAbstractR66Handler {
 

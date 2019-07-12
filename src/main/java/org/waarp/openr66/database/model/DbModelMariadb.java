@@ -41,7 +41,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * MariaDB Database Model implementation
  *
  * @author Frederic Bregier
- *
  */
 public class DbModelMariadb extends org.waarp.common.database.model.DbModelMariadb {
     private final ReentrantLock lock = new ReentrantLock();
@@ -52,6 +51,7 @@ public class DbModelMariadb extends org.waarp.common.database.model.DbModelMaria
      * @param dbserver
      * @param dbuser
      * @param dbpasswd
+     *
      * @throws WaarpDatabaseNoConnectionException
      */
     public DbModelMariadb(String dbserver, String dbuser, String dbpasswd)

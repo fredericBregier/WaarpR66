@@ -37,7 +37,6 @@ import java.sql.Timestamp;
  * Client to submit a transfer
  *
  * @author Frederic Bregier
- *
  */
 public class SubmitTransfer extends AbstractTransfer {
 
@@ -50,11 +49,8 @@ public class SubmitTransfer extends AbstractTransfer {
     }
 
     /**
-     *
-     * @param args
-     *            configuration file, the remoteHost Id, the file to transfer, the rule, file
-     *            transfer information as arguments and optionally isMD5=1 for true or 0 for
-     *            false(default) and the blocksize if different than default
+     * @param args configuration file, the remoteHost Id, the file to transfer, the rule, file transfer information as
+     * arguments and optionally isMD5=1 for true or 0 for false(default) and the blocksize if different than default
      */
     public static void main(String[] args) {
         WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(null));

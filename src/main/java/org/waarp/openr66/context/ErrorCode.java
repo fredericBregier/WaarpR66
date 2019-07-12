@@ -19,11 +19,10 @@ package org.waarp.openr66.context;
 import org.waarp.openr66.protocol.configuration.Messages;
 
 /**
- * This enum class keeps all code that will be returned into the result and store (char
- * representation) into the runner.
+ * This enum class keeps all code that will be returned into the result and store (char representation) into the
+ * runner.
  *
  * @author Frederic Bregier
- *
  */
 public enum ErrorCode {
     /**
@@ -143,8 +142,7 @@ public enum ErrorCode {
      */
     CommandNotFound('c'),
     /**
-     * Code stands for a request in PassThroughMode and required action is incompatible with this
-     * mode
+     * Code stands for a request in PassThroughMode and required action is incompatible with this mode
      */
     PassThroughMode('p'),
     /**
@@ -177,6 +175,7 @@ public enum ErrorCode {
      * Code is either the 1 char code or the exact name in Enum
      *
      * @param code
+     *
      * @return the ErrorCode according to the code
      */
     public static ErrorCode getFromCode(String code) {

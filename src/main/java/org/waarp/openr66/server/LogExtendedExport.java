@@ -51,7 +51,6 @@ import java.sql.Timestamp;
  * Log Export from a client (local or allowed)
  *
  * @author Frederic Bregier
- *
  */
 public class LogExtendedExport implements Runnable {
     protected static String _INFO_ARGS =
@@ -99,6 +98,7 @@ public class LogExtendedExport implements Runnable {
     protected String ruleDownload = null;
     protected boolean tryimport = false;
     protected DbHostAuth host;
+
     /**
      * @param future
      * @param clean
@@ -303,8 +303,8 @@ public class LogExtendedExport implements Runnable {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

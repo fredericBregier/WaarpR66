@@ -47,7 +47,6 @@ import java.net.SocketAddress;
  * Config Export from a local client without database connection
  *
  * @author Frederic Bregier
- *
  */
 public class ConfigExport implements Runnable {
     protected static String _INFO_ARGS =
@@ -77,6 +76,7 @@ public class ConfigExport implements Runnable {
     protected final boolean role;
     protected final NetworkTransaction networkTransaction;
     protected DbHostAuth dbhost;
+
     public ConfigExport(R66Future future, boolean host, boolean rule,
                         NetworkTransaction networkTransaction) {
         this.future = future;
@@ -88,6 +88,7 @@ public class ConfigExport implements Runnable {
         this.networkTransaction = networkTransaction;
         this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
     }
+
     public ConfigExport(R66Future future, boolean host, boolean rule,
                         boolean business, boolean alias, boolean role,
                         NetworkTransaction networkTransaction) {
@@ -213,8 +214,8 @@ public class ConfigExport implements Runnable {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

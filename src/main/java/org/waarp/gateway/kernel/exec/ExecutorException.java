@@ -20,7 +20,6 @@ package org.waarp.gateway.kernel.exec;
  * ExecutorException
  *
  * @author Frederic Bregier
- *
  */
 public class ExecutorException extends Exception {
 

@@ -32,9 +32,7 @@ import java.io.IOException;
 /**
  * Execute an external command
  *
- *
  * @author Frederic Bregier
- *
  */
 public class ExecTask extends AbstractExecTask {
 

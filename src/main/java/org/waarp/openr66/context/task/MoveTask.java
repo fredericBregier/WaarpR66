@@ -29,7 +29,6 @@ import java.io.File;
  * Move the file (without renaming it)
  *
  * @author Frederic Bregier
- *
  */
 public class MoveTask extends AbstractTask {
     /**

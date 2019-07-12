@@ -38,7 +38,6 @@ import java.util.concurrent.TimeUnit;
  * This class launch and control the Commander and enable TaskRunner job submissions
  *
  * @author Frederic Bregier
- *
  */
 public class InternalRunner {
     /**
@@ -122,8 +121,7 @@ public class InternalRunner {
     }
 
     /**
-     * This should be called when the server is shutting down, after stopping active requests if
-     * possible.
+     * This should be called when the server is shutting down, after stopping active requests if possible.
      */
     public void stopInternalRunner() {
         isRunning = false;

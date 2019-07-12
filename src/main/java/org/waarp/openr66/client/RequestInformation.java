@@ -46,7 +46,6 @@ import java.net.SocketAddress;
  * Class to request information on remote files
  *
  * @author Frederic Bregier
- *
  */
 public class RequestInformation implements Runnable {
     protected static String _INFO_ARGS =
@@ -78,10 +77,8 @@ public class RequestInformation implements Runnable {
      * @param rulename
      * @param filename
      * @param request
-     * @param id
-     *            Id of the request
-     * @param isTo
-     *            request is To remote Host (true), or From remote host (false)
+     * @param id Id of the request
+     * @param isTo request is To remote Host (true), or From remote host (false)
      * @param networkTransaction
      */
     public RequestInformation(R66Future future, String requested, String rulename,
@@ -101,6 +98,7 @@ public class RequestInformation implements Runnable {
      * Parse the parameter and set current values
      *
      * @param args
+     *
      * @return True if all parameters were found and correct
      */
     protected static boolean getParams(String[] args) {

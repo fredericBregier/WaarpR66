@@ -23,7 +23,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Import Configuration JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class ConfigImportJsonPacket extends JsonPacket {
 
@@ -40,8 +39,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param purgehost
-     *            the purgehost to set
+     * @param purgehost the purgehost to set
      */
     public void setPurgehost(boolean purgehost) {
         this.purgehost = purgehost;
@@ -55,8 +53,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param purgerule
-     *            the purgerule to set
+     * @param purgerule the purgerule to set
      */
     public void setPurgerule(boolean purgerule) {
         this.purgerule = purgerule;
@@ -70,8 +67,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param purgebusiness
-     *            the purgebusiness to set
+     * @param purgebusiness the purgebusiness to set
      */
     public void setPurgebusiness(boolean purgebusiness) {
         this.purgebusiness = purgebusiness;
@@ -85,8 +81,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param purgealias
-     *            the purgealias to set
+     * @param purgealias the purgealias to set
      */
     public void setPurgealias(boolean purgealias) {
         this.purgealias = purgealias;
@@ -100,8 +95,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param purgeroles
-     *            the purgeroles to set
+     * @param purgeroles the purgeroles to set
      */
     public void setPurgeroles(boolean purgeroles) {
         this.purgeroles = purgeroles;
@@ -115,8 +109,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param host
-     *            the host to set
+     * @param host the host to set
      */
     public void setHost(String host) {
         this.host = host;
@@ -130,8 +123,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param rule
-     *            the rule to set
+     * @param rule the rule to set
      */
     public void setRule(String rule) {
         this.rule = rule;
@@ -145,8 +137,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param business
-     *            the business to set
+     * @param business the business to set
      */
     public void setBusiness(String business) {
         this.business = business;
@@ -160,8 +151,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param alias
-     *            the alias to set
+     * @param alias the alias to set
      */
     public void setAlias(String alias) {
         this.alias = alias;
@@ -175,8 +165,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param roles
-     *            the roles to set
+     * @param roles the roles to set
      */
     public void setRoles(String roles) {
         this.roles = roles;
@@ -190,8 +179,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param hostid
-     *            the hostid to set
+     * @param hostid the hostid to set
      */
     public void setHostid(long hostid) {
         this.hostid = hostid;
@@ -205,8 +193,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param ruleid
-     *            the ruleid to set
+     * @param ruleid the ruleid to set
      */
     public void setRuleid(long ruleid) {
         this.ruleid = ruleid;
@@ -220,8 +207,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param businessid
-     *            the businessid to set
+     * @param businessid the businessid to set
      */
     public void setBusinessid(long businessid) {
         this.businessid = businessid;
@@ -235,8 +221,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param aliasid
-     *            the aliasid to set
+     * @param aliasid the aliasid to set
      */
     public void setAliasid(long aliasid) {
         this.aliasid = aliasid;
@@ -250,8 +235,7 @@ public class ConfigImportJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param rolesid
-     *            the rolesid to set
+     * @param rolesid the rolesid to set
      */
     public void setRolesid(long rolesid) {
         this.rolesid = rolesid;

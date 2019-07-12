@@ -60,7 +60,6 @@ import java.util.List;
  * Handler for Rest HTTP support for R66
  *
  * @author Frederic Bregier
- *
  */
 public class HttpRestR66Handler extends HttpRestHandler {
 
@@ -347,7 +346,7 @@ public class HttpRestR66Handler extends HttpRestHandler {
 
     /**
      * Called at the beginning of every new request
-     *
+     * <p>
      * Override if needed
      */
     protected void initialize() {

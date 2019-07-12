@@ -28,11 +28,10 @@ import org.waarp.openr66.protocol.utils.ChannelUtils;
 
 /**
  * Example of Java Task for ExecJava
- *
+ * <p>
  * 2nd argument is a numerical rank. When rank > 100 stops, else increment rank.
  *
  * @author Frederic Bregier
- *
  */
 public class TestExecJavaTask extends AbstractExecJavaTask {
 

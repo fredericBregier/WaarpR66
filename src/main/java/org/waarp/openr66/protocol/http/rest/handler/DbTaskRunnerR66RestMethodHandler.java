@@ -47,7 +47,6 @@ import java.sql.Timestamp;
  * DbTaskRunner Rest handler
  *
  * @author "Frederic Bregier"
- *
  */
 public class DbTaskRunnerR66RestMethodHandler extends DataModelRestMethodHandler<DbTaskRunner> {
     public static final String BASEURI = "transfers";

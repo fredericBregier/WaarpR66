@@ -62,7 +62,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Configuration Table object
  *
  * @author Frederic Bregier
- *
  */
 public class DbHostConfiguration extends AbstractDbData {
     public static final int[] dbTypes = {
@@ -187,6 +186,7 @@ public class DbHostConfiguration extends AbstractDbData {
      *
      * @param dbSession
      * @param source
+     *
      * @throws WaarpDatabaseSqlException
      */
     public DbHostConfiguration(ObjectNode source) throws WaarpDatabaseSqlException {
@@ -203,6 +203,7 @@ public class DbHostConfiguration extends AbstractDbData {
     /**
      * @param dbSession
      * @param hostid
+     *
      * @throws WaarpDatabaseException
      */
     public DbHostConfiguration(String hostid) throws WaarpDatabaseException {
@@ -232,7 +233,9 @@ public class DbHostConfiguration extends AbstractDbData {
      * For instance from Commander when getting updated information
      *
      * @param preparedStatement
+     *
      * @return the next updated Configuration
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -246,8 +249,8 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbPreparedStatement for getting Updated Object
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -281,14 +284,15 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @param session
      * @param hostid
      * @param business
      * @param role
      * @param alias
      * @param other
+     *
      * @return a preparedStatement with the filter set
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -347,9 +351,9 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @param dbSession
      * @param hostid
+     *
      * @return the version of the database from HostConfiguration table
      */
     public static String getVersionDb(String hostid) {
@@ -418,7 +422,6 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbValue associated with this table
      */
     public static DbValue[] getAllType() {
@@ -596,8 +599,7 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     * @param aliases
-     *            the aliases to set
+     * @param aliases the aliases to set
      */
     public void setAliases(String aliases) {
         this.business.setAliases(aliases == null? "" : aliases);
@@ -715,8 +717,7 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     * @param others
-     *            the others to set
+     * @param others the others to set
      */
     public void setOthers(String others) {
         this.business.setOthers(others == null? "" : others);
@@ -730,7 +731,6 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return the element for the content of the other part
      */
     public Element getOtherElement() {
@@ -748,9 +748,7 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
-     * @param element
-     *            the element to set as XML string to other part
+     * @param element the element to set as XML string to other part
      */
     public void setOtherElement(Element element) {
         setOthers(element.asXML());
@@ -844,7 +842,6 @@ public class DbHostConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return True if this Configuration refers to the current host
      */
     public boolean isOwnConfiguration() {
@@ -857,6 +854,7 @@ public class DbHostConfiguration extends AbstractDbData {
      * @param source
      * @param path
      * @param set
+     *
      * @return True if ok
      */
     private boolean updateSet(String source, String path, HashSet<String> set) {
@@ -908,6 +906,7 @@ public class DbHostConfiguration extends AbstractDbData {
      * @param config
      * @param newbusiness
      * @param purged
+     *
      * @return True if updated
      */
     public boolean updateBusiness(Configuration config, String newbusiness, boolean purged) {
@@ -956,6 +955,7 @@ public class DbHostConfiguration extends AbstractDbData {
      * @param valpath
      * @param split
      * @param map
+     *
      * @return True if ok
      */
     private boolean updateMap(String source, String path, String keypath, String valpath, String split,
@@ -1024,6 +1024,7 @@ public class DbHostConfiguration extends AbstractDbData {
      * @param config
      * @param newalias
      * @param purged
+     *
      * @return True if updated
      */
     public boolean updateAlias(Configuration config, String newalias, boolean purged) {
@@ -1105,6 +1106,7 @@ public class DbHostConfiguration extends AbstractDbData {
      * @param config
      * @param newroles
      * @param purged
+     *
      * @return True if ok
      */
     public boolean updateRoles(Configuration config, String newroles, boolean purged) {

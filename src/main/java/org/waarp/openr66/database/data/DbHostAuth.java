@@ -55,7 +55,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Host Authentication Table object
  *
  * @author Frederic Bregier
- *
  */
 public class DbHostAuth extends AbstractDbData {
     public static final String DEFAULT_CLIENT_ADDRESS = "0.0.0.0";
@@ -155,6 +154,7 @@ public class DbHostAuth extends AbstractDbData {
     /**
      * @param dbSession
      * @param hostid
+     *
      * @throws WaarpDatabaseException
      */
     public DbHostAuth(String hostid) throws WaarpDatabaseException {
@@ -190,7 +190,9 @@ public class DbHostAuth extends AbstractDbData {
      * Delete all entries (used when purge and reload)
      *
      * @param dbSession
+     *
      * @return the previous existing array of DbRule
+     *
      * @throws WaarpDatabaseException
      */
     public static DbHostAuth[] deleteAll() throws WaarpDatabaseException {
@@ -217,9 +219,10 @@ public class DbHostAuth extends AbstractDbData {
     /**
      * Get All DbHostAuth from database or from internal hashMap in case of no database support
      *
-     * @param dbSession
-     *            may be null
+     * @param dbSession may be null
+     *
      * @return the array of DbHostAuth
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -248,7 +251,9 @@ public class DbHostAuth extends AbstractDbData {
      * For instance from Commander when getting updated information
      *
      * @param preparedStatement
+     *
      * @return the next updated DbHostAuth
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -288,13 +293,14 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @param session
      * @param host
      * @param addr
      * @param ssl
      * @param active
+     *
      * @return the DbPreparedStatement according to the filter
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -335,11 +341,12 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @param session
      * @param host
      * @param addr
+     *
      * @return the DbPreparedStatement according to the filter
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -408,7 +415,9 @@ public class DbHostAuth extends AbstractDbData {
      * Write selected DbHostAuth to a Json String
      *
      * @param preparedStatement
+     *
      * @return the associated Json String
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      * @throws OpenR66ProtocolBusinessException
@@ -437,8 +446,8 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @param session
+     *
      * @return True if any of the server has the isProxified property
      */
     public static boolean hasProxifiedHosts() {
@@ -460,7 +469,6 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbValue associated with this table
      */
     public static DbValue[] getAllType() {
@@ -687,6 +695,7 @@ public class DbHostAuth extends AbstractDbData {
      * Is the given key a valid one
      *
      * @param newkey
+     *
      * @return True if the key is valid (or any key is valid)
      */
     public boolean isKeyValid(byte[] newkey) {
@@ -751,10 +760,9 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @return the SocketAddress from the address and port
-     * @exception IllegalArgumentException
-     *                when the address is for a Client and therefore cannot be checked
+     *
+     * @throws IllegalArgumentException when the address is for a Client and therefore cannot be checked
      */
     public SocketAddress getSocketAddress() throws IllegalArgumentException {
         if (isNoAddress()) {
@@ -764,7 +772,6 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @return True if this Host ref is with SSL support
      */
     public boolean isSsl() {
@@ -826,7 +833,6 @@ public class DbHostAuth extends AbstractDbData {
     }
 
     /**
-     *
      * @return the Json string for this
      */
     public String getJsonAsString() {
@@ -837,8 +843,8 @@ public class DbHostAuth extends AbstractDbData {
     /**
      * @param session
      * @param body
-     * @param crypted
-     *            True if the Key is kept crypted, False it will be in clear form
+     * @param crypted True if the Key is kept crypted, False it will be in clear form
+     *
      * @return the runner in Html format specified by body by replacing all instance of fields
      */
     public String toSpecializedHtml(R66Session session, String body, boolean crypted) {

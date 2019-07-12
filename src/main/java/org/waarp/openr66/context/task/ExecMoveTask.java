@@ -38,15 +38,14 @@ import java.io.PipedOutputStream;
 
 /**
  * Execute an external command and Rename the file (using the new name from the result).<br>
- *
+ * <p>
  * The move of the file (if any) should be done by the external command itself.<br>
  * <br>
- *
- * waitForValidation (#NOWAIT#) must not be set since it will prevent to have the MOVE TASK to occur
- * normally. So even if set, the #NOWAIT# will be ignored.
+ * <p>
+ * waitForValidation (#NOWAIT#) must not be set since it will prevent to have the MOVE TASK to occur normally. So even
+ * if set, the #NOWAIT# will be ignored.
  *
  * @author Frederic Bregier
- *
  */
 public class ExecMoveTask extends AbstractExecTask {
     /**

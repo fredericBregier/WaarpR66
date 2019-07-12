@@ -33,7 +33,6 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * Test class for Recv Through client
  *
  * @author Frederic Bregier
- *
  */
 public class TestRecvThroughClient extends RecvThroughClient {
     /**

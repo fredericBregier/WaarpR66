@@ -84,7 +84,6 @@ import java.util.Locale;
  * File Based Configuration
  *
  * @author frederic bregier
- *
  */
 public class FileBasedConfiguration {
     /**
@@ -279,8 +278,8 @@ public class FileBasedConfiguration {
      */
     private static final String XML_MULTIPLE_MONITORS = "multiplemonitors";
     /**
-     * If you need a special Business Factory, you must specify the full class name here.
-     * Default is: org.waarp.openr66.context.R66DefaultBusinessFactory which only logs in DEBUG mode.
+     * If you need a special Business Factory, you must specify the full class name here. Default is:
+     * org.waarp.openr66.context.R66DefaultBusinessFactory which only logs in DEBUG mode.
      */
     private static final String XML_BUSINESS_FACTORY = "businessfactory";
     /**
@@ -409,13 +408,13 @@ public class FileBasedConfiguration {
      */
     private static final String XML_GAPRESTART = "gaprestart";
     /**
-     * Size by default of block size for receive/sending files. Should be a multiple of 8192
-     * (maximum = 64K due to block limitation to 2 bytes)
+     * Size by default of block size for receive/sending files. Should be a multiple of 8192 (maximum = 64K due to block
+     * limitation to 2 bytes)
      */
     private static final String XML_BLOCKSIZE = "blocksize";
     /**
-     * If set to <=0, will not use Thrift support, if set >0 (preferably > 1024) will enable
-     * Thrift support on the TCP port specified by this number
+     * If set to <=0, will not use Thrift support, if set >0 (preferably > 1024) will enable Thrift support on the TCP
+     * port specified by this number
      */
     private static final String XML_USETHRIFT = "usethrift";
     /**
@@ -513,7 +512,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configIdentityDecls = {
             // identity
@@ -525,7 +523,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configServerParamDecls = {
             // server
@@ -553,7 +550,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configNetworkServerDecls = {
             // network
@@ -564,7 +560,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configSslDecls = {
             // ssl
@@ -577,7 +572,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configDbDecls = {
             // db
@@ -591,7 +585,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configLimitDecls = {
             // limit
@@ -626,7 +619,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configSubmitLimitDecls = {
             // limit
@@ -634,7 +626,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configClientParamDecls = {
             // client
@@ -643,7 +634,6 @@ public class FileBasedConfiguration {
     };
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configDirectoryDecls = {
             // directory
@@ -669,7 +659,6 @@ public class FileBasedConfiguration {
     private static final String XML_REST = "rest";
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configRestDecls = {
             // Rest support configuration
@@ -767,8 +756,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the identity of the server is correctly loaded
      */
     private static boolean loadIdentity(Configuration config) {
@@ -802,8 +791,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the authentication of partners is correctly loaded
      */
     private static boolean loadAuthentication(Configuration config) {
@@ -832,8 +821,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the server parameters are correctly loaded
      */
     private static boolean loadServerParam(Configuration config) {
@@ -1092,8 +1081,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the client parameters are correctly loaded
      */
     private static boolean loadClientParam(Configuration config) {
@@ -1128,8 +1117,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the directory parameters are correctly loaded
      */
     private static boolean loadDirectory(Configuration config) {
@@ -1196,9 +1185,9 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
      * @param updateLimit
+     *
      * @return True if the limit configuration is correctly loaded
      */
     private static boolean loadLimit(Configuration config, boolean updateLimit) {
@@ -1435,8 +1424,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the SSL configuration is correctly loaded
      */
     private static boolean loadSsl(Configuration config) {
@@ -1530,8 +1519,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
+     *
      * @return True if the network configuration is correctly loaded
      */
     private static boolean loadNetworkServer(Configuration config) {
@@ -1573,8 +1562,8 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param configuration
+     *
      * @return True if the REST configuration is correctly loaded
      */
     @SuppressWarnings("unchecked")
@@ -1718,6 +1707,7 @@ public class FileBasedConfiguration {
      * Set the Crypto Key from the Document
      *
      * @param config
+     *
      * @return True if OK
      */
     private static boolean setCryptoKey(Configuration config, XmlHash hashConfig) {
@@ -1747,6 +1737,7 @@ public class FileBasedConfiguration {
      * Load data from database or from files if not connected
      *
      * @param config
+     *
      * @return True if OK
      */
     private static boolean loadFromDatabase(Configuration config) {
@@ -1793,6 +1784,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param initdb
+     *
      * @return True if OK
      */
     private static boolean loadDatabase(Configuration config, boolean initdb) {
@@ -2086,10 +2078,11 @@ public class FileBasedConfiguration {
     }
 
     /**
-     *
      * @param config
      * @param fromXML
+     *
      * @return the new subpath
+     *
      * @throws OpenR66ProtocolSystemException
      */
     private static String getSubPath(Configuration config, String fromXML)
@@ -2126,6 +2119,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setConfigurationLoadLimitFromXml(Configuration config, String filename) {
@@ -2166,6 +2160,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setConfigurationInitDatabase(Configuration config,
@@ -2218,6 +2213,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setConfigurationServerMinimalFromXml(Configuration config, String filename) {
@@ -2299,6 +2295,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setConfigurationServerShutdownFromXml(Configuration config,
@@ -2397,6 +2394,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setConfigurationServerFromXml(Configuration config, String filename) {
@@ -2490,6 +2488,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setClientConfigurationFromXml(Configuration config, String filename) {
@@ -2587,6 +2586,7 @@ public class FileBasedConfiguration {
      *
      * @param config
      * @param filename
+     *
      * @return True if OK
      */
     public static boolean setSubmitClientConfigurationFromXml(Configuration config, String filename) {

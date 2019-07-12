@@ -67,6 +67,7 @@ class LocalClientHandler extends SimpleChannelInboundHandler<AbstractLocalPacket
      * Initiate the LocalChannelReference
      *
      * @param channel
+     *
      * @throws InterruptedException
      * @throws OpenR66ProtocolNetworkException
      */

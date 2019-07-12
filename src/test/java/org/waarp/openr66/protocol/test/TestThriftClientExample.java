@@ -34,7 +34,6 @@ import java.util.List;
  * Example of Java class to interact with the Thrift R66 service
  *
  * @author "Frederic Bregier"
- *
  */
 public class TestThriftClientExample {
     private static final int PORT = 4266;

@@ -33,11 +33,10 @@ import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
- * Through API Transfer from a client with or without database connection, and enabling access to
- * statistic of the transfer (unblocking transfer)
+ * Through API Transfer from a client with or without database connection, and enabling access to statistic of the
+ * transfer (unblocking transfer)
  *
  * @author Frederic Bregier
- *
  */
 public abstract class ProgressBarTransfer extends AbstractTransfer {
     protected final NetworkTransaction networkTransaction;
@@ -56,29 +55,26 @@ public abstract class ProgressBarTransfer extends AbstractTransfer {
     }
 
     /**
-     * This function will be called every 100ms (or other fixed value in INTERVALCALLBACK). Note
-     * that final rank is unknown.
+     * This function will be called every 100ms (or other fixed value in INTERVALCALLBACK). Note that final rank is
+     * unknown.
      *
-     * @param currentBlock
-     *            the current block rank (from 0 to n-1)
-     * @param blocksize
-     *            blocksize of 1 block
+     * @param currentBlock the current block rank (from 0 to n-1)
+     * @param blocksize blocksize of 1 block
      */
     abstract public void callBack(int currentBlock, int blocksize);
 
     /**
      * This function will be called only once when the transfer is over
      *
-     * @param success
-     *            True if the transfer is successful
+     * @param success True if the transfer is successful
      * @param currentBlock
      * @param blocksize
      */
     abstract public void lastCallBack(boolean success, int currentBlock, int blocksize);
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

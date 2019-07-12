@@ -38,7 +38,6 @@ import java.net.InetSocketAddress;
  * Client to execute external command through Waarp Local Exec
  *
  * @author Frederic Bregier
- *
  */
 public class LocalExecClient {
     /**
@@ -106,8 +105,7 @@ public class LocalExecClient {
     }
 
     /**
-     * Run one command with a specific allowed delay for execution. The connection must be ready
-     * (done with connect()).
+     * Run one command with a specific allowed delay for execution. The connection must be ready (done with connect()).
      *
      * @param command
      * @param delay

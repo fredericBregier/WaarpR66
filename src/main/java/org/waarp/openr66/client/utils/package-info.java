@@ -17,6 +17,9 @@
  * Package that contains helper for Clients
  *
  * @author "Frederic Bregier"
+ * <p>
+ * Package that contains helper for Clients
+ * @author "Frederic Bregier"
  */
 /**
  * Package that contains helper for Clients

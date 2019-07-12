@@ -34,7 +34,6 @@ import java.io.File;
  * Server local configuration export to files
  *
  * @author Frederic Bregier
- *
  */
 public class ServerExportConfiguration {
     /**
@@ -43,9 +42,7 @@ public class ServerExportConfiguration {
     private static WaarpLogger logger;
 
     /**
-     *
-     * @param args
-     *            as configuration file and the directory where to export
+     * @param args as configuration file and the directory where to export
      */
     public static void main(String[] args) {
         WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(null));

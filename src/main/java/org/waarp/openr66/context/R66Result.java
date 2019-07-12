@@ -24,7 +24,6 @@ import org.waarp.openr66.protocol.exception.OpenR66Exception;
  * This class is the result for every operations in OpenR66.
  *
  * @author Frederic Bregier
- *
  */
 public class R66Result {
     /**
@@ -97,7 +96,6 @@ public class R66Result {
     }
 
     /**
-     *
      * @return the associated message with this Result
      */
     public String getMessage() {

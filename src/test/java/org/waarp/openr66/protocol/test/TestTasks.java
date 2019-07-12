@@ -48,7 +48,6 @@ import java.io.File;
  * The object of this class is to test various tasks.
  *
  * @author "Frederic Bregier"
- *
  */
 public class TestTasks {
 

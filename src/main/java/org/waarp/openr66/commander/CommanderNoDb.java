@@ -34,13 +34,12 @@ import java.io.File;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Commander is responsible to read list of updated data from time to time in order to achieve new
- * runner or new configuration updates.
- *
+ * Commander is responsible to read list of updated data from time to time in order to achieve new runner or new
+ * configuration updates.
+ * <p>
  * Based on no Database support
  *
  * @author Frederic Bregier
- *
  */
 public class CommanderNoDb implements CommanderInterface {
     public static final ConcurrentLinkedQueue<AbstractDbData> todoList = new ConcurrentLinkedQueue<AbstractDbData>();
@@ -64,8 +63,7 @@ public class CommanderNoDb implements CommanderInterface {
      * Prepare requests that will be executed from time to time
      *
      * @param runner
-     * @param fromStartup
-     *            True if call from startup of the server
+     * @param fromStartup True if call from startup of the server
      */
     public CommanderNoDb(InternalRunner runner, boolean fromStartup) {
         this.internalConstructor(runner);

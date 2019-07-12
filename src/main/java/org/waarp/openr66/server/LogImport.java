@@ -29,11 +29,9 @@ import org.waarp.openr66.protocol.utils.ChannelUtils;
 import java.io.File;
 
 /**
- * To import logs that were exported (one should not try to import on the same server to prevent
- * strange behavior).
+ * To import logs that were exported (one should not try to import on the same server to prevent strange behavior).
  *
  * @author "Frederic Bregier"
- *
  */
 public class LogImport {
     /**

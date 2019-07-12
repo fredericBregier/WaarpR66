@@ -38,7 +38,6 @@ import java.util.concurrent.Executors;
  * Test class for internal ping pong test
  *
  * @author Frederic Bregier
- *
  */
 public class TestTransaction implements Runnable {
     /**

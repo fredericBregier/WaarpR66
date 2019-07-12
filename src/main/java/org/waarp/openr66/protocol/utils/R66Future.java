@@ -24,7 +24,6 @@ import org.waarp.openr66.database.data.DbTaskRunner;
  * Future implementation
  *
  * @author Frederic Bregier
- *
  */
 public class R66Future extends WaarpFuture {
 
@@ -56,8 +55,7 @@ public class R66Future extends WaarpFuture {
     }
 
     /**
-     * @param result
-     *            the result to set
+     * @param result the result to set
      */
     public void setResult(R66Result result) {
         this.result = result;

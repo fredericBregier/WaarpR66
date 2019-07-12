@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Exporting Configuration response JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
 
@@ -37,8 +36,7 @@ public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
     }
 
     /**
-     * @param command
-     *            the command to set
+     * @param command the command to set
      */
     public void setCommand(byte command) {
         this.command = command;
@@ -52,8 +50,7 @@ public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
     }
 
     /**
-     * @param filehost
-     *            the filehost to set
+     * @param filehost the filehost to set
      */
     public void setFilehost(String filehost) {
         this.filehost = filehost;
@@ -67,8 +64,7 @@ public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
     }
 
     /**
-     * @param filerule
-     *            the filerule to set
+     * @param filerule the filerule to set
      */
     public void setFilerule(String filerule) {
         this.filerule = filerule;
@@ -82,8 +78,7 @@ public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
     }
 
     /**
-     * @param filebusiness
-     *            the filebusiness to set
+     * @param filebusiness the filebusiness to set
      */
     public void setFilebusiness(String filebusiness) {
         this.filebusiness = filebusiness;
@@ -97,8 +92,7 @@ public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
     }
 
     /**
-     * @param filealias
-     *            the filealias to set
+     * @param filealias the filealias to set
      */
     public void setFilealias(String filealias) {
         this.filealias = filealias;
@@ -112,8 +106,7 @@ public class ConfigExportResponseJsonPacket extends ConfigExportJsonPacket {
     }
 
     /**
-     * @param fileroles
-     *            the fileroles to set
+     * @param fileroles the fileroles to set
      */
     public void setFileroles(String fileroles) {
         this.fileroles = fileroles;

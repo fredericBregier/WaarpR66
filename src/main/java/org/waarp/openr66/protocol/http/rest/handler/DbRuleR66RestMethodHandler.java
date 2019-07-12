@@ -44,7 +44,6 @@ import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler;
  * DbRule Rest handler
  *
  * @author "Frederic Bregier"
- *
  */
 public class DbRuleR66RestMethodHandler extends DataModelRestMethodHandler<DbRule> {
     public static final String BASEURI = "rules";

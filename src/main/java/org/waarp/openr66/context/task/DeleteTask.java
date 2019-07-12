@@ -25,11 +25,9 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
 
 /**
- * Delete the file. The current file is no more valid.<br>
- * No arguments are taken into account.
+ * Delete the file. The current file is no more valid.<br> No arguments are taken into account.
  *
  * @author Frederic Bregier
- *
  */
 public class DeleteTask extends AbstractTask {
     /**

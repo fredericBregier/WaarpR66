@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Startup Message class
- *
+ * <p>
  * 1 localId (Integer): localId
  *
  * @author frederic bregier
@@ -45,6 +45,7 @@ public class StartupPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new ValidPacket from buffer
      */
     public static StartupPacket createFromBuffer(int headerLength,

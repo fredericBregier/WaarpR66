@@ -28,7 +28,6 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 
 /**
  * @author Frederic Bregier
- *
  */
 public class HttpSslInitializer extends ChannelInitializer<SocketChannel> {
     private boolean useHttpCompression = false;

@@ -42,7 +42,6 @@ import java.net.SocketAddress;
  * Abstract class for internal Business Request
  *
  * @author Frederic Bregier
- *
  */
 public abstract class AbstractBusinessRequest implements Runnable {
     /**
@@ -134,6 +133,7 @@ public abstract class AbstractBusinessRequest implements Runnable {
      * Parse the parameter and set current values
      *
      * @param args
+     *
      * @return True if all parameters were found and correct
      */
     protected static boolean getParams(String[] args) {

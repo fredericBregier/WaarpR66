@@ -45,8 +45,7 @@ import org.waarp.openr66.protocol.utils.R66Future;
 import org.waarp.openr66.protocol.utils.R66Versions;
 
 /**
- * Reference of one object using Local Channel localId and containing local channel and network
- * channel.
+ * Reference of one object using Local Channel localId and containing local channel and network channel.
  *
  * @author Frederic Bregier
  */
@@ -152,11 +151,11 @@ public class LocalChannelReference {
     private volatile DbSession noconcurrencyDbSession = null;
 
     /**
-     *
      * @param localChannel
      * @param networkChannelRef
      * @param remoteId
      * @param futureRequest
+     *
      * @throws OpenR66ProtocolRemoteShutdownException
      */
     public LocalChannelReference(LocalChannel localChannel, NetworkChannelReference networkChannelRef,
@@ -248,8 +247,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param remoteId
-     *            the remoteId to set
+     * @param remoteId the remoteId to set
      */
     public void setRemoteId(Integer remoteId) {
         this.remoteId = remoteId;
@@ -277,7 +275,6 @@ public class LocalChannelReference {
     }
 
     /**
-     *
      * @return the actual dbSession
      */
     public DbSession getDbSession() {
@@ -299,8 +296,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param session
-     *            the session to set
+     * @param session the session to set
      */
     public void setSession(R66Session session) {
         this.session = session;
@@ -314,8 +310,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param errorMessage
-     *            the errorMessage to set
+     * @param errorMessage the errorMessage to set
      */
     public void setErrorMessage(String errorMessage, ErrorCode code) {
         this.errorMessage = errorMessage;
@@ -346,7 +341,6 @@ public class LocalChannelReference {
     }
 
     /**
-     *
      * @return the futureValidateStartup
      */
     public R66Future getFutureValidateStartup() {
@@ -363,7 +357,6 @@ public class LocalChannelReference {
     }
 
     /**
-     *
      * @return True if the connection is validated (in OK or KO status)
      */
     public boolean isConnectionValidate() {
@@ -392,7 +385,6 @@ public class LocalChannelReference {
     }
 
     /**
-     *
      * @return the futureValidateConnection
      */
     public R66Future getFutureValidateConnection() {
@@ -648,15 +640,13 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param recvThroughHandler
-     *            the recvThroughHandler to set
+     * @param recvThroughHandler the recvThroughHandler to set
      */
     public void setRecvThroughHandler(RecvThroughHandler recvThroughHandler) {
         this.recvThroughHandler = recvThroughHandler;
     }
 
     /**
-     *
      * @return True if in RecvThrough Mode
      */
     public boolean isRecvThroughMode() {
@@ -671,8 +661,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param isSendThroughMode
-     *            the isSendThroughMode to set
+     * @param isSendThroughMode the isSendThroughMode to set
      */
     public void setSendThroughMode(boolean isSendThroughMode) {
         this.isSendThroughMode = isSendThroughMode;
@@ -686,8 +675,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param clientRunner
-     *            the clientRunner to set
+     * @param clientRunner the clientRunner to set
      */
     public void setClientRunner(ClientRunner clientRunner) {
         this.clientRunner = clientRunner;
@@ -705,7 +693,6 @@ public class LocalChannelReference {
     }
 
     /**
-     *
      * @return the current state or TEST if no session exists
      */
     public R66FiniteDualStates getSessionState() {
@@ -723,8 +710,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param hashComputeDuringTransfer
-     *            the hashComputeDuringTransfer to set
+     * @param hashComputeDuringTransfer the hashComputeDuringTransfer to set
      */
     public void setHashComputeDuringTransfer(String hashComputeDuringTransfer) {
         this.hashComputeDuringTransfer = hashComputeDuringTransfer;
@@ -746,8 +732,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param hostId
-     *            the partner to set
+     * @param hostId the partner to set
      */
     public void setPartner(String hostId) {
         logger.debug("host:" + hostId);
@@ -765,8 +750,7 @@ public class LocalChannelReference {
     }
 
     /**
-     * @param requestId
-     *            the requestId to set
+     * @param requestId the requestId to set
      */
     public void setRequestId(String requestId) {
         this.requestId = requestId;

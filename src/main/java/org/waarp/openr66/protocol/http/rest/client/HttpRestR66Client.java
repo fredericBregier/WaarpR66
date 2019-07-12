@@ -40,21 +40,16 @@ import java.util.Map;
  * Http Rest R66 client helper class
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestR66Client extends HttpRestClientHelper {
 
     /**
      * Prepare the future connection
      *
-     * @param baseUri
-     *            in general = '/'
-     * @param Initializer
-     *            the associated Initializer including the REST handler for client side
-     * @param client
-     *            limit number of concurrent connected clients
-     * @param timeout
-     *            time out for network connection
+     * @param baseUri in general = '/'
+     * @param Initializer the associated Initializer including the REST handler for client side
+     * @param client limit number of concurrent connected clients
+     * @param timeout time out for network connection
      */
     public HttpRestR66Client(String baseUri, ChannelInitializer<SocketChannel> Initializer, int client, long timeout) {
         super(baseUri, client, timeout, Initializer);
@@ -63,24 +58,17 @@ public class HttpRestR66Client extends HttpRestClientHelper {
     /**
      * Send an HTTP query using the channel for target
      *
-     * @param config
-     *            configuration for REST service
-     * @param channel
-     *            target of the query
-     * @param method
-     *            HttpMethod to use
-     * @param host
-     *            target of the query (shall be the same as for the channel)
-     * @param addedUri
-     *            additional uri, added to baseUri (shall include also extra arguments) (might be null)
-     * @param user
-     *            user to use in authenticated Rest procedure (might be null)
-     * @param pwd
-     *            password to use in authenticated Rest procedure (might be null)
-     * @param uriArgs
-     *            arguments for Uri if any (might be null)
-     * @param json
-     *            json to send as body in the request (might be null); Useful in PUT, POST but should not in GET, DELETE, OPTIONS
+     * @param config configuration for REST service
+     * @param channel target of the query
+     * @param method HttpMethod to use
+     * @param host target of the query (shall be the same as for the channel)
+     * @param addedUri additional uri, added to baseUri (shall include also extra arguments) (might be null)
+     * @param user user to use in authenticated Rest procedure (might be null)
+     * @param pwd password to use in authenticated Rest procedure (might be null)
+     * @param uriArgs arguments for Uri if any (might be null)
+     * @param json json to send as body in the request (might be null); Useful in PUT, POST but should not in GET,
+     * DELETE, OPTIONS
+     *
      * @return the RestFuture associated with this request
      */
     public RestFuture sendQuery(RestConfiguration config, Channel channel, HttpMethod method, String host,
@@ -94,8 +82,8 @@ public class HttpRestR66Client extends HttpRestClientHelper {
     }
 
     /**
-     *
      * @param bodyResponse
+     *
      * @return the associated RESTHANDLERS if any, else null
      */
     public RESTHANDLERS getRestHandler(RestArgument bodyResponse) {
@@ -111,8 +99,8 @@ public class HttpRestR66Client extends HttpRestClientHelper {
     }
 
     /**
-     *
      * @param bodyResponse
+     *
      * @return the primary property value associated with the Model (from the bodyResponse), else null
      */
     public String getPrimaryProperty(RestArgument bodyResponse) {
@@ -126,8 +114,8 @@ public class HttpRestR66Client extends HttpRestClientHelper {
     }
 
     /**
-     *
      * @param model
+     *
      * @return the primary property name associated with the Model
      */
     public String getPrimaryPropertyName(String model) {
@@ -145,10 +133,11 @@ public class HttpRestR66Client extends HttpRestClientHelper {
     }
 
     /**
-     *
      * @param dbSession
      * @param future
+     *
      * @return the DbData allocated from result if any, else null
+     *
      * @throws HttpIncorrectRequestException
      */
     @SuppressWarnings("unchecked")
@@ -175,9 +164,10 @@ public class HttpRestR66Client extends HttpRestClientHelper {
     }
 
     /**
-     *
      * @param future
+     *
      * @return the JsonPacket from result if any, else null
+     *
      * @throws HttpIncorrectRequestException
      */
     public JsonPacket getJsonPacketFromFuture(RestFuture future) throws HttpIncorrectRequestException {

@@ -43,7 +43,6 @@ import java.net.SocketAddress;
  * Message testing between two hosts
  *
  * @author Frederic Bregier
- *
  */
 public class Message implements Runnable {
     protected static String _INFO_ARGS =
@@ -88,6 +87,7 @@ public class Message implements Runnable {
      * Parse the parameter and set current values
      *
      * @param args
+     *
      * @return True if all parameters were found and correct
      */
     protected static boolean getParams(String[] args) {

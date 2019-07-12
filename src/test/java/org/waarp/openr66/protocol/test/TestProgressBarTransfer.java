@@ -30,7 +30,6 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * @author Frederic Bregier
- *
  */
 public class TestProgressBarTransfer extends ProgressBarTransfer {
 

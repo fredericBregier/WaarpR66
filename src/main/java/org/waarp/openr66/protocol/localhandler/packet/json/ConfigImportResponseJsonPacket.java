@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Import Configuration response JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
 
@@ -38,8 +37,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param command
-     *            the command to set
+     * @param command the command to set
      */
     public void setCommand(byte command) {
         this.command = command;
@@ -53,8 +51,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param purgedhost
-     *            the purgedhost to set
+     * @param purgedhost the purgedhost to set
      */
     public void setPurgedhost(boolean purgedhost) {
         this.purgedhost = purgedhost;
@@ -68,8 +65,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param purgedrule
-     *            the purgedrule to set
+     * @param purgedrule the purgedrule to set
      */
     public void setPurgedrule(boolean purgedrule) {
         this.purgedrule = purgedrule;
@@ -83,8 +79,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param purgedbusiness
-     *            the purgedbusiness to set
+     * @param purgedbusiness the purgedbusiness to set
      */
     public void setPurgedbusiness(boolean purgedbusiness) {
         this.purgedbusiness = purgedbusiness;
@@ -98,8 +93,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param purgedalias
-     *            the purgedalias to set
+     * @param purgedalias the purgedalias to set
      */
     public void setPurgedalias(boolean purgedalias) {
         this.purgedalias = purgedalias;
@@ -113,8 +107,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param purgedroles
-     *            the purgedroles to set
+     * @param purgedroles the purgedroles to set
      */
     public void setPurgedroles(boolean purgedroles) {
         this.purgedroles = purgedroles;
@@ -128,8 +121,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param importedhost
-     *            the importedhost to set
+     * @param importedhost the importedhost to set
      */
     public void setImportedhost(boolean importedhost) {
         this.importedhost = importedhost;
@@ -143,8 +135,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param importedrule
-     *            the importedrule to set
+     * @param importedrule the importedrule to set
      */
     public void setImportedrule(boolean importedrule) {
         this.importedrule = importedrule;
@@ -158,8 +149,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param importedbusiness
-     *            the importedbusiness to set
+     * @param importedbusiness the importedbusiness to set
      */
     public void setImportedbusiness(boolean importedbusiness) {
         this.importedbusiness = importedbusiness;
@@ -173,8 +163,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param importedalias
-     *            the importedalias to set
+     * @param importedalias the importedalias to set
      */
     public void setImportedalias(boolean importedalias) {
         this.importedalias = importedalias;
@@ -188,8 +177,7 @@ public class ConfigImportResponseJsonPacket extends ConfigImportJsonPacket {
     }
 
     /**
-     * @param importedroles
-     *            the importedroles to set
+     * @param importedroles the importedroles to set
      */
     public void setImportedroles(boolean importedroles) {
         this.importedroles = importedroles;

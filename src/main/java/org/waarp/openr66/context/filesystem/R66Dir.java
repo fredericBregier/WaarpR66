@@ -37,7 +37,6 @@ import java.util.List;
  * Directory representation
  *
  * @author frederic bregier
- *
  */
 public class R66Dir extends FilesystemBasedDirImpl {
 
@@ -49,8 +48,8 @@ public class R66Dir extends FilesystemBasedDirImpl {
     }
 
     /**
-     *
      * @param file
+     *
      * @return the final unique basename without the temporary extension
      */
     public static String getFinalUniqueFilename(R66File file) {
@@ -72,7 +71,9 @@ public class R66Dir extends FilesystemBasedDirImpl {
      *
      * @param prefix
      * @param filename
+     *
      * @return the R66File with a unique filename and a temporary extension
+     *
      * @throws CommandAbstractException
      */
     public synchronized R66File setUniqueFile(long prefix, String filename)
@@ -99,14 +100,15 @@ public class R66Dir extends FilesystemBasedDirImpl {
     }
 
     /**
-     * Finds all files matching a wildcard expression (based on '?', '~' or '*') but without
-     * checking BusinessPath, thus returning absolute path.
+     * Finds all files matching a wildcard expression (based on '?', '~' or '*') but without checking BusinessPath, thus
+     * returning absolute path.
      *
-     * @param pathWithWildcard
-     *            The wildcard expression with a business path.
-     * @return List of String as relative paths matching the wildcard expression. Those files are
-     *         tested as valid from business point of view. If Wildcard support is not active, if
-     *         the path contains any wildcards, it will throw an error.
+     * @param pathWithWildcard The wildcard expression with a business path.
+     *
+     * @return List of String as relative paths matching the wildcard expression. Those files are tested as valid from
+     * business point of view. If Wildcard support is not active, if the path contains any wildcards, it will throw an
+     * error.
+     *
      * @throws CommandAbstractException
      */
     protected List<String> wildcardFilesNoCheck(String pathWithWildcard)
@@ -179,7 +181,9 @@ public class R66Dir extends FilesystemBasedDirImpl {
      * Create a new file according to the path without checking BusinessPath, so as external File.
      *
      * @param path
+     *
      * @return the File created
+     *
      * @throws CommandAbstractException
      */
     public R66File setFileNoCheck(String path)

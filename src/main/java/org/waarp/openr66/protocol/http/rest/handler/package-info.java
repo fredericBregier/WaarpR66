@@ -17,6 +17,9 @@
  * Http Rest method handlers for R66
  *
  * @author "Frederic Bregier"
+ * <p>
+ * Http Rest method handlers for R66
+ * @author "Frederic Bregier"
  */
 /**
  * Http Rest method handlers for R66

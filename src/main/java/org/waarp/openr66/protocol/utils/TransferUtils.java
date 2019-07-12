@@ -50,7 +50,6 @@ import java.util.Map;
  * Utility class for transfers
  *
  * @author Frederic Bregier
- *
  */
 public class TransferUtils {
     /**
@@ -63,7 +62,9 @@ public class TransferUtils {
      * Try to restart one Transfer Runner Task
      *
      * @param taskRunner
+     *
      * @return the associated Result
+     *
      * @throws WaarpDatabaseException
      */
     public static R66Result restartTransfer(DbTaskRunner taskRunner, LocalChannelReference lcr)
@@ -165,6 +166,7 @@ public class TransferUtils {
      *
      * @param taskRunner
      * @param localChannelReference
+     *
      * @throws OpenR66RunnerErrorException
      */
     public static void finalizeTaskWithNoSession(DbTaskRunner taskRunner,
@@ -296,6 +298,7 @@ public class TransferUtils {
      * @param pending
      * @param transfer
      * @param error
+     *
      * @return the associated StringBuilder if the one given as parameter is not null
      */
     public static void stopSelectedTransfers(DbSession dbSession, int limit,
@@ -421,6 +424,7 @@ public class TransferUtils {
      * @param pending
      * @param transfer
      * @param error
+     *
      * @return the associated StringBuilder if the one given as parameter is not null
      */
     public static void cleanSelectedTransfers(DbSession dbSession, int limit,

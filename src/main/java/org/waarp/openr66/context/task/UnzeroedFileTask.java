@@ -29,14 +29,13 @@ import java.io.IOException;
 /**
  * This task add 1 byte to empty file if the current file is empty (0 length).<br>
  * <br>
- *
- * The task will be in error only if the file is of length 0 but cannot be unzeroed.<br>
- * The content of PATH, if not empty, will be the content when unzeroed. If empty, the 'blank' character will be used.<br>
- *
+ * <p>
+ * The task will be in error only if the file is of length 0 but cannot be unzeroed.<br> The content of PATH, if not
+ * empty, will be the content when unzeroed. If empty, the 'blank' character will be used.<br>
+ * <p>
  * delay >= 1 will make a log using info level for 1, warn level for 2.
  *
  * @author Frederic Bregier
- *
  */
 public class UnzeroedFileTask extends AbstractTask {
     /**

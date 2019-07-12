@@ -30,15 +30,14 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Request class
- *
+ * <p>
  * header = "rulename MODETRANS" middle = way+"FILENAME BLOCKSIZE RANK specialId code (optional length)" end =
  * "fileInformation"
- *
+ * <p>
  * or
- *
- * header = "{rule:rulename, mode:MODETRANS}" middle = way{filename:FILENAME, block:BLOCKSIZE, rank:RANK, id:specialId, code:code,
- * length:length}" end =
- * "fileInformation"
+ * <p>
+ * header = "{rule:rulename, mode:MODETRANS}" middle = way{filename:FILENAME, block:BLOCKSIZE, rank:RANK, id:specialId,
+ * code:code, length:length}" end = "fileInformation"
  *
  * @author frederic bregier
  */
@@ -124,8 +123,8 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
+     *
      * @return the same mode (RECV or SEND) in MD5 version
      */
     public final static int getModeMD5(int mode) {
@@ -140,8 +139,8 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
+     *
      * @return true if this mode is a RECV(MD5) mode
      */
     public final static boolean isRecvMode(int mode) {
@@ -152,9 +151,9 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
      * @param isRequested
+     *
      * @return True if this mode is a THROUGH (MD5) mode
      */
     public final static boolean isSendThroughMode(int mode, boolean isRequested) {
@@ -162,8 +161,8 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
+     *
      * @return True if this mode is a SEND THROUGH (MD5) mode
      */
     public final static boolean isSendThroughMode(int mode) {
@@ -172,9 +171,9 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
      * @param isRequested
+     *
      * @return True if this mode is a THROUGH (MD5) mode
      */
     public final static boolean isRecvThroughMode(int mode, boolean isRequested) {
@@ -182,8 +181,8 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
+     *
      * @return True if this mode is a RECV THROUGH (MD5) mode
      */
     public final static boolean isRecvThroughMode(int mode) {
@@ -196,8 +195,8 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
+     *
      * @return True if this mode is a THROUGH mode (with or without MD5)
      */
     public final static boolean isThroughMode(int mode) {
@@ -206,8 +205,8 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode
+     *
      * @return true if this mode is a MD5 mode
      */
     public final static boolean isMD5Mode(int mode) {
@@ -218,9 +217,9 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param mode1
      * @param mode2
+     *
      * @return true if both modes are compatible (both send, or both recv)
      */
     public final static boolean isCompatibleMode(int mode1, int mode2) {
@@ -233,7 +232,9 @@ public class RequestPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new RequestPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static RequestPacket createFromBuffer(int headerLength,
@@ -395,8 +396,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param filename
-     *            the filename to set
+     * @param filename the filename to set
      */
     public void setFilename(String filename) {
         this.filename = filename;
@@ -410,7 +410,6 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @return True if this packet concerns a Retrieve operation
      */
     public boolean isRetrieve() {
@@ -439,8 +438,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param rank
-     *            the rank to set
+     * @param rank the rank to set
      */
     public void setRank(int rank) {
         this.rank = rank;
@@ -454,8 +452,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param originalSize
-     *            the originalSize to set
+     * @param originalSize the originalSize to set
      */
     public void setOriginalSize(long originalSize) {
         this.originalSize = originalSize;
@@ -469,8 +466,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param specialId
-     *            the specialId to set
+     * @param specialId the specialId to set
      */
     public void setSpecialId(long specialId) {
         this.specialId = specialId;
@@ -499,8 +495,7 @@ public class RequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param code
-     *            the code to set
+     * @param code the code to set
      */
     public void setCode(char code) {
         this.code = code;

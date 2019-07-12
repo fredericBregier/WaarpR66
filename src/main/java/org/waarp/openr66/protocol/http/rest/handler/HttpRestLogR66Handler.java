@@ -47,7 +47,6 @@ import java.util.Date;
  * Log Http REST interface: http://host/log?... + LogJsonPacket as GET
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestLogR66Handler extends HttpRestAbstractR66Handler {
 

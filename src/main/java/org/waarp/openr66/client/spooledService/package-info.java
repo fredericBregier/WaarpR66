@@ -17,6 +17,9 @@
  * This package contains helper to setup a SpooledDirectory as a service using Apache Service Daemons tool.
  *
  * @author "Frederic Bregier"
+ * <p>
+ * This package contains helper to setup a SpooledDirectory as a service using Apache Service Daemons tool.
+ * @author "Frederic Bregier"
  */
 /**
  * This package contains helper to setup a SpooledDirectory as a service using Apache Service Daemons tool.

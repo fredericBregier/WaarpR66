@@ -33,7 +33,6 @@ import org.waarp.openr66.protocol.utils.ChannelUtils;
  * Dummy Runnable Task that only logs
  *
  * @author Frederic Bregier
- *
  */
 public abstract class AbstractExecJavaTask implements R66Runnable {
     /**
@@ -83,8 +82,7 @@ public abstract class AbstractExecJavaTask implements R66Runnable {
     /**
      * To be called by the requester when finished
      *
-     * @param object
-     *            special object to get back
+     * @param object special object to get back
      */
     public void finalValidate(Object object) {
         this.status = 0;

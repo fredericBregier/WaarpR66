@@ -18,7 +18,6 @@ package org.waarp.openr66.commander;
 
 /**
  * @author Frederic Bregier
- *
  */
 public interface CommanderInterface extends Runnable {
     /**

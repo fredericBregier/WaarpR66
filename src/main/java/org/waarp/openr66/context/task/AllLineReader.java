@@ -22,11 +22,9 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 
 /**
- * This class is used with external process in order to get the All echo from the stdout of the
- * process.
+ * This class is used with external process in order to get the All echo from the stdout of the process.
  *
  * @author Frederic Bregier
- *
  */
 class AllLineReader implements Runnable {
     private final BufferedReader reader;

@@ -46,7 +46,6 @@ import java.net.SocketAddress;
  * Config Import from a local client without database connection
  *
  * @author Frederic Bregier
- *
  */
 public class ConfigImport implements Runnable {
     protected static String _INFO_ARGS =
@@ -104,6 +103,7 @@ public class ConfigImport implements Runnable {
             businessid = DbConstant.ILLEGALVALUE, aliasid = DbConstant.ILLEGALVALUE,
             roleid = DbConstant.ILLEGALVALUE;
     protected DbHostAuth dbhost;
+
     public ConfigImport(R66Future future, boolean hostPurge, boolean rulePurge,
                         String host, String rule,
                         NetworkTransaction networkTransaction) {
@@ -121,6 +121,7 @@ public class ConfigImport implements Runnable {
         this.networkTransaction = networkTransaction;
         this.dbhost = Configuration.configuration.getHOST_SSLAUTH();
     }
+
     public ConfigImport(R66Future future, boolean hostPurge, boolean rulePurge,
                         boolean businessPurge, boolean aliasPurge, boolean rolePurge,
                         String host, String rule,
@@ -347,8 +348,8 @@ public class ConfigImport implements Runnable {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

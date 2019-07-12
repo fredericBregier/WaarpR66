@@ -60,7 +60,6 @@ import java.util.Date;
  * Class to request information or request cancellation or restart
  *
  * @author Frederic Bregier
- *
  */
 public class RequestTransfer implements Runnable {
     protected static String _INFO_ARGS =
@@ -113,8 +112,7 @@ public class RequestTransfer implements Runnable {
      * @param cancel
      * @param stop
      * @param restart
-     * @param restarttime
-     *            in yyyyMMddHHmmss format
+     * @param restarttime in yyyyMMddHHmmss format
      * @param networkTransaction
      */
     public RequestTransfer(R66Future future, long specialId, String requested, String requester,
@@ -135,6 +133,7 @@ public class RequestTransfer implements Runnable {
      * Parse the parameter and set current values
      *
      * @param args
+     *
      * @return True if all parameters were found and correct
      */
     protected static boolean getParams(String[] args) {

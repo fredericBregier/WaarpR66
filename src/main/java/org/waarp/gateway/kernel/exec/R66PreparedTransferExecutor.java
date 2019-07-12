@@ -38,33 +38,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * R66PreparedTransferExecutor class. If the command starts with "REFUSED", the command will be
- * refused for execution. If "REFUSED" is set, the command "RETR" or "STOR" like operations will be
- * stopped at starting of command.
- *
- *
- *
- * Format is like r66send command in any order except "-info" which should be the last item:<br>
- * "-to Host -file FILE -rule RULE [-md5] [-nolog] [-start yyyyMMddHHmmss or -delay (delay or +delay)] [-info INFO]" <br>
+ * R66PreparedTransferExecutor class. If the command starts with "REFUSED", the command will be refused for execution.
+ * If "REFUSED" is set, the command "RETR" or "STOR" like operations will be stopped at starting of command.
+ * <p>
+ * <p>
+ * <p>
+ * Format is like r66send command in any order except "-info" which should be the last item:<br> "-to Host -file FILE
+ * -rule RULE [-md5] [-nolog] [-start yyyyMMddHHmmss or -delay (delay or +delay)] [-info INFO]" <br>
  * <br>
  * INFO is the only one field that can contains blank character.<br>
  * <br>
- * The following replacement are done dynamically before the command is executed:<br>
- * - #BASEPATH# is replaced by the full path for the root of FTP Directory<br>
- * - #FILE# is replaced by the current file path relative to FTP Directory (so #BASEPATH##FILE# is
- * the full path of the file)<br>
- * - #USER# is replaced by the username<br>
- * - #ACCOUNT# is replaced by the account<br>
- * - #COMMAND# is replaced by the command issued for the file<br>
- * - #SPECIALID# is replaced by the FTP id of the transfer (whatever in or out)<br>
- * - #UUID# is replaced by a special UUID globally unique for the transfer, in general to be placed in -info part (for instance ##UUID## giving #uuid#)<br>
+ * The following replacement are done dynamically before the command is executed:<br> - #BASEPATH# is replaced by the
+ * full path for the root of FTP Directory<br> - #FILE# is replaced by the current file path relative to FTP Directory
+ * (so #BASEPATH##FILE# is the full path of the file)<br> - #USER# is replaced by the username<br> - #ACCOUNT# is
+ * replaced by the account<br> - #COMMAND# is replaced by the command issued for the file<br> - #SPECIALID# is replaced
+ * by the FTP id of the transfer (whatever in or out)<br> - #UUID# is replaced by a special UUID globally unique for the
+ * transfer, in general to be placed in -info part (for instance ##UUID## giving #uuid#)<br>
  * <br>
- * So for instance
- * "-to Host -file #BASEPATH##FILE# -rule RULE [-md5] [-nolog] [-delay +delay]  [-info ##UUID## #USER# #ACCOUNT# #COMMAND# INFO]" <br>
- * will be a standard use of this function.
+ * So for instance "-to Host -file #BASEPATH##FILE# -rule RULE [-md5] [-nolog] [-delay +delay]  [-info ##UUID## #USER#
+ * #ACCOUNT# #COMMAND# INFO]" <br> will be a standard use of this function.
  *
  * @author Frederic Bregier
- *
  */
 public class R66PreparedTransferExecutor extends AbstractExecutor {
     /**
@@ -95,7 +89,6 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
     protected DbSession dbsession;
 
     /**
-     *
      * @param command
      * @param delay
      * @param futureCompletion
@@ -162,8 +155,7 @@ public class R66PreparedTransferExecutor extends AbstractExecutor {
     }
 
     /**
-     * @param dbsession
-     *            the dbsession to set
+     * @param dbsession the dbsession to set
      */
     public void setDbsession(DbSession dbsession) {
         this.dbsession = dbsession;

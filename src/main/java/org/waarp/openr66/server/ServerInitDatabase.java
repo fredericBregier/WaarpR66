@@ -39,7 +39,6 @@ import java.io.IOException;
  * Utility class to initiate the database for a server
  *
  * @author Frederic Bregier
- *
  */
 public class ServerInitDatabase {
     protected static String _INFO_ARGS =
@@ -95,8 +94,7 @@ public class ServerInitDatabase {
     }
 
     /**
-     * @param args
-     *            as config_database file [rules_directory host_authent limit_configuration]
+     * @param args as config_database file [rules_directory host_authent limit_configuration]
      */
     public static void main(String[] args) {
         WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(null));
@@ -252,7 +250,6 @@ public class ServerInitDatabase {
     }
 
     /**
-     *
      * @return True if the base is up to date, else False (need Upgrade)
      */
     public static boolean upgradedb()

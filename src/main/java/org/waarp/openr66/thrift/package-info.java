@@ -17,6 +17,8 @@
  * Thrift Package that can be activated to allow Thrift clients interactions
  *
  * @author Frederic Bregier
+ * @apiviz.landmark Thrift Package that can be activated to allow Thrift clients interactions
+ * @author Frederic Bregier
  * @apiviz.landmark
  */
 /**

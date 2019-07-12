@@ -42,7 +42,6 @@ import java.nio.channels.FileChannel;
  * File Utils
  *
  * @author Frederic Bregier
- *
  */
 public class FileUtils {
 
@@ -51,10 +50,9 @@ public class FileUtils {
      *
      * @param from
      * @param to
-     * @param move
-     *            True if the copy is in fact a move operation
-     * @param append
-     *            True if the copy is in append
+     * @param move True if the copy is in fact a move operation
+     * @param append True if the copy is in append
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public static void copy(File from, File to, boolean move, boolean append)
@@ -101,9 +99,10 @@ public class FileUtils {
      *
      * @param from
      * @param directoryTo
-     * @param move
-     *            True if the copy is in fact a move operation
+     * @param move True if the copy is in fact a move operation
+     *
      * @return the group of copy files or null (partially or totally) if an error occurs
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public static File[] copy(File[] from, File directoryTo, boolean move)
@@ -130,9 +129,10 @@ public class FileUtils {
      *
      * @param from
      * @param directoryTo
-     * @param move
-     *            True if the copy is in fact a move operation
+     * @param move True if the copy is in fact a move operation
+     *
      * @return The copied file or null if an error occurs
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public static File copyToDir(File from, File directoryTo, boolean move)
@@ -178,6 +178,7 @@ public class FileUtils {
      * Create the directory associated with the File as path
      *
      * @param directory
+     *
      * @return True if created, False else.
      */
     public final static boolean createDir(File directory) {
@@ -194,6 +195,7 @@ public class FileUtils {
      * Delete physically the file
      *
      * @param file
+     *
      * @return True if OK, else if not (or if the file never exists).
      */
     public final static boolean delete(File file) {
@@ -207,6 +209,7 @@ public class FileUtils {
      * Delete the directory associated with the File as path if empty
      *
      * @param directory
+     *
      * @return True if deleted, False else.
      */
     public final static boolean deleteDir(File directory) {
@@ -238,6 +241,7 @@ public class FileUtils {
      * Delete the directory and its subdirs associated with the File as path if empty
      *
      * @param directory
+     *
      * @return True if deleted, False else.
      */
     public static boolean deleteRecursiveDir(File directory) {
@@ -278,6 +282,7 @@ public class FileUtils {
      * Delete the directory and its subdirs associated with the File dir if empty
      *
      * @param dir
+     *
      * @return True if deleted, False else.
      */
     private static boolean deleteRecursiveFileDir(File dir) {
@@ -317,14 +322,14 @@ public class FileUtils {
      *
      * @param logger
      * @param session
-     * @param filenameSrc
-     *            new filename
+     * @param filenameSrc new filename
      * @param isPreStart
      * @param isSender
      * @param isThrough
-     * @param file
-     *            old R66File if any (might be null)
+     * @param file old R66File if any (might be null)
+     *
      * @return the R66File
+     *
      * @throws OpenR66RunnerErrorException
      */
     public final static R66File getFile(WaarpLogger logger, R66Session session, String filenameSrc,
@@ -380,6 +385,7 @@ public class FileUtils {
     /**
      * @param _FileName
      * @param _Path
+     *
      * @return true if the file exist in the specified path
      */
     public final static boolean fileExist(String _FileName, String _Path) {
@@ -393,12 +399,14 @@ public class FileUtils {
     }
 
     /**
-     * Returns the FileChannel in Out MODE (if isOut is True) or in In MODE (if isOut is False)
-     * associated with the file. In out MODE, it can be in append MODE.
+     * Returns the FileChannel in Out MODE (if isOut is True) or in In MODE (if isOut is False) associated with the
+     * file. In out MODE, it can be in append MODE.
      *
      * @param isOut
      * @param append
+     *
      * @return the FileChannel (OUT or IN)
+     *
      * @throws OpenR66ProtocolSystemException
      */
     private static FileChannel getFileChannel(File file, boolean isOut,
@@ -438,6 +446,7 @@ public class FileUtils {
      * Get the list of files from a given directory
      *
      * @param directory
+     *
      * @return the list of files (as an array)
      */
     public final static File[] getFiles(File directory) {
@@ -452,6 +461,7 @@ public class FileUtils {
      *
      * @param directory
      * @param filter
+     *
      * @return the list of files (as an array)
      */
     public final static File[] getFiles(File directory, FilenameFilter filter) {
@@ -464,9 +474,10 @@ public class FileUtils {
     /**
      * Calculates and returns the hash of the contents of the given file.
      *
-     * @param f
-     *            FileInterface to hash
+     * @param f FileInterface to hash
+     *
      * @return the hash from the given file
+     *
      * @throws OpenR66ProtocolSystemException
      **/
     public final static String getHash(File f) throws OpenR66ProtocolSystemException {
@@ -480,8 +491,8 @@ public class FileUtils {
     }
 
     /**
-     *
      * @param buffer
+     *
      * @return the hash from the given Buffer
      */
     public final static ByteBuf getHash(ByteBuf buffer, DigestAlgo algo) {
@@ -549,11 +560,11 @@ public class FileUtils {
     /**
      * Write one fileChannel to another one. Close the fileChannels
      *
-     * @param fileChannelIn
-     *            source of file
-     * @param fileChannelOut
-     *            destination of file
+     * @param fileChannelIn source of file
+     * @param fileChannelOut destination of file
+     *
      * @return The size of copy if is OK
+     *
      * @throws AtlasIoException
      */
     private static long write(FileChannel fileChannelIn,

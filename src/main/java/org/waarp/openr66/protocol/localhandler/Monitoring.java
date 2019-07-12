@@ -46,7 +46,6 @@ import org.waarp.snmp.r66.WaarpPrivateMib.WaarpGlobalValuesIndex;
  * Monitoring class as an helper to get values of interest. Also used by SNMP support.
  *
  * @author Frederic Bregier
- *
  */
 public class Monitoring implements WaarpInterfaceMonitor {
     /**
@@ -297,7 +296,6 @@ public class Monitoring implements WaarpInterfaceMonitor {
     }
 
     /**
-     *
      * @return the last Time in ms of the execution
      */
     public long lastRunTimeMs() {
@@ -312,9 +310,7 @@ public class Monitoring implements WaarpInterfaceMonitor {
     }
 
     /**
-     *
-     * @param nbSecond
-     *            as specific PastLimit
+     * @param nbSecond as specific PastLimit
      */
     public void run(long nbSecond) {
         this.run(nbSecond, false);
@@ -323,15 +319,13 @@ public class Monitoring implements WaarpInterfaceMonitor {
     /**
      * Default execution of testing with default pastLimit
      *
-     * @param detail
-     *            as to get detailed information
+     * @param detail as to get detailed information
      */
     public void run(boolean detail) {
         this.run(-1, detail);
     }
 
     /**
-     *
      * @return False if too early, else return True
      */
     private boolean reCompute() {
@@ -345,11 +339,8 @@ public class Monitoring implements WaarpInterfaceMonitor {
     }
 
     /**
-     *
-     * @param nbSecond
-     *            as specific PastLimit
-     * @param detail
-     *            as to get detailed information
+     * @param nbSecond as specific PastLimit
+     * @param detail as to get detailed information
      */
     public void run(long nbSecond, boolean detail) {
         synchronized (trafficCounter) {
@@ -586,6 +577,7 @@ public class Monitoring implements WaarpInterfaceMonitor {
 
     /**
      * @param detail
+     *
      * @return The XML representation of the current status
      */
     public String exportXml(boolean detail) {
@@ -803,6 +795,7 @@ public class Monitoring implements WaarpInterfaceMonitor {
 
     /**
      * @param detail
+     *
      * @return The Json representation of the current status
      */
     public String exportJson(boolean detail) {
@@ -810,8 +803,8 @@ public class Monitoring implements WaarpInterfaceMonitor {
     }
 
     /**
-     *
      * @param detail
+     *
      * @return The Json representation of the current status
      */
     public ObjectNode exportAsJson(boolean detail) {

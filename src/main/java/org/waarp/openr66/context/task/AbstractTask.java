@@ -38,7 +38,6 @@ import java.util.Date;
  * Abstract implementation of task
  *
  * @author Frederic Bregier
- *
  */
 public abstract class AbstractTask implements Runnable {
     /**
@@ -150,8 +149,7 @@ public abstract class AbstractTask implements Runnable {
      */
     public static final String NOWAIT = "#NOWAIT#";
     /**
-     * If specified, use the LocalExec Daemon specified in the global configuration (default no
-     * usage of LocalExec)
+     * If specified, use the LocalExec Daemon specified in the global configuration (default no usage of LocalExec)
      */
     public static final String LOCALEXEC = "#LOCALEXEC#";
     /**
@@ -216,7 +214,6 @@ public abstract class AbstractTask implements Runnable {
     }
 
     /**
-     *
      * @return the TaskType of this AbstractTask
      */
     public TaskType getType() {
@@ -229,7 +226,6 @@ public abstract class AbstractTask implements Runnable {
     abstract public void run();
 
     /**
-     *
      * @return True if the operation is in success status
      */
     public boolean isSuccess() {
@@ -238,7 +234,6 @@ public abstract class AbstractTask implements Runnable {
     }
 
     /**
-     *
      * @return the R66Future of completion
      */
     public R66Future getFutureCompletion() {
@@ -246,13 +241,10 @@ public abstract class AbstractTask implements Runnable {
     }
 
     /**
+     * @param arg as the Format string where FIXED items will be replaced by context values and next using argFormat as
+     * format second argument; this arg comes from the rule itself
+     * @param argFormat as format second argument; this argFormat comes from the transfer Information itself
      *
-     * @param arg
-     *            as the Format string where FIXED items will be replaced by context values and next
-     *            using argFormat as format second argument; this arg comes from the rule itself
-     * @param argFormat
-     *            as format second argument; this argFormat comes from the transfer Information
-     *            itself
      * @return The string with replaced values from context and second argument
      */
     protected String getReplacedValue(String arg, Object[] argFormat) {

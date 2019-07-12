@@ -4,7 +4,7 @@ import org.junit.ClassRule;
 import org.testcontainers.containers.MySQLContainer;
 import org.waarp.openr66.dao.database.DBTransferDAO;
 import org.waarp.openr66.dao.database.DBTransferDAOIT;
-import org.waarp.openr66.dao.database.MariaDBTransferDAO;
+import org.waarp.openr66.dao.database.mariadb.MariaDBTransferDAO;
 import org.waarp.openr66.dao.exception.DAOException;
 
 import java.sql.Connection;

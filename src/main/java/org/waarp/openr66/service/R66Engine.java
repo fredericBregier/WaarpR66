@@ -30,7 +30,6 @@ import org.waarp.openr66.server.R66Server;
  * Engine used to start and stop the real R66 service
  *
  * @author Frederic Bregier
- *
  */
 public class R66Engine extends EngineAbstract {
     /**

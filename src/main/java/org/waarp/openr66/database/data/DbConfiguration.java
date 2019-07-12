@@ -42,7 +42,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Configuration Table object
  *
  * @author Frederic Bregier
- *
  */
 public class DbConfiguration extends AbstractDbData {
     public static final int[] dbTypes = {
@@ -83,16 +82,11 @@ public class DbConfiguration extends AbstractDbData {
     /**
      * @param dbSession
      * @param hostid
-     * @param rg
-     *            Read Global Limit
-     * @param wg
-     *            Write Global Limit
-     * @param rs
-     *            Read Session Limit
-     * @param ws
-     *            Write Session Limit
-     * @param del
-     *            Delay Limit
+     * @param rg Read Global Limit
+     * @param wg Write Global Limit
+     * @param rs Read Session Limit
+     * @param ws Write Session Limit
+     * @param del Delay Limit
      */
     public DbConfiguration(String hostid, long rg, long wg, long rs, long ws,
                            long del) {
@@ -110,6 +104,7 @@ public class DbConfiguration extends AbstractDbData {
      *
      * @param dbSession
      * @param source
+     *
      * @throws WaarpDatabaseSqlException
      */
     public DbConfiguration(ObjectNode source) throws WaarpDatabaseSqlException {
@@ -124,6 +119,7 @@ public class DbConfiguration extends AbstractDbData {
     /**
      * @param dbSession
      * @param hostid
+     *
      * @throws WaarpDatabaseException
      */
     public DbConfiguration(String hostid) throws WaarpDatabaseException {
@@ -162,8 +158,8 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbPreparedStatement for getting Updated Object
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -197,12 +193,12 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @param session
      * @param hostid
-     * @param limitBandwith
-     *            0 for no limit, > 0 for one limit, < 0 for no filter
+     * @param limitBandwith 0 for no limit, > 0 for one limit, < 0 for no filter
+     *
      * @return the preparedStatement with the filter
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -243,7 +239,6 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbValue associated with this table
      */
     public static DbValue[] getAllType() {
@@ -325,8 +320,10 @@ public class DbConfiguration extends AbstractDbData {
 
     /**
      * Read json object into Array then setFromArray
+     *
      * @param node
      * @param ignorePrimaryKey
+     *
      * @throws WaarpDatabaseSqlException
      */
     @Override
@@ -434,7 +431,6 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     *
      * @return True if this Configuration refers to the current host
      */
     public boolean isOwnConfiguration() {

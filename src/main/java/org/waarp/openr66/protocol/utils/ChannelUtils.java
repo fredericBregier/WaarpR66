@@ -72,6 +72,7 @@ public class ChannelUtils extends Thread {
      * Get the Remote InetAddress
      *
      * @param channel
+     *
      * @return the remote InetAddress
      */
     public final static InetAddress getRemoteInetAddress(Channel channel) {
@@ -86,6 +87,7 @@ public class ChannelUtils extends Thread {
      * Get the Local InetAddress
      *
      * @param channel
+     *
      * @return the local InetAddress
      */
     public final static InetAddress getLocalInetAddress(Channel channel) {
@@ -97,6 +99,7 @@ public class ChannelUtils extends Thread {
      * Get the Remote InetSocketAddress
      *
      * @param channel
+     *
      * @return the remote InetSocketAddress
      */
     public final static InetSocketAddress getRemoteInetSocketAddress(Channel channel) {
@@ -107,6 +110,7 @@ public class ChannelUtils extends Thread {
      * Get the Local InetSocketAddress
      *
      * @param channel
+     *
      * @return the local InetSocketAddress
      */
     public final static InetSocketAddress getLocalInetSocketAddress(Channel channel) {
@@ -151,6 +155,7 @@ public class ChannelUtils extends Thread {
      * Return the current number of network connections
      *
      * @param configuration
+     *
      * @return the current number of network connections
      */
     public final static int nbCommandChannels(Configuration configuration) {
@@ -171,10 +176,11 @@ public class ChannelUtils extends Thread {
     }
 
     /**
-     *
      * @param localChannelReference
      * @param block
+     *
      * @return the ChannelFuture of this write operation
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static ChannelFuture writeBackDataBlock(
@@ -199,6 +205,7 @@ public class ChannelUtils extends Thread {
      * Write the EndTransfer
      *
      * @param localChannelReference
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public final static void writeEndTransfer(
@@ -214,6 +221,7 @@ public class ChannelUtils extends Thread {
      *
      * @param localChannelReference
      * @param hash
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public final static void writeEndTransfer(
@@ -231,7 +239,9 @@ public class ChannelUtils extends Thread {
      * @param localChannelReference
      * @param packet
      * @param wait
+     *
      * @return the ChannelFuture on write operation
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static ChannelFuture writeAbstractLocalPacket(
@@ -267,7 +277,9 @@ public class ChannelUtils extends Thread {
      *
      * @param localChannelReference
      * @param packet
+     *
      * @return the ChannelFuture on write operation
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public final static ChannelFuture writeAbstractLocalPacketToLocal(
@@ -281,6 +293,7 @@ public class ChannelUtils extends Thread {
      *
      * @param localChannelReference
      * @param size
+     *
      * @return the wait in ms
      */
     public static final long willBeWaitingWriting(LocalChannelReference localChannelReference,
@@ -294,6 +307,7 @@ public class ChannelUtils extends Thread {
      *
      * @param cts
      * @param size
+     *
      * @return the wait in ms
      */
     public static final long willBeWaitingWriting(ChannelTrafficShapingHandler cts, int size) {

@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Export Log response JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class LogResponseJsonPacket extends LogJsonPacket {
 
@@ -38,8 +37,7 @@ public class LogResponseJsonPacket extends LogJsonPacket {
     }
 
     /**
-     * @param command
-     *            the command to set
+     * @param command the command to set
      */
     public void setCommand(byte command) {
         this.command = command;
@@ -53,8 +51,7 @@ public class LogResponseJsonPacket extends LogJsonPacket {
     }
 
     /**
-     * @param filename
-     *            the filename to set
+     * @param filename the filename to set
      */
     public void setFilename(String filename) {
         this.filename = filename;
@@ -68,8 +65,7 @@ public class LogResponseJsonPacket extends LogJsonPacket {
     }
 
     /**
-     * @param exported
-     *            the exported to set
+     * @param exported the exported to set
      */
     public void setExported(long exported) {
         this.exported = exported;
@@ -83,8 +79,7 @@ public class LogResponseJsonPacket extends LogJsonPacket {
     }
 
     /**
-     * @param purged
-     *            the purged to set
+     * @param purged the purged to set
      */
     public void setPurged(long purged) {
         this.purged = purged;

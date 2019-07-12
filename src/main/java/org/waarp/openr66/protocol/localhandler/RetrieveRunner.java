@@ -43,7 +43,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Retrieve transfer runner
  *
  * @author Frederic Bregier
- *
  */
 public class RetrieveRunner extends Thread {
     /**
@@ -67,10 +66,8 @@ public class RetrieveRunner extends Thread {
     }
 
     /**
-     *
      * @param session
-     * @param channel
-     *            local channel
+     * @param channel local channel
      */
     public RetrieveRunner(R66Session session, LocalChannel channel) {
         this.session = session;
@@ -83,7 +80,9 @@ public class RetrieveRunner extends Thread {
      *
      * @param block
      * @param localChannelReference
+     *
      * @return the ChannelFuture on the write operation
+     *
      * @throws OpenR66ProtocolPacketException
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
@@ -112,8 +111,8 @@ public class RetrieveRunner extends Thread {
     /**
      * Utility method for send through mode
      *
-     * @param data
-     *            the data byte, if null it is the last block
+     * @param data the data byte, if null it is the last block
+     *
      * @return the DataBlock associated to the data
      */
     public static DataBlock transformToDataBlock(byte[] data) {

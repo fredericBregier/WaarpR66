@@ -25,17 +25,16 @@ import org.waarp.openr66.context.task.exception.OpenR66RunnerException;
 import org.waarp.openr66.database.data.DbTaskRunner;
 
 /**
- * This task checks some properties relative to the File according to the following argument:<br>
- * - SIZE LT/GT/LTE/GTE/EQ number : to check the file size according to a limit (less than, greater than, less than or equal,
- * greater than or equal, equal)<br>
- * - DFCHECK : to check if the future received file size is compatible with the space left on both working and received
- * directories (from general configuration or rule configuration)<br>
+ * This task checks some properties relative to the File according to the following argument:<br> - SIZE
+ * LT/GT/LTE/GTE/EQ number : to check the file size according to a limit (less than, greater than, less than or equal,
+ * greater than or equal, equal)<br> - DFCHECK : to check if the future received file size is compatible with the space
+ * left on both working and received directories (from general configuration or rule configuration)<br>
  * <br>
- * For instance "SIZE LT 10000000 SIZE GT 1000 DFCHECK" will test that the current file size is less than 10 MB (base 10),
- * and greater than 1000 bytes, and that the working and received directories have enough space to receive the file.
+ * For instance "SIZE LT 10000000 SIZE GT 1000 DFCHECK" will test that the current file size is less than 10 MB (base
+ * 10), and greater than 1000 bytes, and that the working and received directories have enough space to receive the
+ * file.
  *
  * @author Frederic Bregier
- *
  */
 public class FileCheckTask extends AbstractTask {
     /**

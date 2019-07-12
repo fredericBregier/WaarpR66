@@ -24,7 +24,6 @@ import org.waarp.openr66.protocol.networkhandler.packet.NetworkPacket;
  * Global function
  *
  * @author Frederic Bregier
- *
  */
 public class GlobalTrafficHandler extends GlobalChannelTrafficShapingHandler {
 

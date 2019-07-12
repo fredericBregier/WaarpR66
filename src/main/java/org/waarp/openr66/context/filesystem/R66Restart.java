@@ -25,7 +25,6 @@ import org.waarp.openr66.context.R66Session;
  * Restart implementation
  *
  * @author frederic bregier
- *
  */
 public class R66Restart extends FilesystemBasedRestartImpl {
 
@@ -52,6 +51,7 @@ public class R66Restart extends FilesystemBasedRestartImpl {
      * Same as restartMarker with String
      *
      * @param newposition
+     *
      * @return True if OK
      */
     public boolean restartMarker(long newposition) {

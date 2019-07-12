@@ -54,8 +54,8 @@ public class ServerShutdown {
             "If '-restart' is specified, the server will shutdown then restart immediately";
 
     /**
-     * @param args
-     *            the configuration file as first argument
+     * @param args the configuration file as first argument
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static void main(String[] args)

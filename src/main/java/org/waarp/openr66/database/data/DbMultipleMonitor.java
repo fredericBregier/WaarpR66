@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Configuration Table object
  *
  * @author Frederic Bregier
- *
  */
 public class DbMultipleMonitor extends AbstractDbData {
     public static final int[] dbTypes = {
@@ -67,12 +66,9 @@ public class DbMultipleMonitor extends AbstractDbData {
     /**
      * @param dbSession
      * @param hostid
-     * @param cc
-     *            count for Config
-     * @param ch
-     *            count for Host
-     * @param cr
-     *            count for Rule
+     * @param cc count for Config
+     * @param ch count for Host
+     * @param cr count for Rule
      */
     public DbMultipleMonitor(String hostid, int cc, int ch, int cr) {
         super();
@@ -82,6 +78,7 @@ public class DbMultipleMonitor extends AbstractDbData {
     /**
      * @param dbSession
      * @param hostid
+     *
      * @throws WaarpDatabaseException
      */
     public DbMultipleMonitor(String hostid) throws WaarpDatabaseException {
@@ -111,7 +108,9 @@ public class DbMultipleMonitor extends AbstractDbData {
      * For instance from Commander when getting updated information
      *
      * @param preparedStatement
+     *
      * @return the next updated Configuration
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -125,8 +124,8 @@ public class DbMultipleMonitor extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbPreparedStatement for getting Updated Object in "FOR UPDATE" mode
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */

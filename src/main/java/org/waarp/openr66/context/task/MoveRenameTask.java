@@ -28,7 +28,6 @@ import java.io.File;
  * Move and Rename the current file
  *
  * @author Frederic Bregier
- *
  */
 public class MoveRenameTask extends AbstractTask {
     /**

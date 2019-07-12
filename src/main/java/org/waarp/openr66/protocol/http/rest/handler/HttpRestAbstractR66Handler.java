@@ -48,7 +48,6 @@ import static org.waarp.openr66.context.R66FiniteDualStates.*;
  * Common method implementation for Action Rest R66 handlers
  *
  * @author "Frederic Bregier"
- *
  */
 public abstract class HttpRestAbstractR66Handler extends RestMethodHandler {
 

@@ -68,11 +68,10 @@ import java.security.NoSuchAlgorithmException;
 import static org.waarp.openr66.context.R66FiniteDualStates.*;
 
 /**
- * Class to implement actions related to real transfer: request initialization, data transfer, end of transfer and of request,
- * changing filename or filesize.
+ * Class to implement actions related to real transfer: request initialization, data transfer, end of transfer and of
+ * request, changing filename or filesize.
  *
  * @author "Frederic Bregier"
- *
  */
 public class TransferActions extends ServerActions {
     /**
@@ -92,6 +91,7 @@ public class TransferActions extends ServerActions {
      * @param runner
      * @param e1
      * @param packet
+     *
      * @throws OpenR66ProtocolPacketException
      */
     private final void endInitRequestInError(Channel channel, ErrorCode code, DbTaskRunner runner,
@@ -140,6 +140,7 @@ public class TransferActions extends ServerActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolNoDataException
      * @throws OpenR66ProtocolPacketException
      * @throws OpenR66ProtocolBusinessException
@@ -545,6 +546,7 @@ public class TransferActions extends ServerActions {
      *
      * @param packet
      * @param runner
+     *
      * @throws OpenR66ProtocolPacketException
      */
     private final void sendFilenameFilesizeChanging(RequestPacket packet, DbTaskRunner runner, String debug,
@@ -592,6 +594,7 @@ public class TransferActions extends ServerActions {
      * @param message
      * @param code
      * @param channel
+     *
      * @throws OpenR66ProtocolPacketException
      */
     private final void errorToSend(String message, ErrorCode code, Channel channel, int status)
@@ -621,6 +624,7 @@ public class TransferActions extends ServerActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolBusinessException
      * @throws OpenR66ProtocolPacketException
@@ -723,9 +727,9 @@ public class TransferActions extends ServerActions {
                 // Wrong packet
                 logger.error(
                         Messages.getString("LocalServerHandler.17"), packet,
-                        localChannelReference.getPartner().getDigestAlgo().name); //$NON-NLS-1$
+                        localChannelReference.getPartner().getDigestAlgo().getName()); //$NON-NLS-1$
                 errorToSend("Transfer in error due to bad Hash on data packet ("
-                            + localChannelReference.getPartner().getDigestAlgo().name + ")",
+                            + localChannelReference.getPartner().getDigestAlgo().getName() + ")",
                             ErrorCode.MD5Error, channel, 21);
                 packet.clear();
                 return;
@@ -798,6 +802,7 @@ public class TransferActions extends ServerActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      * @throws OpenR66ProtocolNotAuthenticatedException
@@ -853,7 +858,7 @@ public class TransferActions extends ServerActions {
                     //session.getRunner().setRankAtStartup(0);
                     R66Result result = new R66Result(new OpenR66RunnerErrorException(
                             Messages.getString("LocalServerHandler.19") + //$NON-NLS-1$
-                            localChannelReference.getPartner().getDigestAlgo().name + ")"),
+                            localChannelReference.getPartner().getDigestAlgo().getName() + ")"),
                                                      session, true, ErrorCode.MD5Error, session.getRunner());
                     try {
                         session.setFinalizeTransfer(false, result);
@@ -862,7 +867,7 @@ public class TransferActions extends ServerActions {
                     }
                     ErrorPacket error = new ErrorPacket(
                             "Global Hash in error, transfer in error and rank should be reset to 0 (using " +
-                            localChannelReference.getPartner().getDigestAlgo().name + ")",
+                            localChannelReference.getPartner().getDigestAlgo().getName() + ")",
                             ErrorCode.MD5Error.getCode(), ErrorPacket.FORWARDCLOSECODE);
                     try {
                         ChannelUtils.writeAbstractLocalPacket(localChannelReference, error, true);
@@ -1013,6 +1018,7 @@ public class TransferActions extends ServerActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      * @throws OpenR66ProtocolNotAuthenticatedException
@@ -1083,8 +1089,10 @@ public class TransferActions extends ServerActions {
 
     /**
      * If newFileInfo is provided and different than current value
+     *
      * @param channel
      * @param newFileInfo
+     *
      * @throws OpenR66RunnerErrorException
      */
     public void requestChangeFileInfo(Channel channel, String newFileInfo) throws OpenR66RunnerErrorException {
@@ -1128,6 +1136,7 @@ public class TransferActions extends ServerActions {
      * @param channel
      * @param newfilename
      * @param newSize
+     *
      * @throws OpenR66RunnerErrorException
      */
     public void requestChangeNameSize(Channel channel, String newfilename, long newSize)

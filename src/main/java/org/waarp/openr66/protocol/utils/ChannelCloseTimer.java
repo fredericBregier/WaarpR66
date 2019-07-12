@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
  * TimerTask to Close a Channel in the future
  *
  * @author Frederic Bregier
- *
  */
 public class ChannelCloseTimer implements TimerTask {
 
@@ -60,8 +59,7 @@ public class ChannelCloseTimer implements TimerTask {
      * Close in the future this channel
      *
      * @param channel
-     * @param future
-     *            future to wait in addition to other constraints
+     * @param future future to wait in addition to other constraints
      */
     public static void closeFutureChannel(Channel channel, ChannelFuture future) {
         Configuration.configuration.getTimerClose().newTimeout(

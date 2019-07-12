@@ -23,7 +23,6 @@ import org.waarp.snmp.interf.WaarpCounter32;
  * R66 Counter32 SNMP implementation
  *
  * @author Frederic Bregier
- *
  */
 class R66Counter32 extends WaarpCounter32 {
 

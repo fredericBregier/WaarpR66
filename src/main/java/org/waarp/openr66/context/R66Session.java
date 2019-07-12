@@ -46,7 +46,6 @@ import java.util.HashMap;
  * The global object session in OpenR66, a session by local channel
  *
  * @author frederic bregier
- *
  */
 public class R66Session implements SessionInterface {
     /**
@@ -139,8 +138,7 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * @param businessObject
-     *            the businessObject to set
+     * @param businessObject the businessObject to set
      */
     public void setBusinessObject(R66BusinessInterface businessObject) {
         this.businessObject = businessObject;
@@ -150,8 +148,8 @@ public class R66Session implements SessionInterface {
      * Propose a new State
      *
      * @param desiredstate
-     * @throws IllegalFiniteStateException
-     *             if the new status if not ok
+     *
+     * @throws IllegalFiniteStateException if the new status if not ok
      */
     public void newState(R66FiniteDualStates desiredstate) {
         try {
@@ -171,7 +169,6 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     *
      * @return the current state in the finite state machine
      */
     public R66FiniteDualStates getState() {
@@ -275,8 +272,7 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * @param blocksize
-     *            the blocksize to set
+     * @param blocksize the blocksize to set
      */
     public void setBlockSize(int blocksize) {
         blockSize = blocksize;
@@ -295,7 +291,6 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     *
      * @return True if the connection is currently authenticated
      */
     public boolean isAuthenticated() {
@@ -313,8 +308,7 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * @param isReady
-     *            the isReady for transfer to set
+     * @param isReady the isReady for transfer to set
      */
     public void setReady(boolean isReady) {
         this.isReady = isReady;
@@ -329,11 +323,11 @@ public class R66Session implements SessionInterface {
 
     /**
      * Set the runner, and setup the directory first.
-     *
+     * <p>
      * This call should be followed by a startup() call.
      *
-     * @param runner
-     *            the runner to set
+     * @param runner the runner to set
+     *
      * @throws OpenR66RunnerErrorException
      */
     public void setRunner(DbTaskRunner runner)
@@ -382,7 +376,6 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     *
      * @return the remote SocketAddress
      */
     public SocketAddress getRemoteAddress() {
@@ -390,7 +383,6 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     *
      * @return the local SocketAddress
      */
     public SocketAddress getLocalAddress() {
@@ -405,8 +397,7 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * @param localChannelReference
-     *            the localChannelReference to set
+     * @param localChannelReference the localChannelReference to set
      */
     public void setLocalChannelReference(
             LocalChannelReference localChannelReference) {
@@ -485,12 +476,11 @@ public class R66Session implements SessionInterface {
     /**
      * Set the File from the runner once PRE operation are done
      *
-     * @param createFile
-     *            When True, the file can be newly created if needed. If False, no new file will be
-     *            created, thus having an Exception.
+     * @param createFile When True, the file can be newly created if needed. If False, no new file will be created, thus
+     * having an Exception.
+     *
      * @throws OpenR66RunnerErrorException
-     * @throws CommandAbstractException
-     *             only when new received created file cannot be created
+     * @throws CommandAbstractException only when new received created file cannot be created
      */
     public void setFileAfterPreRunner(boolean createFile) throws OpenR66RunnerErrorException, CommandAbstractException {
         if (this.businessObject != null) {
@@ -640,8 +630,8 @@ public class R66Session implements SessionInterface {
     /**
      * START from the PreTask if necessary, and prepare the file
      *
-     * @param checkNotExternal
-     *            if True, the file as Sender should not be external to current directory
+     * @param checkNotExternal if True, the file as Sender should not be external to current directory
+     *
      * @throws OpenR66RunnerErrorException
      */
     public void startup(boolean checkNotExternal) throws OpenR66RunnerErrorException {
@@ -789,10 +779,10 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     * Rename the current receive file from the very beginning since the sender has a post action
-     * that changes its name
+     * Rename the current receive file from the very beginning since the sender has a post action that changes its name
      *
      * @param newFilename
+     *
      * @throws OpenR66RunnerErrorException
      */
     public void renameReceiverFile(String newFilename) throws OpenR66RunnerErrorException {
@@ -824,6 +814,7 @@ public class R66Session implements SessionInterface {
      *
      * @param status
      * @param finalValue
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      */
@@ -926,6 +917,7 @@ public class R66Session implements SessionInterface {
      * Try to finalize the request if possible
      *
      * @param errorValue
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      */
@@ -985,7 +977,6 @@ public class R66Session implements SessionInterface {
     }
 
     /**
-     *
      * @return True if the number of Error is still acceptable
      */
     public boolean addError() {

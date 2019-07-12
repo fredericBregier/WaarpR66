@@ -23,7 +23,6 @@ import org.waarp.snmp.interf.WaarpGauge32;
  * R66 Gauge32 SNMP implementation
  *
  * @author Frederic Bregier
- *
  */
 class R66Gauge32 extends WaarpGauge32 {
 

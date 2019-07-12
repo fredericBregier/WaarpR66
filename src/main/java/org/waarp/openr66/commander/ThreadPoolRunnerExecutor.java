@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
  * Thread Pool Executor for ClientRunner
  *
  * @author Frederic Bregier
- *
  */
 class ThreadPoolRunnerExecutor extends ThreadPoolExecutor {
 
@@ -100,7 +99,6 @@ class ThreadPoolRunnerExecutor extends ThreadPoolExecutor {
      * RejectedExecutionHandler for this ThreadPoolRunnerExecutor
      *
      * @author Frederic Bregier
-     *
      */
     private static class RunnerRejectedExecutionHandler implements RejectedExecutionHandler {
 

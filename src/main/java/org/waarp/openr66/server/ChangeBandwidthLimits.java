@@ -43,11 +43,10 @@ import org.waarp.openr66.protocol.utils.R66Future;
 import java.net.SocketAddress;
 
 /**
- * This command enables the dynamic change of bandwidth limitation. It does not changed the valuesin
- * the database but only dynamic values while the server is running and until it is shutdown.
+ * This command enables the dynamic change of bandwidth limitation. It does not changed the valuesin the database but
+ * only dynamic values while the server is running and until it is shutdown.
  *
  * @author Frederic Bregier
- *
  */
 public class ChangeBandwidthLimits implements Runnable {
     protected static String _INFO_ARGS = "Need the configuration file as first argument then at least one of\n" +
@@ -72,6 +71,7 @@ public class ChangeBandwidthLimits implements Runnable {
     protected final long readSessionLimit;
     protected final NetworkTransaction networkTransaction;
     protected DbHostAuth host;
+
     public ChangeBandwidthLimits(R66Future future, long wgl, long rgl, long wsl, long rsl,
                                  NetworkTransaction networkTransaction) {
         this.future = future;
@@ -202,8 +202,8 @@ public class ChangeBandwidthLimits implements Runnable {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

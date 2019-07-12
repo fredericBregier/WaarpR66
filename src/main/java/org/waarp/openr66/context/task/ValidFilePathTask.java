@@ -25,17 +25,15 @@ import org.waarp.openr66.context.task.exception.OpenR66RunnerException;
 import java.io.File;
 
 /**
- * This task validate the File Path according to the following argument:<br>
- * - the full path is get from the current file<br>
- * - the arg path is transformed as usual (static and dynamic from information transfer) and should
- * be the beginning of the correct valid path<br>
- * - the full path should begin with one of the result of the transformation (blank separated)<br>
+ * This task validate the File Path according to the following argument:<br> - the full path is get from the current
+ * file<br> - the arg path is transformed as usual (static and dynamic from information transfer) and should be the
+ * beginning of the correct valid path<br> - the full path should begin with one of the result of the transformation
+ * (blank separated)<br>
  * <br>
- * For instance "#OUTPATH# #INPATH# #WORKPATH# #ARHCPATH#" will test that the current file is in one
- * of the standard path.
+ * For instance "#OUTPATH# #INPATH# #WORKPATH# #ARHCPATH#" will test that the current file is in one of the standard
+ * path.
  *
  * @author Frederic Bregier
- *
  */
 public class ValidFilePathTask extends AbstractTask {
     /**

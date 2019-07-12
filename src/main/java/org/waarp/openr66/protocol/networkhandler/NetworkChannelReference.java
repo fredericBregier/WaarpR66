@@ -39,7 +39,6 @@ import java.util.ArrayList;
  * NetworkChannelReference object to keep Network channel open while some local channels are attached to it.
  *
  * @author Frederic Bregier
- *
  */
 public class NetworkChannelReference {
     /**
@@ -220,7 +219,6 @@ public class NetworkChannelReference {
     }
 
     /**
-     *
      * @return the hashcode for the global remote networkaddress
      */
     public int getSocketHashCode() {
@@ -240,6 +238,7 @@ public class NetworkChannelReference {
      * Check if the last time used is ok with a delay applied to the current time (timeout)
      *
      * @param delay
+     *
      * @return <= 0 if OK, else > 0 (should send a KeepAlive or wait that time in ms)
      */
     public long checkLastTime(long delay) {
@@ -268,8 +267,7 @@ public class NetworkChannelReference {
     }
 
     /**
-     * @param hostId
-     *            the hostId to set
+     * @param hostId the hostId to set
      */
     public void setHostId(String hostId) {
         this.hostId = hostId;

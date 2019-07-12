@@ -22,16 +22,12 @@ import org.waarp.common.future.WaarpFuture;
 /**
  * NoTaskExecutor class. No action will be taken.
  *
- *
- *
  * @author Frederic Bregier
- *
  */
 public class NoTaskExecutor extends AbstractExecutor {
     private final WaarpFuture futureCompletion;
 
     /**
-     *
      * @param command
      * @param delay
      * @param futureCompletion

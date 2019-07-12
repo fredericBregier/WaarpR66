@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author "Frederic Bregier"
- *
  */
 public class JavaExecutor extends AbstractExecutor {
     /**

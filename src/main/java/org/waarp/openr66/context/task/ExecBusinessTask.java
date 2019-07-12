@@ -24,11 +24,10 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * Business Execution of a Java Task
- *
+ * <p>
  * Fullarg = First argument is the Java class name, Last argument is the delay.
  *
  * @author Frederic Bregier
- *
  */
 public class ExecBusinessTask extends AbstractExecJavaTask {
 

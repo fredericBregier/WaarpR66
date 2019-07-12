@@ -131,7 +131,9 @@ public class LocalTransaction {
      *
      * @param remoteId
      * @param localId
+     *
      * @return the LocalChannelReference
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public LocalChannelReference getClient(Integer remoteId, Integer localId)
@@ -151,6 +153,7 @@ public class LocalTransaction {
      *
      * @param remoteId
      * @param localId
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public void sendLaterToClient(Channel networkChannel, Integer remoteId, Integer localId, NetworkPacket packet) {
@@ -170,11 +173,11 @@ public class LocalTransaction {
      * Create a new Client
      *
      * @param networkChannelReference
-     * @param remoteId
-     *            might be set to ChannelUtils.NOCHANNEL (real creation)
-     * @param futureRequest
-     *            might be null (from NetworkChannel Startup)
+     * @param remoteId might be set to ChannelUtils.NOCHANNEL (real creation)
+     * @param futureRequest might be null (from NetworkChannel Startup)
+     *
      * @return the LocalChannelReference
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws OpenR66ProtocolRemoteShutdownException
      * @throws OpenR66ProtocolNoConnectionException
@@ -246,8 +249,8 @@ public class LocalTransaction {
     }
 
     /**
-     *
      * @param id
+     *
      * @return the LocalChannelReference
      */
     public LocalChannelReference getFromId(Integer id) {
@@ -268,7 +271,6 @@ public class LocalTransaction {
     }
 
     /**
-     *
      * @param runner
      * @param lcr
      */
@@ -279,9 +281,8 @@ public class LocalTransaction {
     }
 
     /**
+     * @param key as "requested requester specialId"
      *
-     * @param key
-     *            as "requested requester specialId"
      * @return the LocalChannelReference
      */
     public LocalChannelReference getFromRequest(String key) {
@@ -289,8 +290,8 @@ public class LocalTransaction {
     }
 
     /**
-     *
      * @param key as "requested requester specialId"
+     *
      * @return True if the LocalChannelReference exists
      */
     public boolean contained(String key) {
@@ -298,7 +299,6 @@ public class LocalTransaction {
     }
 
     /**
-     *
      * @return the number of active local channels
      */
     public int getNumberLocalChannel() {

@@ -39,7 +39,6 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * Test class for Send Through client
  *
  * @author Frederic Bregier
- *
  */
 public class TestSendThroughClient extends SendThroughClient {
 

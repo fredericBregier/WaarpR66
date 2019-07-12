@@ -30,7 +30,6 @@ import java.util.Map;
  * Partner Configuration
  *
  * @author "Frederic Bregier"
- *
  */
 public class PartnerConfiguration {
     /**
@@ -58,12 +57,12 @@ public class PartnerConfiguration {
     private ObjectNode root = JsonHandler.createObjectNode();
     private boolean useJson = false;
     private boolean changeFileInfoEnabled = false;
+
     /**
      * Constructor for an external HostId
      *
      * @param id
-     * @param json
-     *            mainly the version information
+     * @param json mainly the version information
      */
     public PartnerConfiguration(String id, String json) {
         this.id = id;
@@ -83,7 +82,7 @@ public class PartnerConfiguration {
             JsonHandler.setValue(root, FIELDS.FILESIZE, (Boolean) FIELDS.FILESIZE.defaultValue);
             JsonHandler.setValue(root, FIELDS.FINALHASH, (Boolean) FIELDS.FINALHASH.defaultValue);
         }
-        JsonHandler.setValue(root, FIELDS.DIGESTALGO, Configuration.configuration.getDigest().name);
+        JsonHandler.setValue(root, FIELDS.DIGESTALGO, Configuration.configuration.getDigest().getName());
         JsonHandler.setValue(root, FIELDS.PROXIFIED, (Boolean) FIELDS.PROXIFIED.defaultValue);
         String sep = getSEPARATOR_FIELD();
         if (!isVersion2GEQVersion1(R66Versions.V2_4_13.getVersion(), version)) {
@@ -125,7 +124,7 @@ public class PartnerConfiguration {
         JsonHandler.setValue(root, FIELDS.VERSION, Version.ID);
         JsonHandler.setValue(root, FIELDS.FILESIZE, true);
         JsonHandler.setValue(root, FIELDS.FINALHASH, Configuration.configuration.isGlobalDigest());
-        JsonHandler.setValue(root, FIELDS.DIGESTALGO, Configuration.configuration.getDigest().name);
+        JsonHandler.setValue(root, FIELDS.DIGESTALGO, Configuration.configuration.getDigest().getName());
         JsonHandler.setValue(root, FIELDS.PROXIFIED, Configuration.configuration.isHostProxyfied());
         JsonHandler.setValue(root, FIELDS.SEPARATOR, getSEPARATOR_FIELD());
         useJson = true;
@@ -134,7 +133,7 @@ public class PartnerConfiguration {
 
     public final static DigestAlgo getDigestAlgo(String algo) {
         for (DigestAlgo alg : DigestAlgo.values()) {
-            if (alg.name.equals(algo)) {
+            if (alg.getName().equals(algo)) {
                 return alg;
             }
         }
@@ -146,8 +145,8 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @param remoteHost
+     *
      * @return the separator to be used
      */
     public final static String getSeparator(String remoteHost) {
@@ -164,6 +163,7 @@ public class PartnerConfiguration {
      *
      * @param version1
      * @param version2
+     *
      * @return True if version2 >= version1
      */
     public final static boolean isVersion2GEQVersion1(String version1, String version2) {
@@ -209,6 +209,7 @@ public class PartnerConfiguration {
      *
      * @param version1
      * @param version2
+     *
      * @return True if version2 > version1
      */
     public final static boolean isVersion2GTVersion1(String version1, String version2) {
@@ -250,8 +251,8 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @param host
+     *
      * @return True if this host is referenced as using Json
      */
     public final static boolean useJson(String host) {
@@ -282,7 +283,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return the associated HostId
      */
     public String getId() {
@@ -290,7 +290,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return the version for this Host
      */
     public String getVersion() {
@@ -298,7 +297,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return True if this Host returns FileSize
      */
     public boolean useFileSize() {
@@ -306,7 +304,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return True if this Host returns a final hash
      */
     public boolean useFinalHash() {
@@ -314,7 +311,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return True if this Host returns Digest Algo used
      */
     public DigestAlgo getDigestAlgo() {
@@ -323,7 +319,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return True if this Host is proxified
      */
     public boolean isProxified() {
@@ -331,7 +326,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return the separator for this Host
      */
     public String getSeperator() {
@@ -353,7 +347,6 @@ public class PartnerConfiguration {
     }
 
     /**
-     *
      * @return the String representation as version.json
      */
     public String toString() {
@@ -362,11 +355,10 @@ public class PartnerConfiguration {
 
     /**
      * JSON Fields
-     *
      */
     public static enum FIELDS {
         HOSTID("nohostid"), VERSION(R66Versions.V2_4_12.getVersion()),
-        DIGESTALGO(DigestAlgo.MD5.name), FILESIZE(false), FINALHASH(false),
+        DIGESTALGO(DigestAlgo.MD5.getName()), FILESIZE(false), FINALHASH(false),
         PROXIFIED(false), SEPARATOR(BLANK_SEPARATOR_FIELD);
 
         String name;

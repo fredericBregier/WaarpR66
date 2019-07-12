@@ -20,7 +20,6 @@ package org.waarp.openr66.protocol.exception;
  * OpenR66 Database Mother Exception
  *
  * @author Frederic Bregier
- *
  */
 public class OpenR66DatabaseGlobalException extends OpenR66Exception {
 

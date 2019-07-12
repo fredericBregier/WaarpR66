@@ -80,7 +80,6 @@ import java.util.Set;
  * Handler for HTTP information support
  *
  * @author Frederic Bregier
- *
  */
 public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     public static final int LIMITROW = 60; // better if it can be divided by 4
@@ -100,8 +99,7 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
     private HttpResponseStatus status;
     private String uriRequest;
     /**
-     * The Database connection attached to this NetworkChannelReference shared among all associated
-     * LocalChannels
+     * The Database connection attached to this NetworkChannelReference shared among all associated LocalChannels
      */
     private DbSession dbSession = DbConstant.admin.getSession();
     /**
@@ -327,6 +325,7 @@ public class HttpFormattedHandler extends SimpleChannelInboundHandler<FullHttpRe
      * @param preparedStatement
      * @param type
      * @param nb
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */

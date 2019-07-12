@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Validation Message class for packet
- *
+ * <p>
  * 2 strings and one byte: sheader,smiddle,send
  *
  * @author frederic bregier
@@ -49,6 +49,7 @@ public class ValidPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new ValidPacket from buffer
      */
     public static ValidPacket createFromBuffer(int headerLength,
@@ -112,7 +113,6 @@ public class ValidPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param smiddle
      */
     public void setSmiddle(String smiddle) {

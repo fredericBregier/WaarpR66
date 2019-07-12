@@ -41,21 +41,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Direct Transfer from a client with or without database connection to transfer for multiple files to multiple hosts at once.<br>
- * Files will have to be separated by ','.<br>
- * Hosts will have to be separated by ','.<br>
+ * Direct Transfer from a client with or without database connection to transfer for multiple files to multiple hosts at
+ * once.<br> Files will have to be separated by ','.<br> Hosts will have to be separated by ','.<br>
  * <br>
- * For instance: -to host1,host2,host3 -file file1,file2 <br>
- * Will generate: <br>
- * -to host1 -file file1<br>
- * -to host1 -file file2<br>
- * -to host2 -file file1<br>
- * -to host2 -file file2<br>
- * -to host3 -file file1<br>
- * -to host3 -file file2<br>
+ * For instance: -to host1,host2,host3 -file file1,file2 <br> Will generate: <br> -to host1 -file file1<br> -to host1
+ * -file file2<br> -to host2 -file file1<br> -to host2 -file file2<br> -to host3 -file file1<br> -to host3 -file
+ * file2<br>
  *
  * @author Frederic Bregier
- *
  */
 public class MultipleDirectTransfer extends DirectTransfer {
     private int errorMultiple = 0;

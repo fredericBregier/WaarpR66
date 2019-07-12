@@ -36,24 +36,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Client to submit a transfer for multiple files to multiple hosts at once.<br>
- * Files will have to be separated by ','.<br>
- * Hosts will have to be separated by ','.<br>
+ * Client to submit a transfer for multiple files to multiple hosts at once.<br> Files will have to be separated by
+ * ','.<br> Hosts will have to be separated by ','.<br>
  * <br>
- * For instance: -to host1,host2,host3 -file file1,file2 <br>
- * Will generate: <br>
- * -to host1 -file file1<br>
- * -to host1 -file file2<br>
- * -to host2 -file file1<br>
- * -to host2 -file file2<br>
- * -to host3 -file file1<br>
- * -to host3 -file file2<br>
+ * For instance: -to host1,host2,host3 -file file1,file2 <br> Will generate: <br> -to host1 -file file1<br> -to host1
+ * -file file2<br> -to host2 -file file1<br> -to host2 -file file2<br> -to host3 -file file1<br> -to host3 -file
+ * file2<br>
  * <br>
  * <br>
  * Extra option is -client which allows the filename resolution on remote (recv files) when using wildcards.<br>
  *
  * @author Frederic Bregier
- *
  */
 public class MultipleSubmitTransfer extends SubmitTransfer {
     protected boolean submit = false;
@@ -71,11 +64,8 @@ public class MultipleSubmitTransfer extends SubmitTransfer {
     }
 
     /**
-     *
-     * @param args
-     *            configuration file, the remoteHost Id, the file to transfer, the rule, file
-     *            transfer information as arguments and optionally isMD5=1 for true or 0 for
-     *            false(default) and the blocksize if different than default
+     * @param args configuration file, the remoteHost Id, the file to transfer, the rule, file transfer information as
+     * arguments and optionally isMD5=1 for true or 0 for false(default) and the blocksize if different than default
      */
     public static void main(String[] args) {
         WaarpLoggerFactory.setDefaultFactory(new WaarpSlf4JLoggerFactory(null));

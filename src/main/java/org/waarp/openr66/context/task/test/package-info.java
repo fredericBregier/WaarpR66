@@ -17,6 +17,9 @@
  * Package for an example of Java Task for ExecJava and for BusinessFactory
  *
  * @author "Frederic Bregier"
+ * <p>
+ * Package for an example of Java Task for ExecJava and for BusinessFactory
+ * @author "Frederic Bregier"
  */
 /**
  * Package for an example of Java Task for ExecJava and for BusinessFactory

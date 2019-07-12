@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Connection Error Message class for packet
- *
+ * <p>
  * 2 strings: sheader,smiddle
  *
  * @author frederic bregier
@@ -48,7 +48,9 @@ public class ConnectionErrorPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new ErrorPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static ConnectionErrorPacket createFromBuffer(int headerLength,

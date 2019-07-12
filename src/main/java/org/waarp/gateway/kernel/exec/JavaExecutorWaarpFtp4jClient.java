@@ -29,51 +29,27 @@ import java.io.IOException;
  * FTP client compatible for Waarp Gateway Kernel as JavaExecutor<br>
  * <br>
  * Ftp Transfer task: synchronous<br>
- *
- * Result of arguments will be as FTP command.<br>
- * Format is the following:<br>
- * "-file filepath <br>
- * -to requestedHost <br>
- * -port port <br>
- * -user user <br>
- * -pwd pwd <br>
- * [-account account] <br>
- * [-mode active/passive] <br>
- * [-ssl no/implicit/explicit]<br>
- * [-cwd remotepath] <br>
- * [-digest (crc,md5,sha1)] <br>
- * [-pre extraCommand1 with ',' as separator of arguments] <br>
- * -command command from (get,put,append) <br>
- * [-post extraCommand2 with ',' as separator of arguments]" <br>
+ * <p>
+ * Result of arguments will be as FTP command.<br> Format is the following:<br> "-file filepath <br> -to requestedHost
+ * <br> -port port <br> -user user <br> -pwd pwd <br> [-account account] <br> [-mode active/passive] <br> [-ssl
+ * no/implicit/explicit]<br> [-cwd remotepath] <br> [-digest (crc,md5,sha1)] <br> [-pre extraCommand1 with ',' as
+ * separator of arguments] <br> -command command from (get,put,append) <br> [-post extraCommand2 with ',' as separator
+ * of arguments]" <br>
  * <br>
  * <br>
- * The order of commands will be:<br>
- * 1) connection to requestHost on port (if ssl native => using native ssl link)<br>
- * 2) User user<br>
- * 3) PASS pwd<br>
- * 4) if account => ACCT account<br>
- * 5) if -ssl & auth => AUTH, PBSZ 0, PROT P <br>
- * 6) if passive => PASV<br>
- * 7) CWD remotepath; if error => MKD remotepath then CWD remotepath (and ignoring any error)<br>
- * 8) if pre => extraCommand1 with ',' replaced by ' ' (note: do not use standard commands from FTP
- * like
+ * The order of commands will be:<br> 1) connection to requestHost on port (if ssl native => using native ssl link)<br>
+ * 2) User user<br> 3) PASS pwd<br> 4) if account => ACCT account<br> 5) if -ssl & auth => AUTH, PBSZ 0, PROT P <br> 6)
+ * if passive => PASV<br> 7) CWD remotepath; if error => MKD remotepath then CWD remotepath (and ignoring any error)<br>
+ * 8) if pre => extraCommand1 with ',' replaced by ' ' (note: do not use standard commands from FTP like
  * ACCT,PASS,REIN,USER,APPE,STOR,STOU,RETR,RMD,RNFR,RNTO,ABOR,CWD,CDUP,MODE,PASV,PORT,STRU,TYPE,
- * MDTM,MLSD,MLST,SIZE,AUTH) <br>
- * 9) BINARY (binary format)<br>
- * 10) if get => RETR filepath.basename ; if put => STOR filepath ; if append => APPE
- * filepath.basename<br>
- * 11) if digest & get/put/append & remote site compatible with XCRC,XMD5,XSHA1 => FEAT (parsing if
- * found corresponding XCRC,XMD5,XSHA1) ; then XCRC/XMD5/XSHA1 filepath.basename ; then locally
- * comparing this XCRC/XMD5/XSHA1 with the local file<br>
- * 12) if post => extraCommand2 with ',' replaced by ' ' (note: do not use standard commands from
- * FTP like
- * ACCT,PASS,REIN,USER,APPE,STOR,STOU,RETR,RMD,RNFR,RNTO,ABOR,CWD,CDUP,MODE,PASV,PORT,STRU,TYPE
- * ,MDTM,MLSD,MLST,SIZE,AUTH)<br>
- * 13) QUIT<br>
- *
+ * MDTM,MLSD,MLST,SIZE,AUTH) <br> 9) BINARY (binary format)<br> 10) if get => RETR filepath.basename ; if put => STOR
+ * filepath ; if append => APPE filepath.basename<br> 11) if digest & get/put/append & remote site compatible with
+ * XCRC,XMD5,XSHA1 => FEAT (parsing if found corresponding XCRC,XMD5,XSHA1) ; then XCRC/XMD5/XSHA1 filepath.basename ;
+ * then locally comparing this XCRC/XMD5/XSHA1 with the local file<br> 12) if post => extraCommand2 with ',' replaced by
+ * ' ' (note: do not use standard commands from FTP like ACCT,PASS,REIN,USER,APPE,STOR,STOU,RETR,RMD,RNFR,RNTO,ABOR,CWD,CDUP,MODE,PASV,PORT,STRU,TYPE
+ * ,MDTM,MLSD,MLST,SIZE,AUTH)<br> 13) QUIT<br>
  *
  * @author "Frederic Bregier"
- *
  */
 public class JavaExecutorWaarpFtp4jClient implements GatewayRunnable {
     /**

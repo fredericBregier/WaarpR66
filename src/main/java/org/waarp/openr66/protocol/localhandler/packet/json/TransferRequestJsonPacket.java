@@ -29,7 +29,6 @@ import java.util.Date;
  * Transfer request JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 @JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
 public class TransferRequestJsonPacket extends JsonPacket {
@@ -74,8 +73,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isAdditionalDelay
-     *            the isAdditionalDelay to set
+     * @param isAdditionalDelay the isAdditionalDelay to set
      */
     public void setAdditionalDelay(boolean isAdditionalDelay) {
         this.isAdditionalDelay = isAdditionalDelay;
@@ -89,8 +87,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param delay
-     *            the delay to set
+     * @param delay the delay to set
      */
     public void setDelay(long delay) {
         this.delay = delay;
@@ -104,8 +101,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param start
-     *            the start to set
+     * @param start the start to set
      */
     public void setStart(Date start) {
         this.start = start;
@@ -119,8 +115,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param requested
-     *            the requested to set
+     * @param requested the requested to set
      */
     public void setRequested(String requested) {
         this.requested = requested;
@@ -134,8 +129,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param rulename
-     *            the rulename to set
+     * @param rulename the rulename to set
      */
     public void setRulename(String rulename) {
         this.rulename = rulename;
@@ -149,8 +143,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param mode
-     *            the mode to set
+     * @param mode the mode to set
      */
     public void setMode(int mode) {
         this.mode = mode;
@@ -164,8 +157,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param filename
-     *            the filename to set
+     * @param filename the filename to set
      */
     public void setFilename(String filename) {
         this.filename = filename;
@@ -179,8 +171,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param blocksize
-     *            the blocksize to set
+     * @param blocksize the blocksize to set
      */
     public void setBlocksize(int blocksize) {
         this.blocksize = blocksize;
@@ -194,8 +185,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param rank
-     *            the rank to set
+     * @param rank the rank to set
      */
     public void setRank(int rank) {
         this.rank = rank;
@@ -209,8 +199,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param specialId
-     *            the specialId to set
+     * @param specialId the specialId to set
      */
     public void setSpecialId(long specialId) {
         this.specialId = specialId;
@@ -224,8 +213,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param validate
-     *            the validate to set
+     * @param validate the validate to set
      */
     public void setValidate(byte validate) {
         this.validate = validate;
@@ -253,8 +241,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param originalSize
-     *            the originalSize to set
+     * @param originalSize the originalSize to set
      */
     public void setOriginalSize(long originalSize) {
         this.originalSize = originalSize;
@@ -268,8 +255,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param fileInformation
-     *            the fileInformation to set
+     * @param fileInformation the fileInformation to set
      */
     public void setFileInformation(String fileInformation) {
         if (fileInformation == null) {
@@ -286,8 +272,7 @@ public class TransferRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param separator
-     *            the separator to set
+     * @param separator the separator to set
      */
     public void setSeparator(String separator) {
         this.separator = separator;

@@ -21,7 +21,6 @@ import org.waarp.openr66.protocol.networkhandler.packet.NetworkPacket;
 
 /**
  * @author Frederic Bregier
- *
  */
 public class ChannelTrafficHandler extends ChannelTrafficShapingHandler {
 

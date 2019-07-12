@@ -44,7 +44,6 @@ import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler;
  * DbHostAUth Rest handler
  *
  * @author "Frederic Bregier"
- *
  */
 public class DbHostAuthR66RestMethodHandler extends DataModelRestMethodHandler<DbHostAuth> {
     public static final String BASEURI = "hosts";

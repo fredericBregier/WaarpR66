@@ -18,12 +18,11 @@ package org.waarp.openr66.context;
 
 /**
  * @author Frederic Bregier
- *
  */
 public interface R66BusinessFactoryInterface {
     /**
-     *
      * @param session
+     *
      * @return a Business object (new or same, depending on the implementation), maybe null
      */
     public R66BusinessInterface getBusinessInterface(R66Session session);

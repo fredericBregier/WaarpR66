@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 
 /**
  * End of Transfer class
- *
+ * <p>
  * header = "request" middle = way end = might be empty
  *
  * @author frederic bregier
@@ -84,7 +84,9 @@ public class EndTransferPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new EndTransferPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static EndTransferPacket createFromBuffer(int headerLength,
@@ -175,8 +177,7 @@ public class EndTransferPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param optional
-     *            the optional to set
+     * @param optional the optional to set
      */
     public void setOptional(String optional) {
         this.hashOptional = optional;

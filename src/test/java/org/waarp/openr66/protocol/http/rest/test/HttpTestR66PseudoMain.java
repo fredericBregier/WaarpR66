@@ -30,7 +30,6 @@ import java.io.IOException;
 
 /**
  * @author "Frederic Bregier"
- *
  */
 public class HttpTestR66PseudoMain {
 
@@ -69,6 +68,7 @@ public class HttpTestR66PseudoMain {
 
     /**
      * @param args
+     *
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {

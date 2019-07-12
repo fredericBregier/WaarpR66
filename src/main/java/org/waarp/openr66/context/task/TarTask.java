@@ -31,7 +31,6 @@ import java.util.List;
  * TAR task
  *
  * @author Frederic Bregier
- *
  */
 public class TarTask extends AbstractTask {
     /**

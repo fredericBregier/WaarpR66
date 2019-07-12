@@ -64,7 +64,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Rule Table object
  *
  * @author Frederic Bregier
- *
  */
 public class DbRule extends AbstractDbData {
     public static final int[] dbTypes = {
@@ -229,6 +228,7 @@ public class DbRule extends AbstractDbData {
     /**
      * @param dbSession
      * @param idRule
+     *
      * @throws WaarpDatabaseException
      */
     public DbRule(String idRule) throws WaarpDatabaseException {
@@ -295,6 +295,7 @@ public class DbRule extends AbstractDbData {
      *
      * @param dbSession
      * @param source
+     *
      * @throws WaarpDatabaseSqlException
      */
     public DbRule(ObjectNode source) throws WaarpDatabaseSqlException {
@@ -318,7 +319,9 @@ public class DbRule extends AbstractDbData {
      * Delete all entries (used when purge and reload)
      *
      * @param dbSession
+     *
      * @return the previous existing array of DbRule
+     *
      * @throws WaarpDatabaseException
      */
     public static DbRule[] deleteAll() throws WaarpDatabaseException {
@@ -347,9 +350,10 @@ public class DbRule extends AbstractDbData {
     /**
      * Get All DbRule from database or from internal hashMap in case of no database support
      *
-     * @param dbSession
-     *            may be null
+     * @param dbSession may be null
+     *
      * @return the array of DbRule
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -380,7 +384,9 @@ public class DbRule extends AbstractDbData {
      * For instance from Commander when getting updated information
      *
      * @param preparedStatement
+     *
      * @return the next updated DbRule
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -396,8 +402,8 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbPreparedStatement for getting Updated Object
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -431,6 +437,7 @@ public class DbRule extends AbstractDbData {
      * Initialized a ids String from args
      *
      * @param idsArray
+     *
      * @return the new ids string
      */
     private static String setIdsRule(String[] idsArray) {
@@ -449,6 +456,7 @@ public class DbRule extends AbstractDbData {
      * Initialized a tasks String from args
      *
      * @param tasksArray
+     *
      * @return the new tasks string
      */
     private static String setTasksRule(String[][] tasksArray) {
@@ -480,11 +488,12 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @param session
      * @param rule
      * @param mode
+     *
      * @return the DbPreparedStatement according to the filter
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -524,7 +533,9 @@ public class DbRule extends AbstractDbData {
      * Write selected DbRule to a Json String
      *
      * @param preparedStatement
+     *
      * @return the associated Json String
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      * @throws OpenR66ProtocolBusinessException
@@ -553,7 +564,6 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @return the DbValue associated with this table
      */
     public static DbValue[] getAllType() {
@@ -792,10 +802,10 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     * Get Ids from String. If it is not ok, then it sets the default values and return False, else
-     * returns True.
+     * Get Ids from String. If it is not ok, then it sets the default values and return False, else returns True.
      *
      * @param idsref
+     *
      * @return True if ok, else False (default values).
      */
     private String[] getIdsRule(String idsref) {
@@ -820,10 +830,11 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     * Get Tasks from String. If it is not ok, then it sets the default values and return new array
-     * of Tasks or null if in error.
+     * Get Tasks from String. If it is not ok, then it sets the default values and return new array of Tasks or null if
+     * in error.
      *
      * @param tasks
+     *
      * @return Array of tasks or empty array if in error.
      */
     private String[][] getTasksRule(String tasks) {
@@ -851,7 +862,9 @@ public class DbRule extends AbstractDbData {
      * Get the full path from RecvPath (used only in copy MODETRANS)
      *
      * @param filename
+     *
      * @return the full String path
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public String setRecvPath(String filename)
@@ -866,7 +879,9 @@ public class DbRule extends AbstractDbData {
      * Get the full path from sendPath
      *
      * @param filename
+     *
      * @return the full String path
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public String setSendPath(String filename)
@@ -883,7 +898,9 @@ public class DbRule extends AbstractDbData {
      * Get the full path from archivePath
      *
      * @param filename
+     *
      * @return the full String path
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public String setArchivePath(String filename)
@@ -898,7 +915,9 @@ public class DbRule extends AbstractDbData {
      * Get the full path from workPath
      *
      * @param filename
+     *
      * @return the full String path
+     *
      * @throws OpenR66ProtocolSystemException
      */
     public String setWorkingPath(String filename)
@@ -914,6 +933,7 @@ public class DbRule extends AbstractDbData {
      * Check if the given hostTo is in the allowed list
      *
      * @param hostId
+     *
      * @return True if allow, else False
      */
     public boolean checkHostAllow(String hostId) {
@@ -929,7 +949,6 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @return True if this rule is adapted for SENDMODE
      */
     public boolean isSendMode() {
@@ -937,7 +956,6 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @return True if this rule is adapted for RECVMODE
      */
     public boolean isRecvMode() {
@@ -948,6 +966,7 @@ public class DbRule extends AbstractDbData {
      * Object to String
      *
      * @return the string that displays this object
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -965,9 +984,9 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @param isSender
      * @param step
+     *
      * @return a string that prints (debug) the tasks to execute
      */
     public String printTasks(boolean isSender, TASKSTEP step) {
@@ -1000,6 +1019,7 @@ public class DbRule extends AbstractDbData {
      * Object to String
      *
      * @return the string that displays this object
+     *
      * @see java.lang.Object#toString()
      */
     public String toShortString() {
@@ -1046,7 +1066,6 @@ public class DbRule extends AbstractDbData {
     }
 
     /**
-     *
      * @return the Json string for this
      */
     public String getJsonAsString() {
@@ -1058,6 +1077,7 @@ public class DbRule extends AbstractDbData {
     /**
      * @param session
      * @param body
+     *
      * @return the runner in Html format specified by body by replacing all instance of fields
      */
     public String toSpecializedHtml(R66Session session, String body) {

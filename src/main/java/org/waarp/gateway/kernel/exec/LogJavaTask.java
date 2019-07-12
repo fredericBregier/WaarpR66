@@ -21,7 +21,6 @@ import org.waarp.common.logging.WaarpLoggerFactory;
 
 /**
  * @author "Frederic Bregier"
- *
  */
 public class LogJavaTask implements GatewayRunnable {
     /**

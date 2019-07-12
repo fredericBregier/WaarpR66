@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Block Request Message class
- *
+ * <p>
  * 1 code (byte as 0: unblock, 1:block): block, 1 string: spassword(or key)
  *
  * @author frederic bregier
@@ -46,7 +46,9 @@ public class BlockRequestPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new ValidPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static BlockRequestPacket createFromBuffer(int headerLength,

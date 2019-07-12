@@ -30,7 +30,6 @@ import java.util.concurrent.Executors;
  * Test class for multiple SubmitTransfer
  *
  * @author Frederic Bregier
- *
  */
 public class TestSubmitTransfer extends SubmitTransfer {
     static int nb = 100;
@@ -45,6 +44,7 @@ public class TestSubmitTransfer extends SubmitTransfer {
     /**
      * @param args
      * @param rank
+     *
      * @return True if OK
      */
     protected static boolean getSpecialParams(String[] args, int rank) {

@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Business Request JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class BusinessRequestJsonPacket extends JsonPacket {
 
@@ -41,8 +40,7 @@ public class BusinessRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isValidated
-     *            the isValidated to set
+     * @param isValidated the isValidated to set
      */
     public void setValidated(boolean isValidated) {
         this.isValidated = isValidated;
@@ -56,8 +54,7 @@ public class BusinessRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isToApplied
-     *            the isToApplied to set
+     * @param isToApplied the isToApplied to set
      */
     public void setToApplied(boolean isToApplied) {
         this.isToApplied = isToApplied;
@@ -71,8 +68,7 @@ public class BusinessRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param className
-     *            the className to set
+     * @param className the className to set
      */
     public void setClassName(String className) {
         this.className = className;
@@ -86,8 +82,7 @@ public class BusinessRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param arguments
-     *            the arguments to set
+     * @param arguments the arguments to set
      */
     public void setArguments(String arguments) {
         this.arguments = arguments;
@@ -101,8 +96,7 @@ public class BusinessRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param extraArguments
-     *            the extraArguments to set
+     * @param extraArguments the extraArguments to set
      */
     public void setExtraArguments(String extraArguments) {
         this.extraArguments = extraArguments;
@@ -116,8 +110,7 @@ public class BusinessRequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param delay
-     *            the delay to set
+     * @param delay the delay to set
      */
     public void setDelay(int delay) {
         this.delay = delay;

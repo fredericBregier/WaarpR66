@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Error Message class for packet
- *
+ * <p>
  * 2 strings+1 error code: sheader,smiddle,code
  *
  * @author frederic bregier
@@ -59,7 +59,9 @@ public class ErrorPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new ErrorPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static ErrorPacket createFromBuffer(int headerLength,

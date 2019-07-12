@@ -34,18 +34,14 @@ import java.io.IOException;
  *
  *
  * <br>
- * The following replacement are done dynamically before the command is executed:<br>
- * - #BASEPATH# is replaced by the full path for the root of FTP Directory<br>
- * - #FILE# is replaced by the current file path relative to FTP Directory (so #BASEPATH##FILE# is
- * the full path of the file)<br>
- * - #USER# is replaced by the username<br>
- * - #ACCOUNT# is replaced by the account<br>
- * - #COMMAND# is replaced by the command issued for the file<br>
- * - #SPECIALID# is replaced by the FTP id of the transfer (whatever in or out)<br>
- * - #UUID# is replaced by a special UUID globally unique for the transfer, in general to be placed in -info part (for instance ##UUID## giving #uuid#)<br>
+ * The following replacement are done dynamically before the command is executed:<br> - #BASEPATH# is replaced by the
+ * full path for the root of FTP Directory<br> - #FILE# is replaced by the current file path relative to FTP Directory
+ * (so #BASEPATH##FILE# is the full path of the file)<br> - #USER# is replaced by the username<br> - #ACCOUNT# is
+ * replaced by the account<br> - #COMMAND# is replaced by the command issued for the file<br> - #SPECIALID# is replaced
+ * by the FTP id of the transfer (whatever in or out)<br> - #UUID# is replaced by a special UUID globally unique for the
+ * transfer, in general to be placed in -info part (for instance ##UUID## giving #uuid#)<br>
  *
  * @author Frederic Bregier
- *
  */
 public class ExecuteExecutor extends AbstractExecutor {
     /**
@@ -59,7 +55,6 @@ public class ExecuteExecutor extends AbstractExecutor {
     private final long delay;
 
     /**
-     *
      * @param command
      * @param delay
      * @param futureCompletion

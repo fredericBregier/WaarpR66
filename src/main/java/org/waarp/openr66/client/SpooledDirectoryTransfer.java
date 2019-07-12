@@ -58,39 +58,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Direct Transfer from a client with or without database connection
- * or Submit Transfer from a client with database connection
- * to transfer files from a spooled directory to possibly multiple hosts at once.<br>
- * -to Hosts will have to be separated by ','.<br>
- * -rule Rule to be used to send files to partners<br>
+ * Direct Transfer from a client with or without database connection or Submit Transfer from a client with database
+ * connection to transfer files from a spooled directory to possibly multiple hosts at once.<br> -to Hosts will have to
+ * be separated by ','.<br> -rule Rule to be used to send files to partners<br>
  * <br>
- * Mandatory additional elements:<br>
- * -directory source (directory to spooled on ; many directories can be specified using a comma separated list as
- * "directory1,directory2,directory3")<br>
- * -statusfile file (file to use as permanent status (if process is killed or aborts))<br>
- * -stopfile file (file when created will stop the dameon)<br>
- * Other options:<br>
- * -info info to be send with the file as filetransfer information<br>
- * -md5 for md5 option<br>
- * -block size for block size specification<br>
- * -nolog to prevent saving action locally<br>
- * -regex regex (regular expression to filter file names from directory source)<br>
- * -elapse elapse (elapse time in ms > 100 ms between 2 checks of the directory)<br>
- * -submit (to submit only: default: only one between submit and direct is allowed)<br>
- * -direct (to directly transfer only: only one between submit and direct is allowed)<br>
- * -recursive (to scan recursively from the root)<br>
- * -waarp WaarpHosts (seperated by ',') to inform of running spooled directory (information stays in memory of Waarp servers, not
- * in database)<br>
- * -name name to be used as name in list printing in Waarp servers. Note this name must be unique globally.<br>
- * -elapseWaarp elapse to specify a specific timing > 1000ms between to information sent to Waarp servers (default: 5000ms)<br>
- * -parallel to allow (default) parallelism between send actions and information<br>
- * -sequential to not allow parallelism between send actions and information<br>
- * -limitParallel limit to specify the number of concurrent actions in -direct mode only<br>
- * -minimalSize limit to specify the minimal size of each file that will be transferred (default: no limit)<br>
- * -notlogWarn | -logWarn to deactivate or activate (default) the logging in Warn mode of Send/Remove information of the spool<br>
+ * Mandatory additional elements:<br> -directory source (directory to spooled on ; many directories can be specified
+ * using a comma separated list as "directory1,directory2,directory3")<br> -statusfile file (file to use as permanent
+ * status (if process is killed or aborts))<br> -stopfile file (file when created will stop the dameon)<br> Other
+ * options:<br> -info info to be send with the file as filetransfer information<br> -md5 for md5 option<br> -block size
+ * for block size specification<br> -nolog to prevent saving action locally<br> -regex regex (regular expression to
+ * filter file names from directory source)<br> -elapse elapse (elapse time in ms > 100 ms between 2 checks of the
+ * directory)<br> -submit (to submit only: default: only one between submit and direct is allowed)<br> -direct (to
+ * directly transfer only: only one between submit and direct is allowed)<br> -recursive (to scan recursively from the
+ * root)<br> -waarp WaarpHosts (seperated by ',') to inform of running spooled directory (information stays in memory of
+ * Waarp servers, not in database)<br> -name name to be used as name in list printing in Waarp servers. Note this name
+ * must be unique globally.<br> -elapseWaarp elapse to specify a specific timing > 1000ms between to information sent to
+ * Waarp servers (default: 5000ms)<br> -parallel to allow (default) parallelism between send actions and information<br>
+ * -sequential to not allow parallelism between send actions and information<br> -limitParallel limit to specify the
+ * number of concurrent actions in -direct mode only<br> -minimalSize limit to specify the minimal size of each file
+ * that will be transferred (default: no limit)<br> -notlogWarn | -logWarn to deactivate or activate (default) the
+ * logging in Warn mode of Send/Remove information of the spool<br>
  *
  * @author Frederic Bregier
- *
  */
 public class SpooledDirectoryTransfer implements Runnable {
     public static final String NEEDFULL = "needfull";
@@ -183,6 +172,7 @@ public class SpooledDirectoryTransfer implements Runnable {
     protected FileMonitor monitor = null;
     private long sent = 0;
     private long error = 0;
+
     /**
      * @param future
      * @param name
@@ -400,6 +390,7 @@ public class SpooledDirectoryTransfer implements Runnable {
      * Parse the parameter and set current values
      *
      * @param args
+     *
      * @return True if all parameters were found and correct
      */
     protected static boolean getParams(String[] args) {
@@ -552,8 +543,8 @@ public class SpooledDirectoryTransfer implements Runnable {
 
     /**
      * @param args
-     * @param normalStart
-     *            if True, will exit JVM when all daemons are stopped; else False let the caller do (used by SpooledEngine)
+     * @param normalStart if True, will exit JVM when all daemons are stopped; else False let the caller do (used by
+     * SpooledEngine)
      */
     public static boolean initialize(String[] args, boolean normalStart) {
         if (logger == null) {
@@ -870,7 +861,6 @@ public class SpooledDirectoryTransfer implements Runnable {
      * Default arguments
      *
      * @author "Frederic Bregier"
-     *
      */
     protected static class Arguments {
         protected String sname = null;

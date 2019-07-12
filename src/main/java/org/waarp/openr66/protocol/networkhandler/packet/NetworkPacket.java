@@ -23,9 +23,8 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 import org.waarp.openr66.protocol.localhandler.packet.AbstractLocalPacket;
 
 /**
- * Network Packet A Packet is composed of one global length field, two Id (4 bytes x 2) and a
- * buffer. The first Id is the localId on receive operation and the remoteId on send operation. The
- * second Id is the reverse.
+ * Network Packet A Packet is composed of one global length field, two Id (4 bytes x 2) and a buffer. The first Id is
+ * the localId on receive operation and the remoteId on send operation. The second Id is the reverse.
  *
  * @author Frederic Bregier
  */
@@ -53,8 +52,8 @@ public class NetworkPacket {
      * @param localId
      * @param remoteId
      * @param packet
-     * @param lcr
-     *            the LocalChannelReference in use
+     * @param lcr the LocalChannelReference in use
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public NetworkPacket(int localId, int remoteId, AbstractLocalPacket packet, LocalChannelReference lcr)

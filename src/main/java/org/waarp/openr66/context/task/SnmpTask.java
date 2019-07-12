@@ -22,13 +22,12 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.protocol.configuration.Configuration;
 
 /**
- * This class is for sending a SNMP trap/info (according to snmp configuration):<br>
- * - if delay is 0, only a warning will be send with the message accordingly<br>
- * - if delay is 1, a notification with the current task and the current message will be send<br>
+ * This class is for sending a SNMP trap/info (according to snmp configuration):<br> - if delay is 0, only a warning
+ * will be send with the message accordingly<br> - if delay is 1, a notification with the current task and the current
+ * message will be send<br>
  * <br>
  *
  * @author Frederic Bregier
- *
  */
 public class SnmpTask extends AbstractTask {
     /**

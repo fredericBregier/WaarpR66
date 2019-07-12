@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Information (on request or on filesystem) JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class InformationJsonPacket extends JsonPacket {
 
@@ -58,8 +57,7 @@ public class InformationJsonPacket extends JsonPacket {
     /**
      * Constructor for File information
      *
-     * @param request
-     *            InformationPacket.ASKENUM ordinal (converted to byte)
+     * @param request InformationPacket.ASKENUM ordinal (converted to byte)
      * @param rulename
      * @param filename
      */
@@ -79,8 +77,7 @@ public class InformationJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isIdRequest
-     *            the isIdRequest to True for Transfer Request, else for File listing
+     * @param isIdRequest the isIdRequest to True for Transfer Request, else for File listing
      */
     public void setIdRequest(boolean isIdRequest) {
         this.isIdRequest = isIdRequest;
@@ -94,8 +91,7 @@ public class InformationJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(long id) {
         this.id = id;
@@ -109,8 +105,7 @@ public class InformationJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isTo
-     *            the isTo to set
+     * @param isTo the isTo to set
      */
     public void setTo(boolean isTo) {
         this.isTo = isTo;
@@ -124,8 +119,7 @@ public class InformationJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param request
-     *            the request to set
+     * @param request the request to set
      */
     public void setRequest(byte request) {
         this.request = request;
@@ -139,8 +133,7 @@ public class InformationJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param rulename
-     *            the rulename to set (if Transfer and Json requester/requested (isTo true/false))
+     * @param rulename the rulename to set (if Transfer and Json requester/requested (isTo true/false))
      */
     public void setRulename(String rulename) {
         this.rulename = rulename;
@@ -154,8 +147,7 @@ public class InformationJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param filename
-     *            the filename to set
+     * @param filename the filename to set
      */
     public void setFilename(String filename) {
         this.filename = filename;

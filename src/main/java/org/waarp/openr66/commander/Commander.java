@@ -36,11 +36,10 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
 
 /**
- * Commander is responsible to read from database updated data from time to time in order to achieve
- * new runner or new configuration updates.
+ * Commander is responsible to read from database updated data from time to time in order to achieve new runner or new
+ * configuration updates.
  *
  * @author Frederic Bregier
- *
  */
 public class Commander implements CommanderInterface {
     /**
@@ -58,6 +57,7 @@ public class Commander implements CommanderInterface {
      * Prepare requests that will be executed from time to time
      *
      * @param runner
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */
@@ -70,8 +70,8 @@ public class Commander implements CommanderInterface {
      * Prepare requests that will be executed from time to time
      *
      * @param runner
-     * @param fromStartup
-     *            True if call from startup of the server
+     * @param fromStartup True if call from startup of the server
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      */

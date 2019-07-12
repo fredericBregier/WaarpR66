@@ -28,7 +28,16 @@ public class Messages {
         } else {
             setSlocale(locale.getLanguage());
         }
-        RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        try {
+            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        } catch (MissingResourceException e) {
+            try {
+                RESOURCE_BUNDLE = ResourceBundle.getBundle("resources/" + BUNDLE_NAME, locale);
+            } catch (MissingResourceException e2) {
+                System.err.println("Can't load resource : " + BUNDLE_NAME);
+                throw e;
+            }
+        }
     }
 
     public static String getString(String key) {

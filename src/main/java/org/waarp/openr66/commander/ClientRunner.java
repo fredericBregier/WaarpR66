@@ -50,7 +50,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Client Runner from a TaskRunner
  *
  * @author Frederic Bregier
- *
  */
 public class ClientRunner extends Thread {
     /**
@@ -197,9 +196,9 @@ public class ClientRunner extends Thread {
     }
 
     /**
-     *
      * @param runner
      * @param limit
+     *
      * @return True if the task was run less than limit, else False
      */
     public boolean incrementTaskRunnerTry(DbTaskRunner runner, int limit) {
@@ -224,6 +223,7 @@ public class ClientRunner extends Thread {
      * True transfer run (can be called directly to enable exception outside any executors)
      *
      * @return The R66Future of the transfer operation
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolNoConnectionException
      * @throws OpenR66ProtocolPacketException
@@ -252,10 +252,11 @@ public class ClientRunner extends Thread {
     /**
      * In case an overloaded signal is returned by the requested
      *
-     * @param retry
-     *            if True, it will retry in case of overloaded remote server, else it just stops
+     * @param retry if True, it will retry in case of overloaded remote server, else it just stops
      * @param localChannelReference
+     *
      * @return The R66Future of the transfer operation
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolNoConnectionException
      * @throws OpenR66ProtocolPacketException
@@ -309,7 +310,9 @@ public class ClientRunner extends Thread {
      * Finish the transfer (called at the end of runTransfer)
      *
      * @param localChannelReference
+     *
      * @return The R66Future of the transfer operation
+     *
      * @throws OpenR66ProtocolNotYetConnectionException
      * @throws OpenR66ProtocolPacketException
      * @throws OpenR66ProtocolNoConnectionException
@@ -403,6 +406,7 @@ public class ClientRunner extends Thread {
      * Initialize the request
      *
      * @return the localChannelReference holding the transfer request
+     *
      * @throws OpenR66ProtocolNoConnectionException
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolPacketException
@@ -593,8 +597,7 @@ public class ClientRunner extends Thread {
     }
 
     /**
-     * @param handler
-     *            the handler to set
+     * @param handler the handler to set
      */
     public void setRecvThroughHandler(RecvThroughHandler handler) {
         this.handler = handler;

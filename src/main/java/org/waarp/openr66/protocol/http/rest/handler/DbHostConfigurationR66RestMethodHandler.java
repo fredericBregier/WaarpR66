@@ -45,7 +45,6 @@ import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler;
  * DbHostConfiguration Rest handler
  *
  * @author "Frederic Bregier"
- *
  */
 public class DbHostConfigurationR66RestMethodHandler extends DataModelRestMethodHandler<DbHostConfiguration> {
     public static final String BASEURI = "hostconfigs";

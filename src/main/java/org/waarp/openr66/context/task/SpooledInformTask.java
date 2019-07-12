@@ -46,7 +46,6 @@ import java.util.TreeMap;
  * Java Task for SpooledDirectory information to the Waarp Server
  *
  * @author Frederic Bregier
- *
  */
 public class SpooledInformTask extends AbstractExecJavaTask {
 
@@ -61,9 +60,9 @@ public class SpooledInformTask extends AbstractExecJavaTask {
 
     /**
      * @param detailed
-     * @param status
-     *            1 for ok, -1 for ko, 0 for all
+     * @param status 1 for ok, -1 for ko, 0 for all
      * @param uri
+     *
      * @return the StringBuilder containing the HTML format as a Table of the current Spooled information
      */
     public static StringBuilder buildSpooledTable(boolean detailed, int status, String uri) {
@@ -83,6 +82,7 @@ public class SpooledInformTask extends AbstractExecJavaTask {
     /**
      * @param name
      * @param uri
+     *
      * @return the StringBuilder containing the HTML format as a Table of the current Spooled information
      */
     public static StringBuilder buildSpooledUniqueTable(String uri, String name) {
@@ -110,6 +110,7 @@ public class SpooledInformTask extends AbstractExecJavaTask {
     /**
      * @param detailed
      * @param uri
+     *
      * @return the associated StringBuilder as temporary result
      */
     private static StringBuilder beginSpooledTable(boolean detailed, String uri) {
@@ -247,9 +248,9 @@ public class SpooledInformTask extends AbstractExecJavaTask {
 
     /**
      * @param detailed
-     * @param status
-     *            1 for ok, -1 for ko, 0 for all
+     * @param status 1 for ok, -1 for ko, 0 for all
      * @param uri
+     *
      * @return the String containing the JSON format of the current Spooled information
      */
     public static String buildSpooledJson(boolean detailed, int status, String uri) {
@@ -268,6 +269,7 @@ public class SpooledInformTask extends AbstractExecJavaTask {
     /**
      * @param name
      * @param uri
+     *
      * @return the String containing the JSON format of the current Spooled information
      */
     public static String buildSpooledUniqueJson(String uri, String name) {

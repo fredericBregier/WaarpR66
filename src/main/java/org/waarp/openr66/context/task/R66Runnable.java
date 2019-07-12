@@ -19,46 +19,34 @@ package org.waarp.openr66.context.task;
 import org.waarp.openr66.context.R66Session;
 
 /**
- * Runnable interface for internal R66 tasks (through Rule EXECJAVA, or through message
- * BusinessRequestPacket)
+ * Runnable interface for internal R66 tasks (through Rule EXECJAVA, or through message BusinessRequestPacket)
  *
  * @author Frederic Bregier
- *
  */
 public interface R66Runnable extends Runnable {
 
     /**
      * The way the parameter will be set
      *
-     * @param session
-     *            The current R66Session
-     * @param waitForValidation
-     *            True if the caller will wait up to delay time in ms
-     * @param useLocalExec
-     *            True if currently R66 is configured to use LocalExec (may be ignored)
-     * @param delay
-     *            Delay in ms used only if waitForValidation is True
-     * @param classname
-     *            The Classname
-     * @param arg
-     *            full argument
-     * @param callFromBusiness
-     *            True if called from Business operation, not task
-     * @param isToValidate
-     *            True if the call from Business is to Validate
+     * @param session The current R66Session
+     * @param waitForValidation True if the caller will wait up to delay time in ms
+     * @param useLocalExec True if currently R66 is configured to use LocalExec (may be ignored)
+     * @param delay Delay in ms used only if waitForValidation is True
+     * @param classname The Classname
+     * @param arg full argument
+     * @param callFromBusiness True if called from Business operation, not task
+     * @param isToValidate True if the call from Business is to Validate
      */
     public void setArgs(R66Session session, boolean waitForValidation,
                         boolean useLocalExec, int delay, String classname, String arg, boolean callFromBusiness,
                         boolean isToValidate);
 
     /**
-     *
      * @return the final status where 0 is OK, 1 is Warning, 2 is Error
      */
     public int getFinalStatus();
 
     /**
-     *
      * @return Information on task
      */
     public String toString();

@@ -34,16 +34,15 @@ import java.util.Date;
 
 /**
  * Transfer task:<br>
- *
- * Result of arguments will be as r66send command.<br>
- * Format is like r66send command in any order except "-info" which should be the last item, and "-copyinfo"
- * will copy at first place the original transfer information as the new one, while still having the possibility to add new informations through "-info":<br>
- * "-file filepath -to requestedHost -rule rule [-md5] [-start yyyyMMddHHmmss or -delay (delay or +delay)] [-copyinfo] [-info information]" <br>
+ * <p>
+ * Result of arguments will be as r66send command.<br> Format is like r66send command in any order except "-info" which
+ * should be the last item, and "-copyinfo" will copy at first place the original transfer information as the new one,
+ * while still having the possibility to add new informations through "-info":<br> "-file filepath -to requestedHost
+ * -rule rule [-md5] [-start yyyyMMddHHmmss or -delay (delay or +delay)] [-copyinfo] [-info information]" <br>
  * <br>
  * INFO is the only one field that can contains blank character.<br>
  *
  * @author Frederic Bregier
- *
  */
 public class TransferTask extends AbstractExecTask {
     /**

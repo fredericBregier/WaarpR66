@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Keep Alive class
- *
+ * <p>
  * header = empty middle = way end = empty
  *
  * @author frederic bregier
@@ -43,6 +43,7 @@ public class KeepAlivePacket extends AbstractLocalPacket {
     }
 
     /**
+     *
      */
     public KeepAlivePacket() {
         way = ASKVALIDATE;
@@ -53,7 +54,9 @@ public class KeepAlivePacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new EndTransferPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static KeepAlivePacket createFromBuffer(int headerLength,

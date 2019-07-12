@@ -34,7 +34,6 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * class for direct Business Request call
  *
  * @author Frederic Bregier
- *
  */
 public class BusinessRequest extends AbstractBusinessRequest {
     /**

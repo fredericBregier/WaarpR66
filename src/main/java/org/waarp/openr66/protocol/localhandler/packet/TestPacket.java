@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Test class for packet
- *
+ * <p>
  * 3 strings: sheader,smiddle,send
  *
  * @author frederic bregier

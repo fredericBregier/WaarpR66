@@ -17,6 +17,9 @@
  * R66 REST HTTP Client package
  *
  * @author "Frederic Bregier"
+ * <p>
+ * R66 REST HTTP Client package
+ * @author "Frederic Bregier"
  */
 /**
  * R66 REST HTTP Client package

@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Bandwidth setting or getting JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class BandwidthJsonPacket extends JsonPacket {
 
@@ -37,8 +36,7 @@ public class BandwidthJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param setter
-     *            the setter to set
+     * @param setter the setter to set
      */
     public void setSetter(boolean setter) {
         this.setter = setter;
@@ -52,8 +50,7 @@ public class BandwidthJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param writeglobal
-     *            the writeglobal to set
+     * @param writeglobal the writeglobal to set
      */
     public void setWriteglobal(long writeglobal) {
         this.writeglobal = writeglobal;
@@ -67,8 +64,7 @@ public class BandwidthJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param readglobal
-     *            the readglobal to set
+     * @param readglobal the readglobal to set
      */
     public void setReadglobal(long readglobal) {
         this.readglobal = readglobal;
@@ -82,8 +78,7 @@ public class BandwidthJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param writesession
-     *            the writesession to set
+     * @param writesession the writesession to set
      */
     public void setWritesession(long writesession) {
         this.writesession = writesession;
@@ -97,8 +92,7 @@ public class BandwidthJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param readsession
-     *            the readsession to set
+     * @param readsession the readsession to set
      */
     public void setReadsession(long readsession) {
         this.readsession = readsession;

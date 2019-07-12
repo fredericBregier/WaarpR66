@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Frederic Bregier
- *
  */
 public class NetworkSslServerInitializer extends ChannelInitializer<SocketChannel> {
     private static WaarpSslContextFactory waarpSslContextFactory;
@@ -42,9 +41,7 @@ public class NetworkSslServerInitializer extends ChannelInitializer<SocketChanne
     protected final boolean isClient;
 
     /**
-     *
-     * @param isClient
-     *            True if this Factory is to be used in Client mode
+     * @param isClient True if this Factory is to be used in Client mode
      */
     public NetworkSslServerInitializer(boolean isClient) {
         super();

@@ -30,71 +30,61 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Reschedule Transfer task to a time delayed by the specified number of milliseconds, if the error
- * code is one of the specified codes and the optional intervals of date are compatible with the new
- * time schedule<br>
+ * Reschedule Transfer task to a time delayed by the specified number of milliseconds, if the error code is one of the
+ * specified codes and the optional intervals of date are compatible with the new time schedule<br>
  * <br>
- *
+ * <p>
  * Result of arguments will be as following options (the two first are mandatory):<br>
  * <br>
- *
+ * <p>
  * "-delay ms" where ms is the added number of ms on current time before retry on schedule<br>
  * <br>
- * "-case errorCode,errorCode,..." where errorCode is one of the following error of the current
- * transfer (either literal or code in 1 character:<br>
- * ConnectionImpossible(C), ServerOverloaded(l), BadAuthent(A), ExternalOp(E), TransferError(T),
- * MD5Error(M), Disconnection(D), RemoteShutdown(r), FinalOp(F), Unimplemented(U), Shutdown(S),
+ * "-case errorCode,errorCode,..." where errorCode is one of the following error of the current transfer (either literal
+ * or code in 1 character:<br> ConnectionImpossible(C), ServerOverloaded(l), BadAuthent(A), ExternalOp(E),
+ * TransferError(T), MD5Error(M), Disconnection(D), RemoteShutdown(r), FinalOp(F), Unimplemented(U), Shutdown(S),
  * RemoteError(R), Internal(I), StoppedTransfer(H), CanceledTransfer(K), Warning(W), Unknown(-),
- * QueryAlreadyFinished(Q), QueryStillRunning(s), NotKnownHost(N), QueryRemotelyUnknown(u),
- * FileNotFound(f), CommandNotFound(c), PassThroughMode(p)<br>
+ * QueryAlreadyFinished(Q), QueryStillRunning(s), NotKnownHost(N), QueryRemotelyUnknown(u), FileNotFound(f),
+ * CommandNotFound(c), PassThroughMode(p)<br>
  * <br>
- * "-between start;end" and/or "-notbetween start;end" (multiple times are allowed, start or end can
- * be not set) and where start and stop are in the following format:<br>
- * Yn:Mn:Dn:Hn:mn:Sn where n is a number for each time specification, each specification is
- * optional, as Y=Year, M=Month, D=Day, H=Hour, m=minute, s=second.<br>
- * Format can be X+n, X-n, X=n or Xn where X+-n means adding/subtracting n to current date value,
- * while X=n or Xn means setting exact value<br>
- * If one time specification is not set, it is based on the current date.<br>
+ * "-between start;end" and/or "-notbetween start;end" (multiple times are allowed, start or end can be not set) and
+ * where start and stop are in the following format:<br> Yn:Mn:Dn:Hn:mn:Sn where n is a number for each time
+ * specification, each specification is optional, as Y=Year, M=Month, D=Day, H=Hour, m=minute, s=second.<br> Format can
+ * be X+n, X-n, X=n or Xn where X+-n means adding/subtracting n to current date value, while X=n or Xn means setting
+ * exact value<br> If one time specification is not set, it is based on the current date.<br>
  * <br>
  * "-count limit" will be the limit of retry. The current value limit is taken from the "transferInfo" internal code
- * (not any more the "information of transfer")and not from the rule
- * as "{"CPTLIMIT": limit}" as JSON code. Each time this function is called, the
- * limit value will be replaced as newlimit = limit - 1 in the "transferInfo" as "{"CPTLIMIT": limit}" as JSON code.<br>
- * To ensure correctness, the value must be in the "transferInfo" internal code since this value will be
- * changed statically in the "transferInfo". If taken from the rule, it will be wrong since
- * the value will never decrease. However, a value must be setup in the rule in order to reset the value
- * when the count reach 0. <br>
- * So in the rule, "-count resetlimit" must be present, where resetlimit will be
- * the new value set when the limit reach 0, and in the "transferInfo" internal code,
- * "{"CPTLIMIT": limit}" as JSON code must be present. If one is missing, the condition is not applied. <br>
+ * (not any more the "information of transfer")and not from the rule as "{"CPTLIMIT": limit}" as JSON code. Each time
+ * this function is called, the limit value will be replaced as newlimit = limit - 1 in the "transferInfo" as
+ * "{"CPTLIMIT": limit}" as JSON code.<br> To ensure correctness, the value must be in the "transferInfo" internal code
+ * since this value will be changed statically in the "transferInfo". If taken from the rule, it will be wrong since the
+ * value will never decrease. However, a value must be setup in the rule in order to reset the value when the count
+ * reach 0. <br> So in the rule, "-count resetlimit" must be present, where resetlimit will be the new value set when
+ * the limit reach 0, and in the "transferInfo" internal code, "{"CPTLIMIT": limit}" as JSON code must be present. If
+ * one is missing, the condition is not applied. <br>
  * <br>
- * If "-notbetween" is specified, the planned date must not be in the area.<br>
- * If "-between" is specified, the planned date must be found in any such specified areas (could be
- * in any of the occurrence). If not specified, it only depends on "-notbetween".<br>
- * If none is specified, the planned date is always valid.<br>
+ * If "-notbetween" is specified, the planned date must not be in the area.<br> If "-between" is specified, the planned
+ * date must be found in any such specified areas (could be in any of the occurrence). If not specified, it only depends
+ * on "-notbetween".<br> If none is specified, the planned date is always valid.<br>
  * <br>
- *
- * Note that if a previous called to a reschedule was done for this attempt and was successful, the
- * following calls will be ignored.<br>
+ * <p>
+ * Note that if a previous called to a reschedule was done for this attempt and was successful, the following calls will
+ * be ignored.<br>
  * <br>
  * <B>Important note: any subsequent task will be ignored and not executed once the reschedule is accepted.</B><br>
  * <br>
- * In case start > end, end will be +1 day<br>
- * In case start and end < current planned date, both will have +1 day.<br>
+ * In case start > end, end will be +1 day<br> In case start and end < current planned date, both will have +1 day.<br>
  * <br>
- *
- * Example: -delay 3600000 -case ConnectionImpossible,ServerOverloaded,Shutdown -notbetween
- * H7:m0:S0;H19:m0:S0 -notbetween H1:m0:S0;H=3:m0:S0<br>
- * means retry in case of error during initialization of connection in 1 hour if not between 7AM to
- * 7PM and not between 1AM to 3AM.<br>
+ * <p>
+ * Example: -delay 3600000 -case ConnectionImpossible,ServerOverloaded,Shutdown -notbetween H7:m0:S0;H19:m0:S0
+ * -notbetween H1:m0:S0;H=3:m0:S0<br> means retry in case of error during initialization of connection in 1 hour if not
+ * between 7AM to 7PM and not between 1AM to 3AM.<br>
  *
  * @author Frederic Bregier
- *
  */
 public class RescheduleTransferTask extends AbstractTask {
     /**
-     * Delimiter for -count option in Reschedule to be placed in the transfer info of transfer as
-     * {"CPTLIMIT": limit} where limit is an integer.
+     * Delimiter for -count option in Reschedule to be placed in the transfer info of transfer as {"CPTLIMIT": limit}
+     * where limit is an integer.
      */
     public static final String CPTLIMIT = "CPTLIMIT";
     public static final String CPTTOTAL = "CPTTOTAL";
@@ -404,10 +394,9 @@ public class RescheduleTransferTask extends AbstractTask {
     }
 
     /**
+     * @param values as X+n or X-n or X=n or Xn where X=Y/M/D/H/m/s, n=number and +/- meaning adding/subtracting from
+     * current date and = meaning specific set value
      *
-     * @param values
-     *            as X+n or X-n or X=n or Xn where X=Y/M/D/H/m/s, n=number and +/- meaning
-     *            adding/subtracting from current date and = meaning specific set value
      * @return the Calendar if any specification, or null if no calendar specified
      */
     private Calendar getCalendar(String[] values) {

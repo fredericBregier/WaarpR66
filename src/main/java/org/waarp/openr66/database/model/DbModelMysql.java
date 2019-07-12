@@ -41,7 +41,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * MySQL Database Model implementation
  *
  * @author Frederic Bregier
- *
  */
 public class DbModelMysql extends org.waarp.common.database.model.DbModelMysql {
     private final ReentrantLock lock = new ReentrantLock();
@@ -52,6 +51,7 @@ public class DbModelMysql extends org.waarp.common.database.model.DbModelMysql {
      * @param dbserver
      * @param dbuser
      * @param dbpasswd
+     *
      * @throws WaarpDatabaseNoConnectionException
      */
     public DbModelMysql(String dbserver, String dbuser, String dbpasswd)

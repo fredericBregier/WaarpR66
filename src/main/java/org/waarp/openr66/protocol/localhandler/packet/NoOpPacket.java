@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * No Op class
- *
+ * <p>
  * header = empty middle = empty end = empty
  *
  * @author frederic bregier
@@ -35,7 +35,9 @@ public class NoOpPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new EndTransferPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static NoOpPacket createFromBuffer(int headerLength,

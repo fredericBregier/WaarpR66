@@ -31,7 +31,6 @@ import java.util.Map.Entry;
  * This method allows to format output for Waarp R66 clients
  *
  * @author "Frederic Bregier"
- *
  */
 public class OutputFormat extends JsonHandler {
     static OUTPUTFORMAT defaultOutput = OUTPUTFORMAT.JSON;
@@ -77,7 +76,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @return True if the current default output format is on QUIET
      */
     public static boolean isQuiet() {
@@ -94,7 +92,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param values
      */
     public void setValue(Map<String, Object> values) {
@@ -104,7 +101,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param values
      */
     public void setValueString(Map<String, String> values) {
@@ -114,7 +110,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param node
      */
     public void setValueString(ObjectNode node) {
@@ -122,7 +117,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
      * @param value
      */
@@ -131,7 +125,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
      * @param value
      */
@@ -140,7 +133,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
      * @param value
      */
@@ -149,7 +141,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
      * @param value
      */
@@ -158,7 +149,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
      * @param value
      */
@@ -167,7 +157,6 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
      * @param value
      */
@@ -176,8 +165,8 @@ public class OutputFormat extends JsonHandler {
     }
 
     /**
-     *
      * @param field
+     *
      * @return True if all fields exist
      */
     public final boolean exist(String... field) {
@@ -216,6 +205,7 @@ public class OutputFormat extends JsonHandler {
      * Helper to get string representation of the current object
      *
      * @param format
+     *
      * @return the String representation
      */
     public String toString(OUTPUTFORMAT format) {

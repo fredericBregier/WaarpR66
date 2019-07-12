@@ -48,7 +48,6 @@ import static org.waarp.openr66.context.R66FiniteDualStates.*;
  * Business Http REST interface: http://host/business?... + BusinessRequestJsonPacket as GET
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestBusinessR66Handler extends HttpRestAbstractR66Handler {
 

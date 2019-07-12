@@ -22,7 +22,6 @@ import org.waarp.openr66.database.DbConstant;
  * Class to retrieve the number of runner and the higher rank.
  *
  * @author Frederic Bregier
- *
  */
 public class NbAndSpecialId {
     public int nb = 0;

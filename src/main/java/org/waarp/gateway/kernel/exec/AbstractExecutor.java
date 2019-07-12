@@ -25,28 +25,21 @@ import org.waarp.gateway.kernel.session.CommandExecutorInterface;
 import org.waarp.gateway.kernel.session.HttpAuthInterface;
 
 /**
- * Abstract Executor class. If the command starts with "REFUSED", the command will be refused for
- * execution. If "REFUSED" is set, the command "RETR" or "STOR" like operations will be stopped at
- * starting of command.<br>
- * If the command starts with "EXECUTE", the following will be a command to be executed.<br>
- * If the command starts with "JAVAEXECUTE", the following will be a command through Java class to
- * be executed.<br>
- * If the command starts with "R66PREPARETRANSFER", the following will be a r66 prepare transfer
- * execution (asynchronous operation only).<br>
- *
- *
- * The following replacement are done dynamically before the command is executed:<br>
- * - #BASEPATH# is replaced by the full path for the root of FTP Directory<br>
- * - #FILE# is replaced by the current file path relative to FTP Directory (so #BASEPATH##FILE# is
- * the full path of the file)<br>
- * - #USER# is replaced by the username<br>
- * - #ACCOUNT# is replaced by the account<br>
- * - #COMMAND# is replaced by the command issued for the file<br>
- * - #SPECIALID# is replaced by the FTP id of the transfer (whatever in or out)<br>
- * - #UUID# is replaced by a special UUID globally unique for the transfer, in general to be placed in -info part (for instance ##UUID## giving #uuid#)<br>
+ * Abstract Executor class. If the command starts with "REFUSED", the command will be refused for execution. If
+ * "REFUSED" is set, the command "RETR" or "STOR" like operations will be stopped at starting of command.<br> If the
+ * command starts with "EXECUTE", the following will be a command to be executed.<br> If the command starts with
+ * "JAVAEXECUTE", the following will be a command through Java class to be executed.<br> If the command starts with
+ * "R66PREPARETRANSFER", the following will be a r66 prepare transfer execution (asynchronous operation only).<br>
+ * <p>
+ * <p>
+ * The following replacement are done dynamically before the command is executed:<br> - #BASEPATH# is replaced by the
+ * full path for the root of FTP Directory<br> - #FILE# is replaced by the current file path relative to FTP Directory
+ * (so #BASEPATH##FILE# is the full path of the file)<br> - #USER# is replaced by the username<br> - #ACCOUNT# is
+ * replaced by the account<br> - #COMMAND# is replaced by the command issued for the file<br> - #SPECIALID# is replaced
+ * by the FTP id of the transfer (whatever in or out)<br> - #UUID# is replaced by a special UUID globally unique for the
+ * transfer, in general to be placed in -info part (for instance ##UUID## giving #uuid#)<br>
  *
  * @author Frederic Bregier
- *
  */
 public abstract class AbstractExecutor {
     protected static final String USER = "#USER#";
@@ -137,6 +130,7 @@ public abstract class AbstractExecutor {
      * Check if the given operation is allowed Globally
      *
      * @param isStore
+     *
      * @return True if allowed, else False
      */
     public static boolean isValidOperation(boolean isStore) {
@@ -144,13 +138,9 @@ public abstract class AbstractExecutor {
     }
 
     /**
-     * @param auth
-     *            the current Authentication
-     * @param args
-     *            containing in that order
-     *            "User Account BaseDir FilePath(relative to BaseDir) Command"
-     * @param isStore
-     *            True for a STORE like operation, else False
+     * @param auth the current Authentication
+     * @param args containing in that order "User Account BaseDir FilePath(relative to BaseDir) Command"
+     * @param isStore True for a STORE like operation, else False
      * @param futureCompletion
      */
     public static AbstractExecutor createAbstractExecutor(HttpAuthInterface auth,
@@ -218,10 +208,9 @@ public abstract class AbstractExecutor {
     }
 
     /**
-     *
      * @param command
-     * @param args
-     *            as {User, Account, BaseDir, FilePath(relative to BaseDir), Command}
+     * @param args as {User, Account, BaseDir, FilePath(relative to BaseDir), Command}
+     *
      * @return the prepared command
      */
     public static String getPreparedCommand(String command, String[] args) {
@@ -299,7 +288,6 @@ public abstract class AbstractExecutor {
         public long pstorDelay;
 
         /**
-         *
          * @param retrieve
          * @param retrDelay
          * @param store

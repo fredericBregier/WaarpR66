@@ -81,7 +81,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author "Frederic Bregier"
- *
  */
 public class HttpTestRestR66Client implements Runnable {
     private static final String keydesfilename = "/opt/R66/certs/test-key.des";

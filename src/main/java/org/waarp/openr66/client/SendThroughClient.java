@@ -48,11 +48,10 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * Class for Send Through client
- *
- * This class does not included the real file transfer since it is up to the business project to
- * implement how to read new data to be sent to the remote host. If an error occurs, no transfer log
- * is kept.
- *
+ * <p>
+ * This class does not included the real file transfer since it is up to the business project to implement how to read
+ * new data to be sent to the remote host. If an error occurs, no transfer log is kept.
+ * <p>
  * 1) Configuration must have been loaded<br>
  * <br>
  * 2) Pipeline and NetworkTransaction must have been initiated:<br>
@@ -69,8 +68,8 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * <tt>     DataBlock block = transaction.transformToDataBlock(data);</tt><br>
  * <tt>     futureWrite = transaction.writeWhenPossible(block);</tt><br>
  * <br>
- * 5) Once you have finished, so this is the last block, you have to do the following:<br>
- * If the last block is not empty:<br>
+ * 5) Once you have finished, so this is the last block, you have to do the following:<br> If the last block is not
+ * empty:<br>
  * <tt>     DataBlock block = transaction.transformToDataBlock(data);</tt><br>
  * <tt>     block.setEOF(true);</tt><br>
  * Or if the last block is empty:<br>
@@ -86,8 +85,8 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * <tt>     futureReq.awaitUninterruptibly();</tt><br>
  * <tt>     R66Result result = futureReq.getResult();</tt><br>
  * <br>
- * 7) If there is the need to re-do, just re-execute the steps from 3 to 6.<br>
- * Don't forget at the very end to finish the global structure (steps 3 to 6 no more executed):<br>
+ * 7) If there is the need to re-do, just re-execute the steps from 3 to 6.<br> Don't forget at the very end to finish
+ * the global structure (steps 3 to 6 no more executed):<br>
  * <tt>     networkTransaction.closeAll();</tt><br>
  * <br>
  * 8) In case of errors during steps 4 or 5 (and only those), call the following:<br>
@@ -97,10 +96,8 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * <br>
  * <br>
  *
- * @see TestSendThroughClient Class as example of usage in test part
- *
  * @author Frederic Bregier
- *
+ * @see TestSendThroughClient Class as example of usage in test part
  */
 public abstract class SendThroughClient extends AbstractTransfer {
     protected final NetworkTransaction networkTransaction;
@@ -134,9 +131,9 @@ public abstract class SendThroughClient extends AbstractTransfer {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources. Note that this is only
-     * the first part of the execution for this client.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources. Note that this is only the first part of the
+     * execution for this client.
      *
      * @return True if the initiate of the request is OK, else False
      */
@@ -330,6 +327,7 @@ public abstract class SendThroughClient extends AbstractTransfer {
      * Write the next block when the channel is ready to prevent OOM
      *
      * @param block
+     *
      * @return the ChannelFuture on the write operation
      *
      * @throws OpenR66RunnerErrorException
@@ -345,8 +343,8 @@ public abstract class SendThroughClient extends AbstractTransfer {
     /**
      * Utility method for send through mode
      *
-     * @param data
-     *            the data byte, if null it is the last block
+     * @param data the data byte, if null it is the last block
+     *
      * @return the DataBlock associated to the data
      */
     public DataBlock transformToDataBlock(byte[] data) {

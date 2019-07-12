@@ -45,7 +45,6 @@ import java.util.List;
  * Authentication from File support
  *
  * @author Frederic Bregier
- *
  */
 public class AuthenticationFileBasedConfiguration {
     /**
@@ -111,7 +110,6 @@ public class AuthenticationFileBasedConfiguration {
             .getLogger(AuthenticationFileBasedConfiguration.class);
     /**
      * Structure of the Configuration file
-     *
      */
     private static final XmlDecl[] configAuthenticationDecls = {
             // identity
@@ -142,6 +140,7 @@ public class AuthenticationFileBasedConfiguration {
      * Load Authentication from File
      *
      * @param filename
+     *
      * @return True if OK
      */
     @SuppressWarnings("unchecked")
@@ -272,6 +271,7 @@ public class AuthenticationFileBasedConfiguration {
      *
      * @param name
      * @param value
+     *
      * @return the new Element
      */
     private static Element newElement(String name, String value) {
@@ -284,6 +284,7 @@ public class AuthenticationFileBasedConfiguration {
      * Write all authentication to a file with filename
      *
      * @param filename
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException

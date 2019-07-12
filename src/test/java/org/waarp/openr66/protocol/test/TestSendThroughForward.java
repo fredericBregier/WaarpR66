@@ -46,11 +46,10 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * <b>WARNING: This class is not functional neither integrated</b><br>
- *
- * Test class for Send Through to another R66 Server as forward<br>
- * Only a subpart of SenThroughClient is to be made since steps 1-2 and steps 7-8 are only for
- * client, not for server.
- *
+ * <p>
+ * Test class for Send Through to another R66 Server as forward<br> Only a subpart of SenThroughClient is to be made
+ * since steps 1-2 and steps 7-8 are only for client, not for server.
+ * <p>
  * 3) Prepare the request of transfer:<br>
  * <tt>     R66Future futureReq = new R66Future(true);</tt><br>
  * <tt>     TestSendThroughForward transaction = new TestSendThroughForward(futureReq,...);</tt><br>
@@ -59,8 +58,8 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * 4) Once initiateRequest() gives true, you are ready to send the data in through mode using the
  * TestRecvThroughForwardHandler:<br>
  * <br>
- * 5) Once you have finished, so this is the last block, you have to do the following:<br>
- * If the last block is not empty:<br>
+ * 5) Once you have finished, so this is the last block, you have to do the following:<br> If the last block is not
+ * empty:<br>
  * <tt>     DataBlock block = transaction.transformToDataBlock(data);</tt><br>
  * <tt>     block.setEOF(true);</tt><br>
  * <tt>     futureWrite = transaction.writeWhenPossible(block);</tt><br>
@@ -77,7 +76,6 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * <br>
  *
  * @author Frederic Bregier
- *
  */
 public class TestSendThroughForward extends SendThroughClient {
     public TestRecvThroughForwardHandler handler;
@@ -94,11 +92,9 @@ public class TestSendThroughForward extends SendThroughClient {
      * @param isMD5
      * @param blocksize
      * @param networkTransaction
-     * @param idt
-     *            Id Transfer if any temptative already exists
+     * @param idt Id Transfer if any temptative already exists
      * @param dbSession
-     * @param runner
-     *            (recv runner)
+     * @param runner (recv runner)
      */
     public TestSendThroughForward(R66Future future, String remoteHost,
                                   String filename, String rulename, String fileinfo, boolean isMD5,

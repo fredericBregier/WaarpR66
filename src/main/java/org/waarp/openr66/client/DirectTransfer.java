@@ -41,7 +41,6 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * Direct Transfer from a client with or without database connection
  *
  * @author Frederic Bregier
- *
  */
 public class DirectTransfer extends AbstractTransfer {
     protected final NetworkTransaction networkTransaction;
@@ -179,8 +178,8 @@ public class DirectTransfer extends AbstractTransfer {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

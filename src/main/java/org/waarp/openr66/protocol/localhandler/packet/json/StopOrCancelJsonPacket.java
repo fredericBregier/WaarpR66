@@ -23,7 +23,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * Stop or Cancel one request JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class StopOrCancelJsonPacket extends JsonPacket {
 
@@ -39,8 +38,7 @@ public class StopOrCancelJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param requester
-     *            the requester to set
+     * @param requester the requester to set
      */
     public void setRequester(String requester) {
         this.requester = requester;
@@ -54,8 +52,7 @@ public class StopOrCancelJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param requested
-     *            the requested to set
+     * @param requested the requested to set
      */
     public void setRequested(String requested) {
         this.requested = requested;
@@ -69,8 +66,7 @@ public class StopOrCancelJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param specialid
-     *            the specialid to set
+     * @param specialid the specialid to set
      */
     public void setSpecialid(long specialid) {
         this.specialid = specialid;

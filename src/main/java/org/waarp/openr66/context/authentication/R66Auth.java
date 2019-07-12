@@ -35,7 +35,6 @@ import java.io.File;
 
 /**
  * @author frederic bregier
- *
  */
 public class R66Auth extends FilesystemBasedAuthImpl {
     /**
@@ -67,6 +66,7 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     /**
      * @param dbSession
      * @param server
+     *
      * @return the SimpleAuth if any for this user
      */
     @Deprecated
@@ -102,11 +102,11 @@ public class R66Auth extends FilesystemBasedAuthImpl {
      * @param dbSession
      * @param hostId
      * @param arg0
+     *
      * @return True if the connection is OK (authentication is OK)
-     * @throws Reply530Exception
-     *             if the authentication is wrong
-     * @throws Reply421Exception
-     *             If the service is not available
+     *
+     * @throws Reply530Exception if the authentication is wrong
+     * @throws Reply421Exception If the service is not available
      */
     @Deprecated
     public boolean connection(DbSession dbSession, String hostId, byte[] arg0,
@@ -118,11 +118,11 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     /**
      * @param hostId
      * @param arg0
+     *
      * @return True if the connection is OK (authentication is OK)
-     * @throws Reply530Exception
-     *             if the authentication is wrong
-     * @throws Reply421Exception
-     *             If the service is not available
+     *
+     * @throws Reply530Exception if the authentication is wrong
+     * @throws Reply421Exception If the service is not available
      */
     public boolean connection(String hostId, byte[] arg0, boolean isSsl)
             throws Reply530Exception, Reply421Exception {
@@ -181,8 +181,8 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     }
 
     /**
-     *
      * @param key
+     *
      * @return True if the key is valid for the current user
      */
     public boolean isKeyValid(byte[] key) {
@@ -190,12 +190,10 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     }
 
     /**
-     * Set the root relative Path from current status of Authentication (should be the highest level
-     * for the current authentication). If setBusinessRootFromAuth returns null, by default set
-     * /user.
+     * Set the root relative Path from current status of Authentication (should be the highest level for the current
+     * authentication). If setBusinessRootFromAuth returns null, by default set /user.
      *
-     * @exception Reply421Exception
-     *                if the business root is not available
+     * @throws Reply421Exception if the business root is not available
      */
     private void setRootFromAuth() throws Reply421Exception {
         rootFromAuth = setBusinessRootFromAuth();
@@ -226,8 +224,8 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     }
 
     /**
-     *
      * @param roleCheck
+     *
      * @return True if the current role contains the specified role to check
      */
     public boolean isValidRole(ROLE roleCheck) {
@@ -235,7 +233,6 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     }
 
     /**
-     *
      * @return True if the associated host is using SSL
      */
     public boolean isSsl() {
@@ -289,17 +286,17 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     }
 
     /**
-     * connection from HTTPS (no default rights, must be set either as admin or specifically through ROLEs).
-     * Only "false client" with port with negative values are allowed.
+     * connection from HTTPS (no default rights, must be set either as admin or specifically through ROLEs). Only "false
+     * client" with port with negative values are allowed.
      *
      * @param dbSession
      * @param hostId
      * @param arg0
+     *
      * @return True if the connection is OK (authentication is OK)
-     * @throws Reply530Exception
-     *             if the authentication is wrong
-     * @throws Reply421Exception
-     *             If the service is not available
+     *
+     * @throws Reply530Exception if the authentication is wrong
+     * @throws Reply421Exception If the service is not available
      */
     public boolean connectionHttps(DbSession dbSession, String hostId, byte[] arg0)
             throws Reply530Exception, Reply421Exception {
@@ -348,7 +345,6 @@ public class R66Auth extends FilesystemBasedAuthImpl {
     }
 
     /**
-     *
      * @return a copy of the Role of the current authenticated partner
      */
     public RoleDefault getRole() {

@@ -20,7 +20,6 @@ package org.waarp.openr66.protocol.exception;
  * Protocol exception due to no Data exception
  *
  * @author Frederic Bregier
- *
  */
 public class OpenR66ProtocolNoDataException extends OpenR66Exception {
 

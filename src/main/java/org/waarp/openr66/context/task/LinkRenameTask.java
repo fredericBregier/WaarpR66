@@ -26,12 +26,11 @@ import java.io.File;
 
 /**
  * Create a link of the current file and make the file pointing to it.
- *
- * The link first tries to be a hard link, then a soft link, and if really not possible (not
- * supported by the filesystem), it does a copy and rename task.
+ * <p>
+ * The link first tries to be a hard link, then a soft link, and if really not possible (not supported by the
+ * filesystem), it does a copy and rename task.
  *
  * @author Frederic Bregier
- *
  */
 public class LinkRenameTask extends AbstractTask {
     /**

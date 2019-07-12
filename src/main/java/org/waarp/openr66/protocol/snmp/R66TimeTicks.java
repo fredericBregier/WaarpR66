@@ -23,7 +23,6 @@ import org.waarp.snmp.interf.WaarpTimeTicks;
  * R66 TimeTicks SNMP implementation
  *
  * @author Frederic Bregier
- *
  */
 class R66TimeTicks extends WaarpTimeTicks {
 

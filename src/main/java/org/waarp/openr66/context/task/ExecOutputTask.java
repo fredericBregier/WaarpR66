@@ -39,17 +39,16 @@ import java.io.PipedOutputStream;
 
 /**
  * Execute an external command and Use the output if an error occurs.<br>
- *
- * The output is ignored if the command has a correct status.<br>
- * In case of error, if the output finishes with <tt>NEWFINALNAME:xxx</tt> then this part is removed from the output
- * and the xxx is used as the last valid name for the file (meaning the file was moved or renamed even in case of error)<br>
+ * <p>
+ * The output is ignored if the command has a correct status.<br> In case of error, if the output finishes with
+ * <tt>NEWFINALNAME:xxx</tt> then this part is removed from the output and the xxx is used as the last valid name for
+ * the file (meaning the file was moved or renamed even in case of error)<br>
  * <br>
- *
- * waitForValidation (#NOWAIT#) must not be set since it will prevent to have the feedback in case
- * of error. So it is ignored.
+ * <p>
+ * waitForValidation (#NOWAIT#) must not be set since it will prevent to have the feedback in case of error. So it is
+ * ignored.
  *
  * @author Frederic Bregier
- *
  */
 public class ExecOutputTask extends AbstractExecTask {
     /**

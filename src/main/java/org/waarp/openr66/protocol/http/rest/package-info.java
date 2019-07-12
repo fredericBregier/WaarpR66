@@ -17,6 +17,9 @@
  * Http Rest R66 interface
  *
  * @author "Frederic Bregier"
+ * <p>
+ * Http Rest R66 interface
+ * @author "Frederic Bregier"
  */
 /**
  * Http Rest R66 interface

@@ -28,7 +28,6 @@ import java.io.File;
  * Copy task
  *
  * @author Frederic Bregier
- *
  */
 public class CopyTask extends AbstractTask {
     /**

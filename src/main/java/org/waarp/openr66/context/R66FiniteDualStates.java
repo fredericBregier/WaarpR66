@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Finite Dual State Machine for OpenR66 (Requester=R, requesteD=D, Sender=S, Receive=R)
  *
  * @author Frederic Bregier
- *
  */
 public enum R66FiniteDualStates {
     OPENEDCHANNEL, CLOSEDCHANNEL, ERROR,
@@ -55,7 +54,6 @@ public enum R66FiniteDualStates {
     }
 
     /**
-     *
      * @return a new Session MachineState for OpenR66
      */
     public static MachineState<R66FiniteDualStates> newSessionMachineState() {
@@ -65,9 +63,7 @@ public enum R66FiniteDualStates {
     }
 
     /**
-     *
-     * @param machine
-     *            the Session MachineState to release
+     * @param machine the Session MachineState to release
      */
     public static void endSessionMachineSate(MachineState<R66FiniteDualStates> machine) {
         machine.release();

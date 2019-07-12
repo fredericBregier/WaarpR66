@@ -33,11 +33,10 @@ import org.waarp.openr66.protocol.utils.R66Future;
 
 /**
  * Class for Recv Through client
- *
- * This class does not included the real file transfer since it is up to the business project to
- * implement how to write new data received from the remote host. If an error occurs, no transfer
- * log is kept.
- *
+ * <p>
+ * This class does not included the real file transfer since it is up to the business project to implement how to write
+ * new data received from the remote host. If an error occurs, no transfer log is kept.
+ * <p>
  * 1) Configuration must have been loaded<br>
  * <br>
  * 2) Pipeline and NetworkTransaction must have been initiated:<br>
@@ -54,16 +53,14 @@ import org.waarp.openr66.protocol.utils.R66Future;
  * <tt>     futureReq.awaitUninterruptibly();</tt><br>
  * <tt>     R66Result result = futureReq.getResult();</tt><br>
  * <br>
- * 5) If there is the need to re-do, just re-execute the steps from 3 to 4.<br>
- * Don't forget at the very end to finish the global structure (steps 3 to 4 no more executed):<br>
+ * 5) If there is the need to re-do, just re-execute the steps from 3 to 4.<br> Don't forget at the very end to finish
+ * the global structure (steps 3 to 4 no more executed):<br>
  * <tt>     networkTransaction.closeAll();</tt><br>
  * <br>
  * <br>
  *
- * @see TestRecvThroughClient Class as example of usage in test part
- *
  * @author Frederic Bregier
- *
+ * @see TestRecvThroughClient Class as example of usage in test part
  */
 public class RecvThroughClient extends AbstractTransfer {
     protected final NetworkTransaction networkTransaction;
@@ -92,8 +89,8 @@ public class RecvThroughClient extends AbstractTransfer {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

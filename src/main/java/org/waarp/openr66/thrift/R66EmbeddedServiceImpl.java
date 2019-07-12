@@ -53,7 +53,6 @@ import java.util.List;
  * Embedded service attached with the Thrift service
  *
  * @author Frederic Bregier
- *
  */
 public class R66EmbeddedServiceImpl implements R66Service.Iface {
     /**

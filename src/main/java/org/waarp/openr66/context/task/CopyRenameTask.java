@@ -28,7 +28,6 @@ import java.io.File;
  * Copy and Rename task
  *
  * @author Frederic Bregier
- *
  */
 public class CopyRenameTask extends AbstractTask {
     /**

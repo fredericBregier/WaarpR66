@@ -82,8 +82,7 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
      */
     private NetworkChannelReference networkChannelReference;
     /**
-     * The Database connection attached to this NetworkChannelReference shared among all associated
-     * LocalChannels
+     * The Database connection attached to this NetworkChannelReference shared among all associated LocalChannels
      */
     private DbSession dbSession;
     /**
@@ -92,7 +91,6 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
     private volatile int keepAlivedSent = 0;
 
     /**
-     *
      * @param isServer
      */
     public NetworkServerHandler(boolean isServer) {
@@ -444,7 +442,6 @@ public class NetworkServerHandler extends SimpleChannelInboundHandler<NetworkPac
     }
 
     /**
-     *
      * @return True if this Handler is for SSL
      */
     public boolean isSsl() {

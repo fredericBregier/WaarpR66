@@ -30,7 +30,6 @@ import org.waarp.gateway.kernel.rest.RestConfiguration;
  * Pipeline Factory for Rest HTTP support for R66
  *
  * @author Frederic Bregier
- *
  */
 public class HttpRestR66Initializer extends ChannelInitializer<SocketChannel> {
     private final boolean useHttpCompression;

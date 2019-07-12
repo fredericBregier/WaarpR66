@@ -52,12 +52,10 @@ import org.waarp.openr66.protocol.localhandler.packet.json.TransferRequestJsonPa
 import java.util.Date;
 
 /**
- * Transfer Http REST interface: http://host/control?... +
- * InformationJsonPacket (should be on Transfer only) RestartTransferJsonPacket StopOrCancelJsonPacket TransferRequestJsonPacket
- * as GET PUT PUT POST
+ * Transfer Http REST interface: http://host/control?... + InformationJsonPacket (should be on Transfer only)
+ * RestartTransferJsonPacket StopOrCancelJsonPacket TransferRequestJsonPacket as GET PUT PUT POST
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestControlR66Handler extends HttpRestAbstractR66Handler {
 

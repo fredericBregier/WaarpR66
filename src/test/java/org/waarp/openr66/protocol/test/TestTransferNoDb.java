@@ -34,7 +34,6 @@ import java.util.concurrent.Executors;
  * Test class for multiple DirectTransfer
  *
  * @author Frederic Bregier
- *
  */
 public class TestTransferNoDb extends DirectTransfer {
     static int nb = 100;
@@ -50,6 +49,7 @@ public class TestTransferNoDb extends DirectTransfer {
     /**
      * @param args
      * @param rank
+     *
      * @return True if OK
      */
     protected static boolean getSpecialParams(String[] args, int rank) {

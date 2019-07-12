@@ -22,7 +22,6 @@ import org.waarp.openr66.protocol.localhandler.packet.LocalPacketFactory;
  * File name or size changing Request JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class RequestJsonPacket extends JsonPacket {
 
@@ -38,8 +37,7 @@ public class RequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param filename
-     *            the filename to set
+     * @param filename the filename to set
      */
     public void setFilename(String filename) {
         this.filename = filename;
@@ -53,8 +51,7 @@ public class RequestJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param filesize
-     *            the filesize to set
+     * @param filesize the filesize to set
      */
     public void setFilesize(long filesize) {
         this.filesize = filesize;

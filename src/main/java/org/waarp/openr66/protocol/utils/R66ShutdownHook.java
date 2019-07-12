@@ -20,7 +20,6 @@ import org.waarp.common.utility.WaarpShutdownHook;
 
 /**
  * @author "Frederic Bregier"
- *
  */
 public class R66ShutdownHook extends WaarpShutdownHook {
 

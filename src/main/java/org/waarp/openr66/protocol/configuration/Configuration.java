@@ -308,14 +308,14 @@ public class Configuration {
     private DbHostAuth HOST_SSLAUTH;
     private String AUTH_FILE;
     /**
-     * Default number of threads in pool for Server (true network listeners). Server will change
-     * this value on startup if not set. The value should be closed to the number of CPU.
+     * Default number of threads in pool for Server (true network listeners). Server will change this value on startup
+     * if not set. The value should be closed to the number of CPU.
      */
     private int SERVER_THREAD = 0;
     /**
-     * Default number of threads in pool for Client. The value is for true client for Executor in
-     * the Pipeline for Business logic. The value does not indicate a limit of concurrent clients,
-     * but a limit on truly packet concurrent actions.
+     * Default number of threads in pool for Client. The value is for true client for Executor in the Pipeline for
+     * Business logic. The value does not indicate a limit of concurrent clients, but a limit on truly packet concurrent
+     * actions.
      */
     private int CLIENT_THREAD = 10;
     /**
@@ -339,8 +339,8 @@ public class Configuration {
      */
     private long TIMEOUTCON = 30000;
     /**
-     * Size by default of block size for receive/sending files. Should be a multiple of 8192
-     * (maximum = 2^30K due to block limitation to 4 bytes)
+     * Size by default of block size for receive/sending files. Should be a multiple of 8192 (maximum = 2^30K due to
+     * block limitation to 4 bytes)
      */
     private int BLOCKSIZE = 0x10000; // 64K
     /**
@@ -581,7 +581,6 @@ public class Configuration {
     }
 
     /**
-     *
      * @return the FilesystemBasedFileParameterImpl
      */
     public static FilesystemBasedFileParameterImpl getFileParameter() {
@@ -705,7 +704,7 @@ public class Configuration {
                ", ThriftPort: " + (getThriftport() > 0? getThriftport() : "'NoThriftSupport'") + ", RestAddress: ["
                + (rest != null? rest : "'NoRestSupport'") + "]" +
                ", TimeOut: " + getTIMEOUTCON() + ", BaseDir: '" + getBaseDirectory() + "', DigestAlgo: '" +
-               getDigest().name
+               getDigest().getName()
                + "', checkRemote: " + isCheckRemoteAddress() +
                ", checkClient: " + isCheckClientAddress() + ", snmpActive: " + (getAgentSnmp() != null) +
                ", chrootChecked: "
@@ -937,7 +936,7 @@ public class Configuration {
 
     /**
      * Prepare the server to stop
-     *
+     * <p>
      * To be called early before other stuff will be closed
      */
     public void prepareServerStop() {
@@ -1025,7 +1024,7 @@ public class Configuration {
 
     /**
      * Stops the server
-     *
+     * <p>
      * To be called after all other stuff are closed (channels, connections)
      */
     public void serverStop() {
@@ -1060,6 +1059,7 @@ public class Configuration {
 
     /**
      * To be called after all other stuff are closed for Client
+     *
      * @param shutdownQuickly For client only, shall be true to speedup the end of the process
      */
     public void clientStop(boolean shutdownQuickly) {
@@ -1166,8 +1166,8 @@ public class Configuration {
     }
 
     /**
-     * Compute number of threads for both client and server from the real number of available
-     * processors (double + 1) if the value is less than 32 threads else (available +1).
+     * Compute number of threads for both client and server from the real number of available processors (double + 1) if
+     * the value is less than 32 threads else (available +1).
      */
     public void computeNbThreads() {
         int nb = Runtime.getRuntime().availableProcessors() * 2 + 1;
@@ -1185,8 +1185,8 @@ public class Configuration {
 
     /**
      * @return a new ChannelTrafficShapingHandler
-     * @throws OpenR66ProtocolNoDataException
      *
+     * @throws OpenR66ProtocolNoDataException
      * @deprecated Should instance channelTrafficShaping in initializer
      */
     @Deprecated
@@ -1196,7 +1196,6 @@ public class Configuration {
     }
 
     /**
-     *
      * @return an executorService to be used for any thread
      */
     public ExecutorService getExecutorService() {
@@ -1295,6 +1294,7 @@ public class Configuration {
      * Is the given key a valid one
      *
      * @param newkey
+     *
      * @return True if the key is valid (or any key is valid)
      */
     public boolean isKeyValid(byte[] newkey) {
@@ -1305,17 +1305,17 @@ public class Configuration {
     }
 
     /**
-     * @param serverkey
-     *            the SERVERADMINKEY to set
+     * @param serverkey the SERVERADMINKEY to set
      */
     public void setSERVERKEY(byte[] serverkey) {
         SERVERADMINKEY = serverkey;
     }
 
     /**
-     *
      * @param isSSL
+     *
      * @return the HostId according to SSL
+     *
      * @throws OpenR66ProtocolNoSslException
      */
     public String getHostId(boolean isSSL) throws OpenR66ProtocolNoSslException {
@@ -1330,10 +1330,11 @@ public class Configuration {
     }
 
     /**
-     *
      * @param dbSession
      * @param remoteHost
+     *
      * @return the HostId according to remoteHost (and its SSL status)
+     *
      * @throws WaarpDatabaseException
      */
     public String getHostId(DbSession dbSession, String remoteHost) throws WaarpDatabaseException {

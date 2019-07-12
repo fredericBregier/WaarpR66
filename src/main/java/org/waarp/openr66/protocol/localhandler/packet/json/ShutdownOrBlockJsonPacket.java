@@ -20,7 +20,6 @@ package org.waarp.openr66.protocol.localhandler.packet.json;
  * Shutdown or Block JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class ShutdownOrBlockJsonPacket extends JsonPacket {
 
@@ -42,8 +41,7 @@ public class ShutdownOrBlockJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param key
-     *            the key to set
+     * @param key the key to set
      */
     public void setKey(byte[] key) {
         this.key = key;
@@ -57,8 +55,7 @@ public class ShutdownOrBlockJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isRestart
-     *            the isRestart to set
+     * @param isRestart the isRestart to set
      */
     public void setRestartOrBlock(boolean isRestart) {
         this.isRestartOrBlock = isRestart;
@@ -72,8 +69,7 @@ public class ShutdownOrBlockJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param isShutdown
-     *            the isShutdown to set
+     * @param isShutdown the isShutdown to set
      */
     public void setShutdownOrBlock(boolean isShutdown) {
         this.isShutdownOrBlock = isShutdown;

@@ -28,7 +28,7 @@ import java.io.IOException;
 
 /**
  * Json Command Message class for packet
- *
+ * <p>
  * 2 strings and one byte: request,result,send
  *
  * @author frederic bregier
@@ -75,6 +75,7 @@ public class JsonCommandPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new ValidPacket from buffer
      */
     public static JsonCommandPacket createFromBuffer(int headerLength,
@@ -153,7 +154,6 @@ public class JsonCommandPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @param result
      */
     public void setResult(String result) {

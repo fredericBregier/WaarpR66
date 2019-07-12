@@ -42,7 +42,6 @@ import org.waarp.openr66.protocol.localhandler.packet.json.JsonPacket;
  * Bandwidth Http REST interface: http://host/bandwidth?... + BandwidthJsonPacket as GET or PUT
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestBandwidthR66Handler extends HttpRestAbstractR66Handler {
 

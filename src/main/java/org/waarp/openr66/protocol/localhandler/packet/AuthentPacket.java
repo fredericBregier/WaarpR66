@@ -29,8 +29,9 @@ import org.waarp.openr66.protocol.utils.R66Versions;
 
 /**
  * Request Authentication class
- *
- * header = "hostId" middle = "key bytes" end = localId + way + (optional version: could be a JSON on the form version.{})
+ * <p>
+ * header = "hostId" middle = "key bytes" end = localId + way + (optional version: could be a JSON on the form
+ * version.{})
  *
  * @author frederic bregier
  */
@@ -84,7 +85,9 @@ public class AuthentPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new AuthentPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static AuthentPacket createFromBuffer(int headerLength,

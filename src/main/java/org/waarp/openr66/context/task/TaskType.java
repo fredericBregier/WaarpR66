@@ -23,11 +23,10 @@ import org.waarp.openr66.context.task.exception.OpenR66RunnerErrorException;
 
 /**
  * This enum class references all available tasks.
- *
+ * <p>
  * If a new task type is to be created, this is the place where it should be referenced.
  *
  * @author Frederic Bregier
- *
  */
 public enum TaskType {
     LOG, MOVE, MOVERENAME, COPY, COPYRENAME, EXEC, EXECMOVE, LINKRENAME, TRANSFER,
@@ -48,12 +47,13 @@ public enum TaskType {
     }
 
     /**
-     *
      * @param type
      * @param argRule
      * @param delay
      * @param session
+     *
      * @return the corresponding AbstractTask
+     *
      * @throws OpenR66RunnerErrorException
      */
     public static AbstractTask getTaskFromId(TaskType type, String argRule,
@@ -140,12 +140,13 @@ public enum TaskType {
     }
 
     /**
-     *
      * @param name
      * @param argRule
      * @param delay
      * @param session
+     *
      * @return the corresponding AbstractTask
+     *
      * @throws OpenR66RunnerErrorException
      */
     public static AbstractTask getTaskFromId(String name, String argRule,
@@ -170,7 +171,9 @@ public enum TaskType {
      * @param argRule
      * @param delay
      * @param session
+     *
      * @return the corresponding AbstractTask
+     *
      * @throws OpenR66RunnerErrorException
      */
     public static AbstractTask getTaskFromIdForBusiness(String name, String argRule,

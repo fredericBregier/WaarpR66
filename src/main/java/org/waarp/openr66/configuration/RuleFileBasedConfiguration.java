@@ -51,7 +51,6 @@ import java.util.List;
  * Rule File Based Configuration
  *
  * @author Frederic Bregier
- *
  */
 public class RuleFileBasedConfiguration {
     public static final String MULTIPLEROOT = "rules";
@@ -136,6 +135,7 @@ public class RuleFileBasedConfiguration {
      * Import all Rule files into the HashTable of Rules
      *
      * @param configDirectory
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseException
      */
@@ -158,6 +158,7 @@ public class RuleFileBasedConfiguration {
      * Utility function
      *
      * @param value
+     *
      * @return the array of tasks or empty array if in error.
      */
     @SuppressWarnings("unchecked")
@@ -223,9 +224,8 @@ public class RuleFileBasedConfiguration {
     }
 
     /**
+     * @param value the XmlValue hosting hostids/hostid
      *
-     * @param value
-     *            the XmlValue hosting hostids/hostid
      * @return the array of HostIds allowed for the current rule
      */
     public static String[] getHostIds(XmlValue value) {
@@ -255,7 +255,9 @@ public class RuleFileBasedConfiguration {
      * Load and update a Rule from a file
      *
      * @param file
+     *
      * @return the newly created R66Rule from XML File
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseException
      * @throws WaarpDatabaseNoDataException
@@ -292,7 +294,9 @@ public class RuleFileBasedConfiguration {
      * Load and update multiple Rules from one file
      *
      * @param file
+     *
      * @return a list of newly created R66Rule from XML File
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseException
      * @throws WaarpDatabaseNoDataException
@@ -337,7 +341,9 @@ public class RuleFileBasedConfiguration {
      * Load and update one Rule from a XmlValue
      *
      * @param root
+     *
      * @return the newly created R66Rule from XML File
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws WaarpDatabaseException
      * @throws WaarpDatabaseNoDataException
@@ -464,6 +470,7 @@ public class RuleFileBasedConfiguration {
      *
      * @param name
      * @param value
+     *
      * @return the new Element
      */
     private static final Element newElement(String name, String value) {
@@ -629,6 +636,7 @@ public class RuleFileBasedConfiguration {
      *
      * @param filename
      * @param rule
+     *
      * @throws OpenR66ProtocolSystemException
      */
     private static final void writeXML(String filename, DbRule rule)
@@ -648,6 +656,7 @@ public class RuleFileBasedConfiguration {
      *
      * @param directory
      * @param hostname
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      * @throws OpenR66ProtocolSystemException
@@ -674,7 +683,9 @@ public class RuleFileBasedConfiguration {
      *
      * @param directory
      * @param hostname
+     *
      * @return the filename
+     *
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
      * @throws OpenR66ProtocolSystemException

@@ -22,12 +22,10 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 
 /**
  * R66 Constraint Limit Handler
- *
- * Constraint Limit (CPU and connection - network and local -) handler, only for server side
- * (requested or requester).
+ * <p>
+ * Constraint Limit (CPU and connection - network and local -) handler, only for server side (requested or requester).
  *
  * @author Frederic Bregier
- *
  */
 public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
     public R66ConstraintLimitHandler() {
@@ -35,24 +33,16 @@ public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
     }
 
     /**
-     * @param useJdKCpuLimit
-     *            True to use JDK Cpu native or False for JavaSysMon
-     * @param lowcpuLimit
-     *            for proactive cpu limitation (throttling bandwidth) (0<= x < 1 & highcpulimit)
-     * @param highcpuLimit
-     *            for proactive cpu limitation (throttling bandwidth) (0<= x <= 1) 0 meaning no
-     *            throttle activated
-     * @param percentageDecrease
-     *            for proactive cpu limitation, throttling bandwidth reduction (0 < x < 1) as 0.25
-     *            for 25% of reduction
-     * @param handler
-     *            the GlobalTrafficShapingHandler associated (null to have no proactive cpu
-     *            limitation)
-     * @param delay
-     *            the delay between 2 tests for proactive cpu limitation
-     * @param limitLowBandwidth
-     *            the minimal bandwidth (read or write) to apply when decreasing bandwidth (low
-     *            limit = 4096)
+     * @param useJdKCpuLimit True to use JDK Cpu native or False for JavaSysMon
+     * @param lowcpuLimit for proactive cpu limitation (throttling bandwidth) (0<= x < 1 & highcpulimit)
+     * @param highcpuLimit for proactive cpu limitation (throttling bandwidth) (0<= x <= 1) 0 meaning no throttle
+     * activated
+     * @param percentageDecrease for proactive cpu limitation, throttling bandwidth reduction (0 < x < 1) as 0.25 for
+     * 25% of reduction
+     * @param handler the GlobalTrafficShapingHandler associated (null to have no proactive cpu limitation)
+     * @param delay the delay between 2 tests for proactive cpu limitation
+     * @param limitLowBandwidth the minimal bandwidth (read or write) to apply when decreasing bandwidth (low limit =
+     * 4096)
      */
     public R66ConstraintLimitHandler(boolean useJdKCpuLimit,
                                      double lowcpuLimit, double highcpuLimit, double percentageDecrease,
@@ -66,14 +56,10 @@ public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
     }
 
     /**
-     * @param useCpuLimit
-     *            True to enable cpuLimit on connection check
-     * @param useJdKCpuLimit
-     *            True to use JDK Cpu native or False for JavaSysMon
-     * @param cpulimit
-     *            high cpu limit (0<= x < 1) to refuse new connections
-     * @param channellimit
-     *            number of connection limit (0<= x)
+     * @param useCpuLimit True to enable cpuLimit on connection check
+     * @param useJdKCpuLimit True to use JDK Cpu native or False for JavaSysMon
+     * @param cpulimit high cpu limit (0<= x < 1) to refuse new connections
+     * @param channellimit number of connection limit (0<= x)
      */
     public R66ConstraintLimitHandler(boolean useCpuLimit,
                                      boolean useJdKCpuLimit, double cpulimit, int channellimit) {
@@ -83,30 +69,19 @@ public class R66ConstraintLimitHandler extends WaarpConstraintLimitHandler {
     }
 
     /**
-     * @param useCpuLimit
-     *            True to enable cpuLimit on connection check
-     * @param useJdKCpuLimit
-     *            True to use JDK Cpu native or False for JavaSysMon
-     * @param cpulimit
-     *            high cpu limit (0<= x < 1) to refuse new connections
-     * @param channellimit
-     *            number of connection limit (0<= x)
-     * @param lowcpuLimit
-     *            for proactive cpu limitation (throttling bandwidth) (0<= x < 1 & highcpulimit)
-     * @param highcpuLimit
-     *            for proactive cpu limitation (throttling bandwidth) (0<= x <= 1) 0 meaning no
-     *            throttle activated
-     * @param percentageDecrease
-     *            for proactive cpu limitation, throttling bandwidth reduction (0 < x < 1) as 0.25
-     *            for 25% of reduction
-     * @param handler
-     *            the GlobalTrafficShapingHandler associated (null to have no proactive cpu
-     *            limitation)
-     * @param delay
-     *            the delay between 2 tests for proactive cpu limitation
-     * @param limitLowBandwidth
-     *            the minimal bandwidth (read or write) to apply when decreasing bandwidth (low
-     *            limit = 4096)
+     * @param useCpuLimit True to enable cpuLimit on connection check
+     * @param useJdKCpuLimit True to use JDK Cpu native or False for JavaSysMon
+     * @param cpulimit high cpu limit (0<= x < 1) to refuse new connections
+     * @param channellimit number of connection limit (0<= x)
+     * @param lowcpuLimit for proactive cpu limitation (throttling bandwidth) (0<= x < 1 & highcpulimit)
+     * @param highcpuLimit for proactive cpu limitation (throttling bandwidth) (0<= x <= 1) 0 meaning no throttle
+     * activated
+     * @param percentageDecrease for proactive cpu limitation, throttling bandwidth reduction (0 < x < 1) as 0.25 for
+     * 25% of reduction
+     * @param handler the GlobalTrafficShapingHandler associated (null to have no proactive cpu limitation)
+     * @param delay the delay between 2 tests for proactive cpu limitation
+     * @param limitLowBandwidth the minimal bandwidth (read or write) to apply when decreasing bandwidth (low limit =
+     * 4096)
      */
     public R66ConstraintLimitHandler(
             boolean useCpuLimit, boolean useJdKCpuLimit, double cpulimit,

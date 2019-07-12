@@ -36,7 +36,6 @@ import java.util.concurrent.Executors;
  * Test class for internal Business test
  *
  * @author Frederic Bregier
- *
  */
 public class TestBusinessRequest extends AbstractBusinessRequest {
     /**

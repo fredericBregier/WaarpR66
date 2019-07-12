@@ -44,7 +44,6 @@ import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler;
  * DBConfiguration Rest Handler
  *
  * @author "Frederic Bregier"
- *
  */
 public class DbConfigurationR66RestMethodHandler extends DataModelRestMethodHandler<DbConfiguration> {
     public static final String BASEURI = "configurations";

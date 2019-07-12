@@ -47,7 +47,6 @@ import org.waarp.openr66.protocol.localhandler.packet.json.JsonPacket;
  * Info Http REST interface: http://host/info?... + InformationJsonPacket as GET
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestInformationR66Handler extends HttpRestAbstractR66Handler {
 

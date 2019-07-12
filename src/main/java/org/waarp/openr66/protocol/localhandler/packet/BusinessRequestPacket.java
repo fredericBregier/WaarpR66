@@ -23,10 +23,9 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Business Request Message class for packet
- *
- * 1 string and on integer and one byte:<br>
- * - sheader = full text with class at first place, following (space separated) by extra arguments - smiddle = integer - send =
- * byte
+ * <p>
+ * 1 string and on integer and one byte:<br> - sheader = full text with class at first place, following (space
+ * separated) by extra arguments - smiddle = integer - send = byte
  *
  * @author frederic bregier
  */
@@ -141,8 +140,7 @@ public class BusinessRequestPacket extends AbstractLocalPacket {
     }
 
     /**
-     * @param delay
-     *            the delay to set
+     * @param delay the delay to set
      */
     public void setDelay(int delay) {
         this.delay = delay;

@@ -28,19 +28,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * This class is for logging or write to an external file some info:<br>
- * - if delay is 0, no echo at all will be done<br>
- * - if delay is 1, will echo some information in the normal log<br>
- * - if delay is 2, will echo some information in the file (last deduced argument will be the full
- * path for the file output)<br>
- * - if delay is 3, will echo both in the normal log and in the file (last deduced argument will be
- * the full path for the file output)<br>
+ * This class is for logging or write to an external file some info:<br> - if delay is 0, no echo at all will be
+ * done<br> - if delay is 1, will echo some information in the normal log<br> - if delay is 2, will echo some
+ * information in the file (last deduced argument will be the full path for the file output)<br> - if delay is 3, will
+ * echo both in the normal log and in the file (last deduced argument will be the full path for the file output)<br>
  * <br>
- * If first word for logging is one of debug, info, warn, error, then the corresponding
- * level of log will be used.
+ * If first word for logging is one of debug, info, warn, error, then the corresponding level of log will be used.
  *
  * @author Frederic Bregier
- *
  */
 public class LogTask extends AbstractTask {
     /**

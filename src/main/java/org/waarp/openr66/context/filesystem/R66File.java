@@ -53,7 +53,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * File representation
  *
  * @author frederic bregier
- *
  */
 public class R66File extends FilesystemBasedFileImpl {
     /**
@@ -72,6 +71,7 @@ public class R66File extends FilesystemBasedFileImpl {
      * @param dir
      * @param path
      * @param append
+     *
      * @throws CommandAbstractException
      */
     public R66File(R66Session session, R66Dir dir, String path, boolean append)
@@ -92,8 +92,8 @@ public class R66File extends FilesystemBasedFileImpl {
     }
 
     /**
-     *
      * @param path
+     *
      * @return the basename from the given path
      */
     public static String getBasename(String path) {
@@ -111,8 +111,8 @@ public class R66File extends FilesystemBasedFileImpl {
     /**
      * Start the retrieve (send to the remote host the local file)
      *
-     * @param running
-     *            When false, should stop the runner
+     * @param running When false, should stop the runner
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      */
@@ -272,7 +272,6 @@ public class R66File extends FilesystemBasedFileImpl {
     }
 
     /**
-     *
      * @return the basename of the current file
      */
     public String getBasename() {
@@ -385,8 +384,8 @@ public class R66File extends FilesystemBasedFileImpl {
     /**
      * Returns the FileOutputStream in Out mode associated with the current file.
      *
-     * @param append
-     *            True if the FileOutputStream should be in append mode
+     * @param append True if the FileOutputStream should be in append mode
+     *
      * @return the FileOutputStream (OUT)
      */
     protected FileOutputStream getFileOutputStream(boolean append) {
@@ -542,9 +541,10 @@ public class R66File extends FilesystemBasedFileImpl {
      * Move the current file to the path as destination
      *
      * @param path
-     * @param external
-     *            if True, the path is outside authentication control
+     * @param external if True, the path is outside authentication control
+     *
      * @return True if the operation is done
+     *
      * @throws CommandAbstractException
      */
     public boolean renameTo(String path, boolean external)
@@ -625,6 +625,7 @@ public class R66File extends FilesystemBasedFileImpl {
      *
      * @param filename
      * @param isExternal
+     *
      * @throws CommandAbstractException
      */
     public void replaceFilename(String filename, boolean isExternal)
@@ -644,7 +645,6 @@ public class R66File extends FilesystemBasedFileImpl {
     }
 
     /**
-     *
      * @return True if this file is outside OpenR66 Base directory
      */
     public boolean isExternal() {

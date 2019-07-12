@@ -34,7 +34,6 @@ import java.net.UnknownHostException;
  * Main Thrift server service
  *
  * @author Frederic Bregier
- *
  */
 public class R66ThriftServerService implements Runnable {
     /**

@@ -28,7 +28,7 @@ import java.io.IOException;
 
 /**
  * Json Object Command Message class for JsonCommandPacket
- *
+ * <p>
  * 1 string = comment
  *
  * @author frederic bregier
@@ -40,7 +40,9 @@ public class JsonPacket {
 
     /**
      * @param value
+     *
      * @return the new JsonPacket from buffer
+     *
      * @throws IOException
      * @throws JsonMappingException
      * @throws JsonParseException
@@ -55,6 +57,7 @@ public class JsonPacket {
 
     /**
      * @return the ObjectNode corresponding to this object
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public ObjectNode createObjectNode() throws OpenR66ProtocolPacketException {
@@ -76,8 +79,7 @@ public class JsonPacket {
     }
 
     /**
-     * @param requestUserPacket
-     *            the requestUserPacket to set
+     * @param requestUserPacket the requestUserPacket to set
      */
     public void setRequestUserPacket(byte requestUserPacket) {
         this.requestUserPacket = requestUserPacket;
@@ -98,8 +100,7 @@ public class JsonPacket {
     }
 
     /**
-     * @param comment
-     *            the comment to set
+     * @param comment the comment to set
      */
     public void setComment(String comment) {
         this.comment = comment;

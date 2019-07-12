@@ -34,8 +34,8 @@ public class R66Server {
     private static WaarpLogger logger;
 
     /**
-     * @param args
-     *            as first argument the configuration file
+     * @param args as first argument the configuration file
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static void main(String[] args)

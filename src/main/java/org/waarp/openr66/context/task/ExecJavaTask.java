@@ -30,9 +30,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Execute a Java command through Class.forName call
  *
- *
  * @author Frederic Bregier
- *
  */
 public class ExecJavaTask extends AbstractTask {
     /**

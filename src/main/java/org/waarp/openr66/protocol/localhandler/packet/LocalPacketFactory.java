@@ -78,12 +78,13 @@ public class LocalPacketFactory {
     /**
      * This method create a Packet from the ByteBuf.
      *
-     * @param headerLength
-     *            length of the header from the current position of the buffer
+     * @param headerLength length of the header from the current position of the buffer
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the newly created Packet
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static AbstractLocalPacket createPacketFromByteBuf(

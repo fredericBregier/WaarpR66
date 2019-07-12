@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * Engine used to start and stop the SpooledDirectory service
  *
  * @author Frederic Bregier
- *
  */
 public class SpooledEngine extends EngineAbstract {
     static final WaarpFuture closeFuture = new WaarpFuture(true);

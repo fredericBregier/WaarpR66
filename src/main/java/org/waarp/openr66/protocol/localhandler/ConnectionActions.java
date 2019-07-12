@@ -68,7 +68,6 @@ import static org.waarp.openr66.context.R66FiniteDualStates.*;
  * Used to store and retrieve the session information.
  *
  * @author "Frederic Bregier"
- *
  */
 public abstract class ConnectionActions {
     /**
@@ -256,6 +255,7 @@ public abstract class ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public void startup(Channel channel, StartupPacket packet)
@@ -305,6 +305,7 @@ public abstract class ConnectionActions {
      * @param channel
      * @param packet
      * @param e1
+     *
      * @throws OpenR66ProtocolPacketException
      */
     private final void refusedConnection(Channel channel, AuthentPacket packet, Exception e1)
@@ -359,6 +360,7 @@ public abstract class ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public void authent(Channel channel, AuthentPacket packet, boolean isSsl)
@@ -523,6 +525,7 @@ public abstract class ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      * @throws OpenR66ProtocolBusinessException
@@ -629,8 +632,8 @@ public abstract class ConnectionActions {
     /**
      * Try to finalize the request if possible
      *
-     * @param errorValue
-     *            in case of Error
+     * @param errorValue in case of Error
+     *
      * @throws OpenR66ProtocolSystemException
      * @throws OpenR66RunnerErrorException
      */
@@ -643,7 +646,6 @@ public abstract class ConnectionActions {
      * Class to finalize a runner when the future is over
      *
      * @author Frederic Bregier
-     *
      */
     private static final class RunnerChannelFutureListener implements ChannelFutureListener {
         private LocalChannelReference localChannelReference;

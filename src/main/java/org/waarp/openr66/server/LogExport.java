@@ -46,7 +46,6 @@ import java.sql.Timestamp;
  * Log Export from a local client without database connection
  *
  * @author Frederic Bregier
- *
  */
 public class LogExport implements Runnable {
     protected static String _INFO_ARGS =
@@ -78,6 +77,7 @@ public class LogExport implements Runnable {
     protected final boolean clean;
     protected final NetworkTransaction networkTransaction;
     protected DbHostAuth host;
+
     public LogExport(R66Future future, boolean purgeLog, boolean clean,
                      Timestamp start, Timestamp stop,
                      NetworkTransaction networkTransaction) {
@@ -207,8 +207,8 @@ public class LogExport implements Runnable {
     }
 
     /**
-     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It
-     * is the responsibility of the caller to finish all network resources.
+     * Prior to call this method, the pipeline and NetworkTransaction must have been initialized. It is the
+     * responsibility of the caller to finish all network resources.
      */
     public void run() {
         if (logger == null) {

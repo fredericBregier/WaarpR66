@@ -23,7 +23,7 @@ import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
  * Information of files class
- *
+ * <p>
  * header = "rulename" middle = requestedInfo end = "FILENAME"
  *
  * @author frederic bregier
@@ -50,7 +50,9 @@ public class InformationPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new EndTransferPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static InformationPacket createFromBuffer(int headerLength,

@@ -22,16 +22,14 @@ import java.util.Set;
 
 /**
  * Client NetworkChannelReference attached to one HostId.
- *
- *
- *
- * This class is used to keep information for one HostID when it connects as client to the current
- * Host. As one Id can be shared or one can use direct send, so having a connection by request, this
- * class is useful when one wants to know who is connected and how many times.
- *
+ * <p>
+ * <p>
+ * <p>
+ * This class is used to keep information for one HostID when it connects as client to the current Host. As one Id can
+ * be shared or one can use direct send, so having a connection by request, this class is useful when one wants to know
+ * who is connected and how many times.
  *
  * @author Frederic Bregier
- *
  */
 public class ClientNetworkChannels {
 

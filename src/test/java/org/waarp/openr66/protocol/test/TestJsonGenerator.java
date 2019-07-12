@@ -35,7 +35,6 @@ import org.waarp.openr66.protocol.exception.OpenR66ProtocolBusinessException;
  * Test class for JsonGenerator
  *
  * @author Frederic Bregier
- *
  */
 public class TestJsonGenerator {
     /**
@@ -47,6 +46,7 @@ public class TestJsonGenerator {
     /**
      * @param args
      * @param rank
+     *
      * @return True if OK
      */
     protected static boolean getSpecialParams(String[] args, int rank) {

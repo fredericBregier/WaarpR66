@@ -24,7 +24,6 @@ import java.util.Date;
  * Export Log JSON packet
  *
  * @author "Frederic Bregier"
- *
  */
 public class LogJsonPacket extends JsonPacket {
     protected boolean purge, clean, statuspending, statustransfer, statusdone, statuserror;
@@ -40,8 +39,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param purge
-     *            the purge to set
+     * @param purge the purge to set
      */
     public void setPurge(boolean purge) {
         this.purge = purge;
@@ -55,8 +53,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param clean
-     *            the clean to set
+     * @param clean the clean to set
      */
     public void setClean(boolean clean) {
         this.clean = clean;
@@ -70,8 +67,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param statuspending
-     *            the statuspending to set
+     * @param statuspending the statuspending to set
      */
     public void setStatuspending(boolean statuspending) {
         this.statuspending = statuspending;
@@ -85,8 +81,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param statustransfer
-     *            the statustransfer to set
+     * @param statustransfer the statustransfer to set
      */
     public void setStatustransfer(boolean statustransfer) {
         this.statustransfer = statustransfer;
@@ -100,8 +95,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param statusdone
-     *            the statusdone to set
+     * @param statusdone the statusdone to set
      */
     public void setStatusdone(boolean statusdone) {
         this.statusdone = statusdone;
@@ -115,8 +109,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param statuserror
-     *            the statuserror to set
+     * @param statuserror the statuserror to set
      */
     public void setStatuserror(boolean statuserror) {
         this.statuserror = statuserror;
@@ -130,8 +123,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param rule
-     *            the rule to set
+     * @param rule the rule to set
      */
     public void setRule(String rule) {
         this.rule = rule;
@@ -145,8 +137,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param request
-     *            the request to set
+     * @param request the request to set
      */
     public void setRequest(String request) {
         this.request = request;
@@ -160,8 +151,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param start
-     *            the start to set
+     * @param start the start to set
      */
     public void setStart(Date start) {
         this.start = start;
@@ -175,8 +165,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param stop
-     *            the stop to set
+     * @param stop the stop to set
      */
     public void setStop(Date stop) {
         this.stop = stop;
@@ -190,8 +179,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param startid
-     *            the startid to set
+     * @param startid the startid to set
      */
     public void setStartid(String startid) {
         this.startid = startid;
@@ -205,8 +193,7 @@ public class LogJsonPacket extends JsonPacket {
     }
 
     /**
-     * @param stopid
-     *            the stopid to set
+     * @param stopid the stopid to set
      */
     public void setStopid(String stopid) {
         this.stopid = stopid;

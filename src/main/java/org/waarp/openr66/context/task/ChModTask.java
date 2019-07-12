@@ -25,13 +25,12 @@ import org.waarp.openr66.context.task.exception.OpenR66RunnerException;
 import java.io.File;
 
 /**
- * This task allows to change the mode of the file (as in Unix CHMOD command) according to the following argument:<br>
- * - the full path is get from the current file<br>
- * - the arg path is transformed as usual (static and dynamic from information transfer)<br>
- * - this final path arg should be of the form [ua][+-=][rwx] where multiple elements could be specified, separated by blank
- * character<br>
- * - u/a meaning user(Waarp system user)/all (group and other do not exist in Java), +/-/= meaning add/remove/set (set means all
- * other values are removed), r/w/x meaning Read/Write/Execute<br>
+ * This task allows to change the mode of the file (as in Unix CHMOD command) according to the following argument:<br> -
+ * the full path is get from the current file<br> - the arg path is transformed as usual (static and dynamic from
+ * information transfer)<br> - this final path arg should be of the form [ua][+-=][rwx] where multiple elements could be
+ * specified, separated by blank character<br> - u/a meaning user(Waarp system user)/all (group and other do not exist
+ * in Java), +/-/= meaning add/remove/set (set means all other values are removed), r/w/x meaning
+ * Read/Write/Execute<br>
  * <br>
  * For instance, the final path arg could be:<br>
  * <ul>
@@ -40,13 +39,12 @@ import java.io.File;
  * <li>u=rw a-wx</li>
  * <li>a+rw</li>
  * </ul>
- * Current access mode for the application will be applied as default "user" access mode, and no access mode (-rwx) will be the
- * default for "all" access mode.<br>
- * If several access mode are set in sequence, the result will be the sum of the results, step by step.<br>
- * "a=r a+w a-r" will result in a=w (first step is r--, second step is rw-, third step is -w-)
+ * Current access mode for the application will be applied as default "user" access mode, and no access mode (-rwx) will
+ * be the default for "all" access mode.<br> If several access mode are set in sequence, the result will be the sum of
+ * the results, step by step.<br> "a=r a+w a-r" will result in a=w (first step is r--, second step is rw-, third step is
+ * -w-)
  *
  * @author Frederic Bregier
- *
  */
 public class ChModTask extends AbstractTask {
     /**

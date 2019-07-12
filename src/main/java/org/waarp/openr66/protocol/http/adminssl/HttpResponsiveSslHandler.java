@@ -102,7 +102,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Frederic Bregier
- *
  */
 public class HttpResponsiveSslHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     public static final String LISTING_PAGE = "Listing.html";
@@ -136,8 +135,8 @@ public class HttpResponsiveSslHandler extends SimpleChannelInboundHandler<FullHt
     private int LIMITROW = 100;
     private int REFRESH = 0;
     /**
-     * The Database connection attached to this NetworkChannelReference shared among all associated
-     * LocalChannels in the session
+     * The Database connection attached to this NetworkChannelReference shared among all associated LocalChannels in the
+     * session
      */
     private DbSession dbSession = null;
     /**

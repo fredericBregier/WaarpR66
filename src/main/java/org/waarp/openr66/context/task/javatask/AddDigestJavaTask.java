@@ -26,16 +26,17 @@ import org.waarp.openr66.context.task.AbstractExecJavaTask;
 import java.io.IOException;
 
 /**
- * Add a digest in the TransferInformation to the current Task.</br>
- * This should be called on caller side in pre-task since the transfer information will be transfered just after.</br>
- * The second argument is -digest followed by one of ADLER32 CRC32 MD2 MD5 SHA1 SHA256 SHA384 SHA512, default being MD5.</br>
- * The third argument, optional, is "-format" followed by a string containing "#DIGEST#" to be replaced by the digest 
- * and starting with - or +, meaning this will be added at the beginning or the end of the generated new string. Default is equivalent to "-format -##DIGEST##".</br>
+ * Add a digest in the TransferInformation to the current Task.</br> This should be called on caller side in pre-task
+ * since the transfer information will be transfered just after.</br> The second argument is -digest followed by one of
+ * ADLER32 CRC32 MD2 MD5 SHA1 SHA256 SHA384 SHA512, default being MD5.</br> The third argument, optional, is "-format"
+ * followed by a string containing "#DIGEST#" to be replaced by the digest and starting with - or +, meaning this will
+ * be added at the beginning or the end of the generated new string. Default is equivalent to "-format
+ * -##DIGEST##".</br>
  * </br>
- * To be called as: <task><type>EXECJAVA</type><path>org.waarp.openr66.context.task.javatask.AddDigestJavaTask -digest ADLER32|CRC32|MD2|MD5|SHA1|SHA256|SHA384|SHA512 [-format (-/+)##DIGEST##]</path></task> 
+ * To be called as: <task><type>EXECJAVA</type><path>org.waarp.openr66.context.task.javatask.AddDigestJavaTask -digest
+ * ADLER32|CRC32|MD2|MD5|SHA1|SHA256|SHA384|SHA512 [-format (-/+)##DIGEST##]</path></task>
  *
  * @author "Frederic Bregier"
- *
  */
 public class AddDigestJavaTask extends AbstractExecJavaTask {
     /**

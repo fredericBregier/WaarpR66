@@ -20,7 +20,6 @@ package org.waarp.openr66.protocol.configuration;
  * This class is only intend to concentrate all SystemProperty definitions
  *
  * @author "Frederic Bregier"
- *
  */
 public class R66SystemProperties {
 
@@ -37,8 +36,8 @@ public class R66SystemProperties {
      */
     public static final String OPENR66_USESPACESEPARATOR = "openr66.usespaceseparator";
     /**
-     * Shall Waarp allow to execute error actions in case no transfer at all occurs but an error in "pre-task" occurs: default
-     * true
+     * Shall Waarp allow to execute error actions in case no transfer at all occurs but an error in "pre-task" occurs:
+     * default true
      */
     public static final String OPENR66_EXECUTEBEFORETRANSFERRED = "openr66.executebeforetransferred";
     /**
@@ -63,22 +62,20 @@ public class R66SystemProperties {
      */
     public static final String OPENR66_CHROOT_CHECKED = "openr66.chroot.checked";
     /**
-     * Shall we blacklist badly authenticated servers (default = true, if OPENR66_ISHOSTPROXYFIED is true, then is mandatory
-     * false).
-     * Note that this must not be true if several partners might have the same IP (proxyfied for instance), since they will all be
-     * banned.
+     * Shall we blacklist badly authenticated servers (default = true, if OPENR66_ISHOSTPROXYFIED is true, then is
+     * mandatory false). Note that this must not be true if several partners might have the same IP (proxyfied for
+     * instance), since they will all be banned.
      */
     public static final String OPENR66_BLACKLIST_BADAUTHENT = "openr66.blacklist.badauthent";
     /**
-     * Filename max length (default = 255), only for Basename (not full path).
-     * to choose the default max filename length used when receiving a file (for the temporary filename and final filename).
-     * This does not prevent to change the filename after (and #ORIGINALFILENAME# does still contain the full filename, not
-     * truncated).
+     * Filename max length (default = 255), only for Basename (not full path). to choose the default max filename length
+     * used when receiving a file (for the temporary filename and final filename). This does not prevent to change the
+     * filename after (and #ORIGINALFILENAME# does still contain the full filename, not truncated).
      */
     public static final String OPENR66_FILENAME_MAXLENGTH = "openr66.filename.maxlength";
     /**
-     * Debug by making a trace of consumption every x s, where x is specify as value in the definition. If 0 or less, means not
-     * activated.
+     * Debug by making a trace of consumption every x s, where x is specify as value in the definition. If 0 or less,
+     * means not activated.
      */
     public static final String OPENR66_TRACE_STATS = "openr66.trace.stats";
     /**
@@ -87,8 +84,8 @@ public class R66SystemProperties {
      */
     public static final String OPENR66_CACHE_LIMIT = "openr66.cache.limit";
     /**
-     * Maximum time in ms of valid element once created, used or updated (used in self request and for instance without database).
-     * Minimal value is 1000 ms (1s). If set to 1000, the value will not be regularly deleted.
+     * Maximum time in ms of valid element once created, used or updated (used in self request and for instance without
+     * database). Minimal value is 1000 ms (1s). If set to 1000, the value will not be regularly deleted.
      */
     public static final String OPENR66_CACHE_TIMELIMIT = "openr66.cache.timelimit";
 

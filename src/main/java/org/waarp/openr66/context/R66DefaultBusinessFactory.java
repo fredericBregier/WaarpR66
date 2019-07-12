@@ -23,7 +23,6 @@ import org.waarp.common.logging.WaarpLoggerFactory;
  * Empty Business factory
  *
  * @author Frederic Bregier
- *
  */
 public class R66DefaultBusinessFactory implements R66BusinessFactoryInterface {
     /**

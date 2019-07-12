@@ -302,6 +302,7 @@ public class NetworkTransaction {
      * Add a new NetworkChannel from connection
      *
      * @param channel
+     *
      * @throws OpenR66ProtocolRemoteShutdownException
      */
     public static NetworkChannelReference addNetworkChannel(Channel channel)
@@ -414,6 +415,7 @@ public class NetworkTransaction {
      * Shutdown a NetworkChannel and add it to BlaclList
      *
      * @param networkChannelReference
+     *
      * @return True if this channel is now blacklisted for a while
      */
     public static boolean shuttingDownNetworkChannelBlackList(NetworkChannelReference networkChannelReference) {
@@ -438,8 +440,8 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param channel
+     *
      * @return True if this channel is blacklisted
      */
     public static boolean isBlacklisted(Channel channel) {
@@ -456,8 +458,8 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param address
+     *
      * @return True if this address (associated channel) is currently in shutdown (or if this channel is not valid)
      */
     public static boolean isShuttingdownNetworkChannel(SocketAddress address) {
@@ -468,6 +470,7 @@ public class NetworkTransaction {
      * Shutdown NetworkChannelReference as client
      *
      * @param requester
+     *
      * @return True if shutdown occurs
      */
     public static boolean shuttingdownNetworkChannelsPerHostID(String requester) {
@@ -512,8 +515,8 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param requester
+     *
      * @return The number of NetworkChannels associated with this requester
      */
     public static int getNumberClients(String requester) {
@@ -573,6 +576,7 @@ public class NetworkTransaction {
      *
      * @param networkChannelReference
      * @param localChannelReference
+     *
      * @return the number of local channel still connected to this channel
      */
     public static int checkClosingNetworkChannel(NetworkChannelReference networkChannelReference,
@@ -603,9 +607,9 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param address
      * @param host
+     *
      * @return a number > 0 if a connection is still active on this socket or for this host
      */
     public static int nbAttachedConnection(SocketAddress address, String host) {
@@ -618,8 +622,8 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param address
+     *
      * @return True if this socket Address is currently valid for connection
      */
     private static boolean isAddressValid(SocketAddress address) {
@@ -648,7 +652,9 @@ public class NetworkTransaction {
      * Returns the NetworkChannelReference if it exists associated with this address
      *
      * @param address
+     *
      * @return NetworkChannelReference
+     *
      * @throws OpenR66ProtocolRemoteShutdownException
      * @throws OpenR66ProtocolNoDataException
      */
@@ -690,8 +696,8 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param channel
+     *
      * @return the associated NetworkChannelReference immediately (if known)
      */
     public static final NetworkChannelReference getImmediateNetworkChannel(Channel channel) {
@@ -758,6 +764,7 @@ public class NetworkTransaction {
      * @param socketAddress
      * @param isSSL
      * @param futureRequest
+     *
      * @return the LocalChannelReference
      */
     public LocalChannelReference createConnectionWithRetry(SocketAddress socketAddress,
@@ -803,7 +810,9 @@ public class NetworkTransaction {
      * @param socketAddress
      * @param isSSL
      * @param futureRequest
+     *
      * @return the LocalChannelReference
+     *
      * @throws OpenR66ProtocolNetworkException
      * @throws OpenR66ProtocolRemoteShutdownException
      * @throws OpenR66ProtocolNoConnectionException
@@ -872,10 +881,11 @@ public class NetworkTransaction {
     }
 
     /**
-     *
      * @param socketServerAddress
      * @param isSSL
+     *
      * @return the NetworkChannelReference
+     *
      * @throws OpenR66ProtocolNetworkException
      * @throws OpenR66ProtocolRemoteShutdownException
      * @throws OpenR66ProtocolNoConnectionException
@@ -968,6 +978,7 @@ public class NetworkTransaction {
      * Send a validation of connection with Authentication
      *
      * @param localChannelReference
+     *
      * @throws OpenR66ProtocolNetworkException
      * @throws OpenR66ProtocolRemoteShutdownException
      */
@@ -1132,11 +1143,9 @@ public class NetworkTransaction {
     }
 
     /**
-     * Class to close the Network Channel if after some delays it has really no Local Channel
-     * attached
+     * Class to close the Network Channel if after some delays it has really no Local Channel attached
      *
      * @author Frederic Bregier
-     *
      */
     private static class CloseFutureChannel implements TimerTask {
 
@@ -1146,6 +1155,7 @@ public class NetworkTransaction {
         /**
          * @param networkChannelReference
          * @param requester
+         *
          * @throws OpenR66RunnerErrorException
          */
         private CloseFutureChannel(NetworkChannelReference networkChannelReference)
@@ -1186,7 +1196,6 @@ public class NetworkTransaction {
      * Remover of Shutdown Remote Host
      *
      * @author Frederic Bregier
-     *
      */
     private static class R66ShutdownNetworkChannelTimerTask implements TimerTask {
         private static final ConcurrentSet<ChannelId> inShutdownRunning = new ConcurrentSet<ChannelId>();
@@ -1201,6 +1210,7 @@ public class NetworkTransaction {
          * Constructor from type
          *
          * @param href
+         *
          * @throws OpenR66RunnerErrorException
          */
         public R66ShutdownNetworkChannelTimerTask(NetworkChannelReference ncr, boolean blackListed)

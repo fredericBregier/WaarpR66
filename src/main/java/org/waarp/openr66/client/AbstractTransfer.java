@@ -50,7 +50,6 @@ import java.util.Date;
  * Abstract class for Transfer operation
  *
  * @author Frederic Bregier
- *
  */
 public abstract class AbstractTransfer implements Runnable {
     protected static final String NO_INFO_ARGS = "noinfo";
@@ -82,9 +81,9 @@ public abstract class AbstractTransfer implements Runnable {
     protected final long id;
     protected final Timestamp startTime;
     protected boolean normalInfoAsWarn = true;
+
     /**
-     * @param clasz
-     *            Class of Client Transfer
+     * @param clasz Class of Client Transfer
      * @param future
      * @param filename
      * @param rulename
@@ -119,8 +118,8 @@ public abstract class AbstractTransfer implements Runnable {
      * Parse the parameter and set current values
      *
      * @param args
-     * @param submitOnly
-     *            True if the client is only a submitter (through database)
+     * @param submitOnly True if the client is only a submitter (through database)
+     *
      * @return True if all parameters were found and correct
      */
     protected static boolean getParams(String[] args, boolean submitOnly) {
@@ -314,6 +313,7 @@ public abstract class AbstractTransfer implements Runnable {
 
     /**
      * Shared code for finalize one Transfer request in error
+     *
      * @param runner
      * @param taskRunner
      */

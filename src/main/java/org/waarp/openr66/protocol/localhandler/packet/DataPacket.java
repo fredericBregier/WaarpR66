@@ -25,7 +25,7 @@ import org.waarp.openr66.protocol.utils.FileUtils;
 
 /**
  * Data packet
- *
+ * <p>
  * header = packetRank middle = data end = key
  *
  * @author frederic bregier
@@ -56,7 +56,9 @@ public class DataPacket extends AbstractLocalPacket {
      * @param middleLength
      * @param endLength
      * @param buf
+     *
      * @return the new DataPacket from buffer
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public static DataPacket createFromBuffer(int headerLength,
@@ -136,7 +138,6 @@ public class DataPacket extends AbstractLocalPacket {
     }
 
     /**
-     *
      * @return True if the Hashed key is valid (or no key is set)
      */
     public boolean isKeyValid(DigestAlgo algo) {

@@ -40,7 +40,6 @@ import org.waarp.snmp.utils.WaarpUptime;
  * Waarp OpenR66 Private MIB implementation
  *
  * @author Frederic Bregier
- *
  */
 public class R66PrivateMib extends WaarpPrivateMib {
     /**

@@ -26,7 +26,6 @@ import org.waarp.openr66.protocol.exception.OpenR66ProtocolSystemException;
  * Rename the current file (no move, move or creation should be done elsewhere)
  *
  * @author Frederic Bregier
- *
  */
 public class RenameTask extends AbstractTask {
     /**

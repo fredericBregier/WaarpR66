@@ -23,16 +23,16 @@ import org.waarp.common.utility.UUID;
 import org.waarp.openr66.context.task.AbstractExecJavaTask;
 
 /**
- * Add an UUID in the TransferInformation to the current Task.</br>
- * This should be called on caller side in pre-task since the transfer information will be transfered just after.</br>
- * The second argument is -1 = added in front, +1 = added at last, default being -1.</br>
- * The third argument, optional, is "-format" followed by a string containing "#UUID#" to be replaced by the uuid
- * and starting with - or +, meaning this will be added at the beginning or the end of the generated new string. Default is equivalent to "-format -##UUID##".
+ * Add an UUID in the TransferInformation to the current Task.</br> This should be called on caller side in pre-task
+ * since the transfer information will be transfered just after.</br> The second argument is -1 = added in front, +1 =
+ * added at last, default being -1.</br> The third argument, optional, is "-format" followed by a string containing
+ * "#UUID#" to be replaced by the uuid and starting with - or +, meaning this will be added at the beginning or the end
+ * of the generated new string. Default is equivalent to "-format -##UUID##".
  * </br>
- * To be called as: <task><type>EXECJAVA</type><path>org.waarp.openr66.context.task.javatask.AddUuidJavaTask [-format (-/+)##UUID##]</path></task> 
+ * To be called as: <task><type>EXECJAVA</type><path>org.waarp.openr66.context.task.javatask.AddUuidJavaTask [-format
+ * (-/+)##UUID##]</path></task>
  *
  * @author "Frederic Bregier"
- *
  */
 public class AddUuidJavaTask extends AbstractExecJavaTask {
     /**

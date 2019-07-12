@@ -32,25 +32,21 @@ import java.io.File;
 /**
  * Transcode the current file from one Charset to another Charset as specified<br>
  * <br>
- * Arguments are:<br>
- * -dos2unix or -unix2dos (only one) ; optional argument, but if present -from and -to might be omitted;<br>
- * -from charset<br>
- * -to charset<br>
- * -newfile newfilename ; optional argument ; if not used, will be current filename.extension ;
- * if used, extension is ignored<br>
- * -extension extension ; optional argument ; if not used, will be filename.transcode<br>
+ * Arguments are:<br> -dos2unix or -unix2dos (only one) ; optional argument, but if present -from and -to might be
+ * omitted;<br> -from charset<br> -to charset<br> -newfile newfilename ; optional argument ; if not used, will be
+ * current filename.extension ; if used, extension is ignored<br> -extension extension ; optional argument ; if not
+ * used, will be filename.transcode<br>
  * <br>
- * A convenient method (from Waarp Common) allows to list in html (-html), csv (-csv) or text format (-text)
- * all the supported Charsets from your JVM. To use it, run the following command:<br>
- * java -cp WaarpCommon-1.2.7.jar org.waarp.common.transcode.CharsetsUtil [-csv | -html | -text ]<br>
+ * A convenient method (from Waarp Common) allows to list in html (-html), csv (-csv) or text format (-text) all the
+ * supported Charsets from your JVM. To use it, run the following command:<br> java -cp WaarpCommon-1.2.7.jar
+ * org.waarp.common.transcode.CharsetsUtil [-csv | -html | -text ]<br>
  * <br>
- * It could also be used as a test of transcode outside R66:<br>
- * java -cp WaarpCommon-1.2.7.jar org.waarp.common.transcode.CharsetsUtil -from fromFilename fromCharset -to toFilename toCharset<br>
- *
+ * It could also be used as a test of transcode outside R66:<br> java -cp WaarpCommon-1.2.7.jar
+ * org.waarp.common.transcode.CharsetsUtil -from fromFilename fromCharset -to toFilename toCharset<br>
+ * <p>
  * The current file is not touched and is not marked as moved.
  *
  * @author Frederic Bregier
- *
  */
 public class TranscodeTask extends AbstractTask {
     /**

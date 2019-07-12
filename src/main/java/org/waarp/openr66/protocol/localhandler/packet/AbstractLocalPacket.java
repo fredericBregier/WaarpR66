@@ -22,11 +22,10 @@ import org.waarp.openr66.protocol.exception.OpenR66ProtocolPacketException;
 import org.waarp.openr66.protocol.localhandler.LocalChannelReference;
 
 /**
- * This class represents Abstract Packet with its header, middle and end parts. A Packet is composed
- * of one Header part, one Middle part (data), and one End part. Header: length field (4 bytes) =
- * Middle length field (4 bytes), End length field (4 bytes), type field (1 byte), ...<br>
- * Middle: (Middle length field bytes)<br>
- * End: (End length field bytes) = code status field (4 bytes), ...<br>
+ * This class represents Abstract Packet with its header, middle and end parts. A Packet is composed of one Header part,
+ * one Middle part (data), and one End part. Header: length field (4 bytes) = Middle length field (4 bytes), End length
+ * field (4 bytes), type field (1 byte), ...<br> Middle: (Middle length field bytes)<br> End: (End length field bytes) =
+ * code status field (4 bytes), ...<br>
  *
  * @author frederic bregier
  */
@@ -72,7 +71,6 @@ public abstract class AbstractLocalPacket {
     public abstract void createEnd(LocalChannelReference lcr) throws OpenR66ProtocolPacketException;
 
     /**
-     *
      * @return the type of Packet
      */
     public abstract byte getType();
@@ -81,9 +79,10 @@ public abstract class AbstractLocalPacket {
     public abstract String toString();
 
     /**
-     * @param lcr
-     *            the LocalChannelReference in use
+     * @param lcr the LocalChannelReference in use
+     *
      * @return the ByteBuf as LocalPacket
+     *
      * @throws OpenR66ProtocolPacketException
      */
     public ByteBuf getLocalPacket(LocalChannelReference lcr) throws OpenR66ProtocolPacketException {

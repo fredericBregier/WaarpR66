@@ -24,8 +24,7 @@ import org.waarp.openr66.context.R66Session;
 import org.waarp.openr66.context.task.exception.OpenR66RunnerErrorException;
 
 /**
- * Example dummy Business Factory which only generates Log Business 
- *
+ * Example dummy Business Factory which only generates Log Business
  */
 public class TestBusinessFactory implements R66BusinessFactoryInterface {
 

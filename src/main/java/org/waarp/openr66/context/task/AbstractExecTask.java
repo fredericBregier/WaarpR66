@@ -38,12 +38,10 @@ import java.util.Map;
 
 /**
  * Execute an external command
- *
+ * <p>
  * It provides some common functionnalities.
  *
- *
  * @author Bruno Carlin
- *
  */
 public abstract class AbstractExecTask extends AbstractTask {
     /**
@@ -69,6 +67,7 @@ public abstract class AbstractExecTask extends AbstractTask {
      * Apply transferInfo substitutions
      *
      * @param line the line to format
+     *
      * @return the line after substitutions
      */
     protected String applyTransferSubstitutions(String line) {
@@ -117,8 +116,7 @@ public abstract class AbstractExecTask extends AbstractTask {
     }
 
     /**
-     * Generates a substitution map as expected by Apache Commons Exec 
-     * CommandLine
+     * Generates a substitution map as expected by Apache Commons Exec CommandLine
      */
     protected Map<String, Object> getSubstitutionMap() {
         Map<String, Object> rv = new HashMap<String, Object>();

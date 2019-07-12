@@ -45,11 +45,10 @@ import org.waarp.openr66.protocol.utils.ChannelUtils;
 import org.waarp.openr66.protocol.utils.R66ShutdownHook;
 
 /**
- * Server Http REST interface: http://host/server?... + ShutdownOrBlockJsonPacket as PUT or no Json body but GET to get Current
- * Status in Json
+ * Server Http REST interface: http://host/server?... + ShutdownOrBlockJsonPacket as PUT or no Json body but GET to get
+ * Current Status in Json
  *
  * @author "Frederic Bregier"
- *
  */
 public class HttpRestServerR66Handler extends HttpRestAbstractR66Handler {
 

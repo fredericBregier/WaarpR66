@@ -107,14 +107,13 @@ import java.util.List;
 import static org.waarp.openr66.context.R66FiniteDualStates.*;
 
 /**
- * Class to implement actions related to extra server actions: shutdown, bandwidth control,
- * configuration import/export, log purge, request restart/stop/cancel, business request, block new request control,
- * information request and transfer request.
- *
+ * Class to implement actions related to extra server actions: shutdown, bandwidth control, configuration import/export,
+ * log purge, request restart/stop/cancel, business request, block new request control, information request and transfer
+ * request.
+ * <p>
  * Can be used in both standard mode (original packet), or in JSON mode.
  *
  * @author "Frederic Bregier"
- *
  */
 public class ServerActions extends ConnectionActions {
     /**
@@ -136,6 +135,7 @@ public class ServerActions extends ConnectionActions {
      * @param bbusiness
      * @param balias
      * @param broles
+     *
      * @return filenames in order
      */
     public static String[] staticConfigExport(DbSession dbSession, String dir, boolean bhost, boolean brule,
@@ -250,6 +250,7 @@ public class ServerActions extends ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolPacketException
      */
@@ -287,6 +288,7 @@ public class ServerActions extends ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws CommandAbstractException
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolNoDataException
@@ -333,6 +335,7 @@ public class ServerActions extends ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
@@ -768,6 +771,7 @@ public class ServerActions extends ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
@@ -1176,11 +1180,11 @@ public class ServerActions extends ConnectionActions {
     /**
      * Shutdown the current request with an optional rank to set for future restart
      *
-     * @param result
-     *            the result to be associated in finalization
-     * @param rank
-     *            the future rank to set if restart (<0 if none)
+     * @param result the result to be associated in finalization
+     * @param rank the future rank to set if restart (<0 if none)
+     *
      * @return the rank to set for future restart if any (< 0 if none)
+     *
      * @throws OpenR66RunnerErrorException
      * @throws OpenR66ProtocolSystemException
      */
@@ -1222,7 +1226,9 @@ public class ServerActions extends ConnectionActions {
      * @param readglobal
      * @param writesession
      * @param readsession
+     *
      * @return the 4 current values for the bandwidth (in the same order)
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      */
     public final long[] bandwidth(boolean setter,
@@ -1289,7 +1295,9 @@ public class ServerActions extends ConnectionActions {
      * Import configuration from files as parameter
      *
      * @param json
+     *
      * @return the packet to answer
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolSystemException
      */
@@ -1581,7 +1589,9 @@ public class ServerActions extends ConnectionActions {
      * @param bbusiness
      * @param balias
      * @param broles
+     *
      * @return filenames in order
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      */
     public final String[] configExport(boolean bhost, boolean brule,
@@ -1613,15 +1623,13 @@ public class ServerActions extends ConnectionActions {
     /**
      * Request to restart a transfer
      *
-     * @param reqd
-     *            requested
-     * @param reqr
-     *            requester
-     * @param id
-     *            id of the Transfer
-     * @param date
-     *            time start if any
+     * @param reqd requested
+     * @param reqr requester
+     * @param id id of the Transfer
+     * @param date time start if any
+     *
      * @return the Result including the error code to use in return
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      */
     public final R66Result requestRestart(String reqd, String reqr, long id, Date date)
@@ -1692,8 +1700,8 @@ public class ServerActions extends ConnectionActions {
     }
 
     /**
-     *
      * @param code
+     *
      * @return True if the code is an OK code and not an error
      */
     public final boolean isCodeValid(ErrorCode code) {
@@ -1755,7 +1763,9 @@ public class ServerActions extends ConnectionActions {
      * @param done
      * @param error
      * @param isPurge
+     *
      * @return an array of Strings as: filename, nb of exported, nb of purged
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolBusinessException
      */
@@ -1850,7 +1860,9 @@ public class ServerActions extends ConnectionActions {
      * @param reqd
      * @param reqr
      * @param id
+     *
      * @return the Result to answer
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @deprecated use stopTransfer or cancel transfer instead
      */
@@ -1921,6 +1933,7 @@ public class ServerActions extends ConnectionActions {
 
     /**
      * @param transfer the transfer to stop
+     *
      * @return
      */
     public R66Result stopTransfer(Transfer transfer) {
@@ -1951,8 +1964,8 @@ public class ServerActions extends ConnectionActions {
     }
 
     /**
-     *
      * @param transfer the transfer to stop
+     *
      * @return
      */
     public R66Result cancelTransfer(Transfer transfer) {
@@ -1989,6 +2002,7 @@ public class ServerActions extends ConnectionActions {
      * @param reqd
      * @param reqr
      * @param code
+     *
      * @return True if correctly stopped or canceled
      */
     private final boolean stopOrCancelRunner(long id, String reqd, String reqr, ErrorCode code) {
@@ -2008,6 +2022,7 @@ public class ServerActions extends ConnectionActions {
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolShutdownException
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolBusinessException
@@ -2026,6 +2041,7 @@ public class ServerActions extends ConnectionActions {
      *
      * @param key
      * @param isRestart
+     *
      * @throws OpenR66ProtocolShutdownException
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolBusinessException
@@ -2064,12 +2080,13 @@ public class ServerActions extends ConnectionActions {
 
     /**
      * Business Request (channel should stay open)
-     *
-     * Note: the thread called should manage all writeback informations, as well as status, channel
-     * closing if needed or not.
+     * <p>
+     * Note: the thread called should manage all writeback informations, as well as status, channel closing if needed or
+     * not.
      *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolPacketException
      */
@@ -2104,17 +2121,18 @@ public class ServerActions extends ConnectionActions {
 
     /**
      * Business Request (channel should stay open)
+     * <p>
+     * Note: the thread called should manage all writeback informations, as well as status, channel closing if needed or
+     * not.
      *
-     * Note: the thread called should manage all writeback informations, as well as status, channel
-     * closing if needed or not.
-     *
-     * @param isToApplied
-     *            True means this is an action request, False it is the feedback
+     * @param isToApplied True means this is an action request, False it is the feedback
      * @param className
      * @param arguments
      * @param extraArguments
      * @param delay
+     *
      * @return future of the execution
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolPacketException
      */
@@ -2152,9 +2170,9 @@ public class ServerActions extends ConnectionActions {
     /**
      * Block/Unblock Request
      *
-     *
      * @param channel
      * @param packet
+     *
      * @throws OpenR66ProtocolPacketException
      * @throws OpenR66ProtocolBusinessException
      */
@@ -2176,10 +2194,11 @@ public class ServerActions extends ConnectionActions {
     /**
      * Block/Unblock Request
      *
-     *
      * @param key
      * @param isBlocking
+     *
      * @return The result
+     *
      * @throws OpenR66ProtocolPacketException
      * @throws OpenR66ProtocolBusinessException
      */
@@ -2217,15 +2236,13 @@ public class ServerActions extends ConnectionActions {
     /**
      * Receive a request of information (Transfer information or File listing)
      *
-     * @param request
-     *            InformationPacket.ASKENUM ordinal
-     * @param rulename
-     *            rulename for file path
-     * @param filename
-     *            partial name (including wildcard)
-     * @param jsonOutput
-     *            ValidPacket will contain Json format ?
+     * @param request InformationPacket.ASKENUM ordinal
+     * @param rulename rulename for file path
+     * @param filename partial name (including wildcard)
+     * @param jsonOutput ValidPacket will contain Json format ?
+     *
      * @return the ValidPacket to answer containing: File Listing as Header and Number of entries as Middle
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolNoDataException
      * @throws OpenR66ProtocolPacketException
@@ -2337,16 +2354,14 @@ public class ServerActions extends ConnectionActions {
     /**
      * Receive a request of information (Transfer information or File listing)
      *
-     * @param id
-     *            Id of request
-     * @param isTo
-     *            True for remote host is requester, False for requested (default)
-     * @param remoteHost
-     *            requester/requested for transfer if jsonOutput is True, else (jsonOutput False) remoteHost is from current
-     *            Authenticated user
-     * @param jsonOutput
-     *            ValidPacket will contain Json format ?
+     * @param id Id of request
+     * @param isTo True for remote host is requester, False for requested (default)
+     * @param remoteHost requester/requested for transfer if jsonOutput is True, else (jsonOutput False) remoteHost is
+     * from current Authenticated user
+     * @param jsonOutput ValidPacket will contain Json format ?
+     *
      * @return the ValidPacket to answer containing: Transfer Information as Header
+     *
      * @throws OpenR66ProtocolNotAuthenticatedException
      * @throws OpenR66ProtocolNoDataException
      * @throws OpenR66ProtocolPacketException
@@ -2416,6 +2431,7 @@ public class ServerActions extends ConnectionActions {
      * Receive a TransferRequest in JSON mode: just setting it to be scheduled
      *
      * @param request
+     *
      * @return the result associated with the new transfer request
      */
     public final R66Result transferRequest(TransferRequestJsonPacket request) {
@@ -2450,6 +2466,7 @@ public class ServerActions extends ConnectionActions {
      * initialize a new Transfer Request
      *
      * @param request
+     *
      * @return the associated DbTaskRunner
      */
     private final DbTaskRunner initTransferRequest(TransferRequestJsonPacket request) {
