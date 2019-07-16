@@ -22,6 +22,7 @@ package org.waarp.openr66.database.data;
 import org.waarp.common.database.DbPreparedStatement;
 import org.waarp.common.database.DbSession;
 import org.waarp.common.database.data.AbstractDbData;
+import org.waarp.common.database.data.DbValue;
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.database.exception.WaarpDatabaseNoConnectionException;
 import org.waarp.common.database.exception.WaarpDatabaseSqlException;
@@ -68,7 +69,6 @@ public class DbMultipleMonitor extends AbstractDbData {
   private MultipleMonitor multipleMonitor;
 
   /**
-   * @param dbSession
    * @param hostid
    * @param cc count for Config
    * @param ch count for Host
@@ -80,7 +80,6 @@ public class DbMultipleMonitor extends AbstractDbData {
   }
 
   /**
-   * @param dbSession
    * @param hostid
    *
    * @throws WaarpDatabaseException
@@ -195,16 +194,21 @@ public class DbMultipleMonitor extends AbstractDbData {
 
   @Override
   protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(multipleMonitor.getHostid(),
-                Columns.HOSTID.name()) };
-        otherFields = new DbValue[] {
-                new DbValue(getCountConfig(), Columns.COUNTCONFIG.name()),
-                new DbValue(getCountHost(), Columns.COUNTHOST.name()),
-                new DbValue(getCountRule(), Columns.COUNTRULE.name()) };
-        allFields = new DbValue[] {
-                otherFields[0], otherFields[1], otherFields[2], primaryKey[0] };
-         */
+    // FIXME : Still NEEDED Dooh !
+    /*
+    primaryKey = new DbValue[] {
+        new DbValue(multipleMonitor.getHostid(),
+                    Columns.HOSTID.name())
+    };
+    otherFields = new DbValue[] {
+        new DbValue(getCountConfig(), Columns.COUNTCONFIG.name()),
+        new DbValue(getCountHost(), Columns.COUNTHOST.name()),
+        new DbValue(getCountRule(), Columns.COUNTRULE.name())
+    };
+    allFields = new DbValue[] {
+        otherFields[0], otherFields[1], otherFields[2], primaryKey[0]
+    };
+    */
   }
 
   @Override

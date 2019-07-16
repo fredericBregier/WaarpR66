@@ -25,6 +25,7 @@ import org.waarp.common.database.exception.WaarpDatabaseSqlException;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.configuration.FileBasedConfiguration;
 import org.waarp.openr66.database.DbConstant;
 import org.waarp.openr66.database.data.DbHostAuth;
@@ -61,7 +62,8 @@ public class TestJsonGenerator {
       if (DbConstant.admin != null && DbConstant.admin.isActive()) {
         DbConstant.admin.close();
       }
-      System.exit(1);
+      DetectionUtils.SystemExit(1);
+      return;
     }
     getSpecialParams(args, 1);
     logger.warn("Start Test Json");

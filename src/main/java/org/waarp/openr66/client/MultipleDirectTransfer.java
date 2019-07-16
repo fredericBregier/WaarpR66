@@ -23,6 +23,7 @@ import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.client.utils.OutputFormat;
 import org.waarp.openr66.client.utils.OutputFormat.FIELDS;
 import org.waarp.openr66.context.ErrorCode;
@@ -194,10 +195,9 @@ public class MultipleDirectTransfer extends DirectTransfer {
             R66Future future = new R66Future(true);
             DirectTransfer transaction = new DirectTransfer(future,
                                                             host, filename,
-                                                            rule, fileInfo,
-                                                            ismd5, block,
-                                                            idt,
-                                                            networkTransaction);
+                                                            rulename, this.fileinfo,
+                                                            this.isMD5, this.blocksize,
+                                                            id, networkTransaction);
             transaction.normalInfoAsWarn = normalInfoAsWarn;
             logger.debug("rhost: " + host + ":" + transaction.remoteHost);
             transaction.run();
@@ -263,8 +263,11 @@ public class MultipleDirectTransfer extends DirectTransfer {
                 outputFormat.setValue(FIELDS.error.name(),
                                       future.getCause().getMessage());
                 outputFormat.sysout();
-                networkTransaction.closeAll();
-                System.exit(ErrorCode.Unknown.ordinal());
+                if (!DetectionUtils.isJunit()) {
+                  networkTransaction.closeAll();
+                  System.exit(ErrorCode.Unknown.ordinal());
+                }
+                return;
               }
               if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
                 outputFormat.setValue(FIELDS.status.name(), 1);

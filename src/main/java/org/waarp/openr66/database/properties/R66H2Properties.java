@@ -50,7 +50,7 @@ public class R66H2Properties extends R66DbProperties {
                    "ADDRESS VARCHAR(8096) NOT NULL ," +
                    "PORT INTEGER NOT NULL ," +
                    "ISSSL BOOLEAN NOT NULL ," +
-                   "HOSTKEY BYTEA NOT NULL ," +
+                   "HOSTKEY BYTEA(255) NOT NULL ," +
                    "ADMINROLE BOOLEAN NOT NULL ," +
                    "ISCLIENT BOOLEAN NOT NULL ," +
                    "ISACTIVE BOOLEAN NOT NULL ," +

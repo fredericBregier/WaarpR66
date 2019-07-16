@@ -61,12 +61,13 @@ public class AuthenticationFileBasedConfiguration {
   /**
    * Authentication Fields
    */
-  public static final String XML_AUTHENTIFICATION_BASED = "/"
-                                                          +
-                                                          XML_AUTHENTIFICATION_ROOT
-                                                          + "/"
-                                                          +
-                                                          XML_AUTHENTIFICATION_ENTRY;
+  public static final String XML_AUTHENTIFICATION_BASED =
+      "/"
+      +
+      XML_AUTHENTIFICATION_ROOT
+      + "/"
+      +
+      XML_AUTHENTIFICATION_ENTRY;
   /**
    * Authentication Fields
    */

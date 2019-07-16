@@ -23,6 +23,7 @@ import org.waarp.common.exception.CryptoException;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.gateway.kernel.rest.RestConfiguration;
 import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler;
 import org.waarp.openr66.protocol.http.rest.HttpRestR66Handler.RESTHANDLERS;
@@ -66,7 +67,8 @@ public class HttpTestR66PseudoMain {
     String pathTemp = "/tmp";
     if (!R66Server.initialize(args[0])) {
       System.err.println("Error during startup");
-      System.exit(1);
+      DetectionUtils.SystemExit(1);
+      return;
     }
 
     config = getTestConfiguration();

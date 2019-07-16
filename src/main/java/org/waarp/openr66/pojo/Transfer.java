@@ -236,7 +236,6 @@ public class Transfer {
   /**
    * Empty constructor for compatibility issues
    */
-  @Deprecated
   public Transfer() {
   }
 

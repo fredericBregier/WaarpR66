@@ -87,8 +87,8 @@ public class R66MariaDBProperties extends R66DbProperties {
                    "FILEINFO TEXT NOT NULL ," +
                    "TRANSFERINFO TEXT NOT NULL ," +
                    "MODETRANS INTEGER NOT NULL ," +
-                   "STARTTRANS TIMESTAMP NOT NULL ," +
-                   "STOPTRANS TIMESTAMP NOT NULL ," +
+                   "STARTTRANS TIMESTAMP(3) NOT NULL ," +
+                   "STOPTRANS TIMESTAMP(3) NOT NULL ," +
                    "INFOSTATUS CHAR(3) NOT NULL ," +
                    "UPDATEDINFO INTEGER NOT NULL ," +
                    "OWNERREQ VARCHAR(8096) NOT NULL ," +

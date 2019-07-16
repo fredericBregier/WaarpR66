@@ -22,6 +22,7 @@ package org.waarp.openr66.protocol.test;
 import io.netty.buffer.ByteBuf;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.client.RecvThroughClient;
 import org.waarp.openr66.client.RecvThroughHandler;
 import org.waarp.openr66.context.ErrorCode;
@@ -72,7 +73,8 @@ public class TestRecvThroughClient extends RecvThroughClient {
       if (DbConstant.admin != null && DbConstant.admin.isActive()) {
         DbConstant.admin.close();
       }
-      System.exit(1);
+      DetectionUtils.SystemExit(1);
+      return;
     }
     Configuration.configuration.pipelineInit();
     NetworkTransaction networkTransaction = new NetworkTransaction();
@@ -114,18 +116,21 @@ public class TestRecvThroughClient extends RecvThroughClient {
         if (result == null || result.getRunner() == null) {
           logger.warn("Transfer in Error with no Id", future.getCause());
           networkTransaction.closeAll();
-          System.exit(1);
+          DetectionUtils.SystemExit(1);
+          return;
         }
         if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
           logger.warn("Transfer in Warning with Id: " +
                       result.getRunner().getSpecialId(), future.getCause());
           networkTransaction.closeAll();
-          System.exit(result.getCode().ordinal());
+          DetectionUtils.SystemExit(result.getCode().ordinal());
+          return;
         } else {
           logger.error("Transfer in Error with Id: " +
                        result.getRunner().getSpecialId(), future.getCause());
           networkTransaction.closeAll();
-          System.exit(result.getCode().ordinal());
+          DetectionUtils.SystemExit(result.getCode().ordinal());
+          return;
         }
       }
     } finally {

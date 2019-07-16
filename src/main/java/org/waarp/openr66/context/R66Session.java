@@ -28,6 +28,7 @@ import org.waarp.common.file.filesystembased.FilesystemBasedFileParameterImpl;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.state.MachineState;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.context.authentication.R66Auth;
 import org.waarp.openr66.context.filesystem.R66Dir;
 import org.waarp.openr66.context.filesystem.R66File;
@@ -160,7 +161,9 @@ public class R66Session implements SessionInterface {
     try {
       state.setCurrent(desiredstate);
     } catch (IllegalFiniteStateException e) {
-      logger.warn("Should not changed of State: {} {}", this, e.getMessage());
+      if (!DetectionUtils.isJunit()) {
+        logger.warn("Should not changed of State: {} {}", this, e.getMessage());
+      }
       state.setDryCurrent(desiredstate);
     }
   }

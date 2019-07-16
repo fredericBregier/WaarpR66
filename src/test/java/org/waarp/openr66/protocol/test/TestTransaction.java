@@ -116,7 +116,7 @@ public class TestTransaction implements Runnable {
     int success = 0;
     int error = 0;
     for (int i = 0; i < nb; i++) {
-      arrayFuture[i].awaitUninterruptibly();
+      arrayFuture[i].awaitForDoneOrInterruptible();
       if (arrayFuture[i].isSuccess()) {
         success++;
       } else {

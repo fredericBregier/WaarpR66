@@ -40,7 +40,6 @@ public class Business {
   /**
    * Empty constructor for compatibility issues
    */
-  @Deprecated
   public Business() {
   }
 

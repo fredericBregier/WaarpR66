@@ -276,9 +276,11 @@ public class DbModelH2 extends org.waarp.common.database.model.DbModelH2 {
       request.close();
     }
 
+    System.out.println("Do UpdateVersionDb");
     DbHostConfiguration
         .updateVersionDb(Configuration.configuration.getHOST_ID(),
                          R66Versions.V2_4_25.getVersion());
+    System.out.println("UpdateVersionDb done");
   }
 
   @Override

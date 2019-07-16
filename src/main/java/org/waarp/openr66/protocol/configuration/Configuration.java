@@ -46,6 +46,7 @@ import org.waarp.common.future.WaarpFuture;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.role.RoleDefault;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.common.utility.SystemPropertyUtil;
 import org.waarp.common.utility.WaarpNettyUtil;
 import org.waarp.common.utility.WaarpShutdownHook;
@@ -1602,6 +1603,10 @@ public class Configuration {
     this.useNOSSL = useNOSSL;
   }
 
+  public void startJunitRestSupport(RestConfiguration config) {
+    HttpRestR66Handler.initializeService(config);
+  }
+
   public InternalRunner getInternalRunner() {
     return internalRunner;
   }
@@ -1684,8 +1689,10 @@ public class Configuration {
       setMonitoring(null);
     }
     shutdownGracefully();
-    if (execOtherWorker != null) {
-      execOtherWorker.shutdownNow();
+    if (!DetectionUtils.isJunit()) {
+      if (execOtherWorker != null) {
+        execOtherWorker.shutdownNow();
+      }
     }
     if (timerCloseOperations != null) {
       timerCloseOperations.stop();

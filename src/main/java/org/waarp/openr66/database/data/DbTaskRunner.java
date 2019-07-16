@@ -747,8 +747,6 @@ public class DbTaskRunner extends AbstractDbData {
 
   /**
    * Private constructor for Commander only
-   *
-   * @param dbSession
    */
   private DbTaskRunner() {
     super();
@@ -1820,8 +1818,6 @@ public class DbTaskRunner extends AbstractDbData {
    * This method is a clean function to be
    * used for instance before log export or at the very beginning of the
    * commander.
-   *
-   * @param session
    *
    * @throws WaarpDatabaseNoConnectionException
    */

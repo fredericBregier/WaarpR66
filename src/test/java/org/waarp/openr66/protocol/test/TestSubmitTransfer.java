@@ -21,6 +21,7 @@ package org.waarp.openr66.protocol.test;
 
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.client.SubmitTransfer;
 import org.waarp.openr66.database.DbConstant;
 import org.waarp.openr66.protocol.utils.R66Future;
@@ -56,7 +57,8 @@ public class TestSubmitTransfer extends SubmitTransfer {
       if (DbConstant.admin != null && DbConstant.admin.isActive()) {
         DbConstant.admin.close();
       }
-      System.exit(1);
+      DetectionUtils.SystemExit(1);
+      return;
     }
     getSpecialParams(args, 1);
 

@@ -112,7 +112,6 @@ public class DbHostAuth extends AbstractDbData {
   private Host host;
 
   /**
-   * @param dbSession
    * @param hostid
    * @param address
    * @param port
@@ -200,7 +199,6 @@ public class DbHostAuth extends AbstractDbData {
   }
 
   /**
-   * @param dbSession
    * @param hostid
    *
    * @throws WaarpDatabaseException
@@ -237,8 +235,6 @@ public class DbHostAuth extends AbstractDbData {
   /**
    * Delete all entries (used when purge and reload)
    *
-   * @param dbSession
-   *
    * @return the previous existing array of DbRule
    *
    * @throws WaarpDatabaseException
@@ -267,8 +263,6 @@ public class DbHostAuth extends AbstractDbData {
   /**
    * Get All DbHostAuth from database or from internal hashMap in case of no
    * database support
-   *
-   * @param dbSession may be null
    *
    * @return the array of DbHostAuth
    *
@@ -593,8 +587,6 @@ public class DbHostAuth extends AbstractDbData {
   }
 
   /**
-   * @param session
-   *
    * @return True if any of the server has the isProxified property
    */
   public static boolean hasProxifiedHosts() {
@@ -625,26 +617,31 @@ public class DbHostAuth extends AbstractDbData {
 
   @Override
   protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(host.getHostid(), Columns.HOSTID
-                .name()) };
-        otherFields = new DbValue[] {
-                new DbValue(host.getAddress(), Columns.ADDRESS.name()),
-                new DbValue(host.getPort(), Columns.PORT.name()),
-                new DbValue(host.isSSL(), Columns.ISSSL.name()),
-                new DbValue(host.getHostkey(), Columns.HOSTKEY.name()),
-                new DbValue(host.isAdmin(), Columns.ADMINROLE.name()),
-                new DbValue(host.isClient(), Columns.ISCLIENT.name()),
-                new DbValue(host.isActive(), Columns.ISACTIVE.name()),
-                new DbValue(host.isProxified(), Columns.ISPROXIFIED.name()),
-                new DbValue(host.getUpdatedInfo().ordinal(),
-                        Columns.UPDATEDINFO.name()) };
-        allFields = new DbValue[] {
-                otherFields[0], otherFields[1], otherFields[2],
-                otherFields[3], otherFields[4], otherFields[5], otherFields[6], otherFields[7], otherFields[8],
-                primaryKey[0] };
-
-         */
+    // FIXME : Still NEEDED Dooh !
+    /*
+    primaryKey = new DbValue[] {
+        new DbValue(host.getHostid(), Columns.HOSTID
+            .name())
+    };
+    otherFields = new DbValue[] {
+        new DbValue(host.getAddress(), Columns.ADDRESS.name()),
+        new DbValue(host.getPort(), Columns.PORT.name()),
+        new DbValue(host.isSSL(), Columns.ISSSL.name()),
+        new DbValue(host.getHostkey(), Columns.HOSTKEY.name()),
+        new DbValue(host.isAdmin(), Columns.ADMINROLE.name()),
+        new DbValue(host.isClient(), Columns.ISCLIENT.name()),
+        new DbValue(host.isActive(), Columns.ISACTIVE.name()),
+        new DbValue(host.isProxified(), Columns.ISPROXIFIED.name()),
+        new DbValue(host.getUpdatedInfo().ordinal(),
+                    Columns.UPDATEDINFO.name())
+    };
+    allFields = new DbValue[] {
+        otherFields[0], otherFields[1], otherFields[2],
+        otherFields[3], otherFields[4], otherFields[5], otherFields[6],
+        otherFields[7], otherFields[8],
+        primaryKey[0]
+    };
+    */
   }
 
   @Override

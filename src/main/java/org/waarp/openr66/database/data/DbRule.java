@@ -201,7 +201,6 @@ public class DbRule extends AbstractDbData {
   private Rule rule;
 
   /**
-   * @param dbSession
    * @param idRule
    * @param ids
    * @param mode
@@ -302,7 +301,6 @@ public class DbRule extends AbstractDbData {
   }
 
   /**
-   * @param dbSession
    * @param idRule
    *
    * @throws WaarpDatabaseException
@@ -333,7 +331,6 @@ public class DbRule extends AbstractDbData {
   /**
    * Constructor used from XML file
    *
-   * @param dbSession
    * @param idrule
    * @param idsArrayRef
    * @param recvpath
@@ -371,7 +368,6 @@ public class DbRule extends AbstractDbData {
   /**
    * Constructor from Json
    *
-   * @param dbSession
    * @param source
    *
    * @throws WaarpDatabaseSqlException
@@ -417,8 +413,6 @@ public class DbRule extends AbstractDbData {
   /**
    * Delete all entries (used when purge and reload)
    *
-   * @param dbSession
-   *
    * @return the previous existing array of DbRule
    *
    * @throws WaarpDatabaseException
@@ -449,8 +443,6 @@ public class DbRule extends AbstractDbData {
   /**
    * Get All DbRule from database or from internal hashMap in case of no
    * database support
-   *
-   * @param dbSession may be null
    *
    * @return the array of DbRule
    *
@@ -829,31 +821,36 @@ public class DbRule extends AbstractDbData {
 
   @Override
   protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(getIdRule(),
-                Columns.IDRULE.name()) };
-        otherFields = new DbValue[] {
-                // HOSTIDS, MODETRANS, RECVPATH, SENDPATH, ARCHIVEPATH, WORKPATH,
-                // PRETASKS, POSTTASKS, ERRORTASKS
-                new DbValue(rule.getXMLHostids(), Columns.HOSTIDS.name(), true),
-                new DbValue(rule.getMode(), Columns.MODETRANS.name()),
-                new DbValue(rule.getRecvPath(), Columns.RECVPATH.name()),
-                new DbValue(rule.getSendPath(), Columns.SENDPATH.name()),
-                new DbValue(rule.getArchivePath(), Columns.ARCHIVEPATH.name()),
-                new DbValue(rule.getWorkPath(), Columns.WORKPATH.name()),
-                new DbValue(rule.getXMLRPreTasks(), Columns.RPRETASKS.name(), true),
-                new DbValue(rule.getXMLRPostTasks(), Columns.RPOSTTASKS.name(), true),
-                new DbValue(rule.getXMLRErrorTasks(), Columns.RERRORTASKS.name(), true),
-                new DbValue(rule.getXMLSPreTasks(), Columns.SPRETASKS.name(), true),
-                new DbValue(rule.getXMLSPostTasks(), Columns.SPOSTTASKS.name(), true),
-                new DbValue(rule.getXMLSErrorTasks(), Columns.SERRORTASKS.name(), true),
-                new DbValue(rule.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
-        allFields = new DbValue[] {
-                otherFields[0], otherFields[1], otherFields[2], otherFields[3],
-                otherFields[4], otherFields[5], otherFields[6], otherFields[7],
-                otherFields[8], otherFields[9], otherFields[10],
-                otherFields[11], otherFields[12], primaryKey[0] };
-         */
+    // FIXME : Still NEEDED Dooh !
+    /*
+    primaryKey = new DbValue[] {
+        new DbValue(getIdRule(),
+                    Columns.IDRULE.name())
+    };
+    otherFields = new DbValue[] {
+        // HOSTIDS, MODETRANS, RECVPATH, SENDPATH, ARCHIVEPATH, WORKPATH,
+        // PRETASKS, POSTTASKS, ERRORTASKS
+        new DbValue(rule.getXMLHostids(), Columns.HOSTIDS.name(), true),
+        new DbValue(rule.getMode(), Columns.MODETRANS.name()),
+        new DbValue(rule.getRecvPath(), Columns.RECVPATH.name()),
+        new DbValue(rule.getSendPath(), Columns.SENDPATH.name()),
+        new DbValue(rule.getArchivePath(), Columns.ARCHIVEPATH.name()),
+        new DbValue(rule.getWorkPath(), Columns.WORKPATH.name()),
+        new DbValue(rule.getXMLRPreTasks(), Columns.RPRETASKS.name(), true),
+        new DbValue(rule.getXMLRPostTasks(), Columns.RPOSTTASKS.name(), true),
+        new DbValue(rule.getXMLRErrorTasks(), Columns.RERRORTASKS.name(), true),
+        new DbValue(rule.getXMLSPreTasks(), Columns.SPRETASKS.name(), true),
+        new DbValue(rule.getXMLSPostTasks(), Columns.SPOSTTASKS.name(), true),
+        new DbValue(rule.getXMLSErrorTasks(), Columns.SERRORTASKS.name(), true),
+        new DbValue(rule.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name())
+    };
+    allFields = new DbValue[] {
+        otherFields[0], otherFields[1], otherFields[2], otherFields[3],
+        otherFields[4], otherFields[5], otherFields[6], otherFields[7],
+        otherFields[8], otherFields[9], otherFields[10],
+        otherFields[11], otherFields[12], primaryKey[0]
+    };
+    */
   }
 
   @Override

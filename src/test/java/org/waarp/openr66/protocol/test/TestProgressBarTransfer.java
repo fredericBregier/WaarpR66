@@ -22,6 +22,7 @@ package org.waarp.openr66.protocol.test;
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.client.ProgressBarTransfer;
 import org.waarp.openr66.context.ErrorCode;
 import org.waarp.openr66.context.R66Result;
@@ -70,7 +71,8 @@ public class TestProgressBarTransfer extends ProgressBarTransfer {
         DbConstant.admin.close();
       }
       ChannelUtils.stopLogger();
-      System.exit(2);
+      DetectionUtils.SystemExit(2);
+      return;
     }
     long time1 = System.currentTimeMillis();
     R66Future future = new R66Future(true);
@@ -138,30 +140,31 @@ public class TestProgressBarTransfer extends ProgressBarTransfer {
         if (result == null || result.getRunner() == null) {
           logger.error("Transfer in     FAILURE with no Id", future.getCause());
           networkTransaction.closeAll();
-          System.exit(ErrorCode.Unknown.ordinal());
+          DetectionUtils.SystemExit(ErrorCode.Unknown.ordinal());
+          return;
         }
         if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
           logger.warn("Transfer is     WARNED     " +
                       result.getRunner().toShortString() +
                       "     <REMOTE>" + rhost + "</REMOTE>", future.getCause());
           networkTransaction.closeAll();
-          System.exit(result.getCode().ordinal());
+          DetectionUtils.SystemExit(result.getCode().ordinal());
         } else {
           logger.error("Transfer in     FAILURE     " +
                        result.getRunner().toShortString() +
                        "     <REMOTE>" + rhost + "</REMOTE>",
                        future.getCause());
           networkTransaction.closeAll();
-          System.exit(result.getCode().ordinal());
+          DetectionUtils.SystemExit(result.getCode().ordinal());
         }
       }
     } finally {
       networkTransaction.closeAll();
       // In case something wrong append
       if (future.isDone() && future.isSuccess()) {
-        System.exit(0);
+        DetectionUtils.SystemExit(0);
       } else {
-        System.exit(66);
+        DetectionUtils.SystemExit(66);
       }
     }
   }

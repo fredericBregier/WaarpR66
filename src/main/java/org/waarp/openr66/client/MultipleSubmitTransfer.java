@@ -22,6 +22,7 @@ package org.waarp.openr66.client;
 import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.client.utils.OutputFormat;
 import org.waarp.openr66.client.utils.OutputFormat.FIELDS;
 import org.waarp.openr66.context.R66Result;
@@ -198,15 +199,21 @@ public class MultipleSubmitTransfer extends SubmitTransfer {
       dbrule = new DbRule(rulename);
     } catch (WaarpDatabaseException e) {
       logger.error(Messages.getString("SubmitTransfer.2") + rule); //$NON-NLS-1$
-      ChannelUtils.stopLogger();
-      System.exit(2);
+      if (!DetectionUtils.isJunit()) {
+        ChannelUtils.stopLogger();
+        System.exit(2);
+      }
+      return;
     }
     if (!submit && dbrule.isRecvMode() && networkTransaction == null) {
       logger.error(
           Messages.getString("Configuration.WrongInit") +
           " => -client argument is missing"); //$NON-NLS-1$
-      ChannelUtils.stopLogger();
-      System.exit(2);
+      if (!DetectionUtils.isJunit()) {
+        ChannelUtils.stopLogger();
+        System.exit(2);
+      }
+      return;
     }
     List<String> files = null;
     if (dbrule.isSendMode()) {
@@ -230,10 +237,11 @@ public class MultipleSubmitTransfer extends SubmitTransfer {
             R66Future future = new R66Future(true);
             SubmitTransfer transaction = new SubmitTransfer(future,
                                                             host, filename,
-                                                            rule, fileInfo,
-                                                            ismd5, block,
-                                                            idt,
-                                                            ttimestart);
+                                                            rulename,
+                                                            this.fileinfo,
+                                                            this.isMD5,
+                                                            this.blocksize,
+                                                            id, this.startTime);
             transaction.normalInfoAsWarn = normalInfoAsWarn;
             transaction.run();
             future.awaitUninterruptibly();

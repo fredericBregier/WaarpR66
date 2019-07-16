@@ -36,6 +36,7 @@ import org.waarp.common.json.JsonHandler;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.role.RoleDefault.ROLE;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.common.utility.WaarpStringUtils;
 import org.waarp.openr66.configuration.AuthenticationFileBasedConfiguration;
 import org.waarp.openr66.configuration.RuleFileBasedConfiguration;
@@ -158,11 +159,13 @@ public class ServerActions extends ConnectionActions {
       localChannelReference.validateRequest(result);
       ChannelUtils
           .writeAbstractLocalPacket(localChannelReference, validPacket, true);
-      logger.warn("Valid TEST MESSAGE from " +
-                  session.getAuth().getUser() +
-                  " [" +
-                  localChannelReference.getNetworkChannel().remoteAddress() +
-                  "] Msg=" + packet.toString());
+      if (!DetectionUtils.isJunit()) {
+        logger.warn("Valid TEST MESSAGE from " +
+                    session.getAuth().getUser() +
+                    " [" +
+                    localChannelReference.getNetworkChannel().remoteAddress() +
+                    "] Msg=" + packet.toString());
+      }
       ChannelCloseTimer.closeFutureChannel(channel);
       packet.clear();
     } else {

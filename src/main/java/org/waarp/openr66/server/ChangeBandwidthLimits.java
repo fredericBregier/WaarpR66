@@ -23,6 +23,7 @@ import org.waarp.common.database.exception.WaarpDatabaseException;
 import org.waarp.common.logging.WaarpLogger;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
 import org.waarp.openr66.configuration.FileBasedConfiguration;
 import org.waarp.openr66.context.ErrorCode;
 import org.waarp.openr66.context.R66FiniteDualStates;
@@ -122,6 +123,7 @@ public class ChangeBandwidthLimits implements Runnable {
               e);
           networkTransaction.closeAll();
           System.exit(10);
+          return;
         }
       } else {
         stohost = Configuration.configuration.getHOST_SSLID();

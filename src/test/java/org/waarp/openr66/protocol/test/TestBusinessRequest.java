@@ -72,13 +72,19 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
     }
     Configuration.configuration.pipelineInit();
 
-    final NetworkTransaction networkTransaction = new NetworkTransaction();
-    DbHostAuth host = Configuration.configuration.getHOST_AUTH();
-    ExecutorService executorService = Executors.newCachedThreadPool();
-    int nb = 100;
-    if (args.length > 1) {
-      nb = Integer.parseInt(args[1]);
+        NetworkTransaction networkTransaction = new NetworkTransaction();
+        DbHostAuth host = Configuration.configuration.getHOST_AUTH();
+        runTest(networkTransaction, host, 1);
+        networkTransaction.closeAll();
     }
+
+    public static int runTest(NetworkTransaction networkTransaction,
+                              DbHostAuth host, int nbToDo) {
+        if (logger == null) {
+            logger = WaarpLoggerFactory.getLogger(TestBusinessRequest.class);
+        }
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        int nb = nbToDo;
 
     R66Future[] arrayFuture = new R66Future[nb];
     logger.info("Start Test of Transaction");
@@ -148,49 +154,47 @@ public class TestBusinessRequest extends AbstractBusinessRequest {
         "Simple ExecJava Success: " + success + " Error: " + error + " NB/s: " +
         1000 / (time4 - time3));
 
-    logger.info("Start Test of Increasing Transaction");
-    time1 = System.currentTimeMillis();
-    String argsAdd =
-        "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-    String value = " business 0 ";
-    int lastnb = nb;
-    for (int i = 0; i < nb; i++) {
-      arrayFuture[i] = new R66Future(true);
-      try {
-        value += argsAdd + argsAdd + argsAdd + argsAdd + argsAdd + argsAdd +
-                 argsAdd + argsAdd + argsAdd
-                 + argsAdd;
-      } catch (OutOfMemoryError e) {
-        logger.warn("Send size: " + value.length());
-        lastnb = i;
-        break;
-      }
-      packet = new BusinessRequestPacket(
-          TestExecJavaTask.class.getName() + value, 0);
-      TestBusinessRequest transaction2 = new TestBusinessRequest(
-          networkTransaction, arrayFuture[i], host.getHostid(),
-          packet);
-      executorService.execute(transaction2);
+        logger.info("Start Test of Increasing Transaction");
+        time1 = System.currentTimeMillis();
+        String argsAdd =
+                "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+        String value = " business 0 ";
+        int lastnb = nb;
+        for (int i = 0; i < nb; i++) {
+            arrayFuture[i] = new R66Future(true);
+            try {
+                value += argsAdd + argsAdd + argsAdd + argsAdd + argsAdd +
+                         argsAdd + argsAdd + argsAdd + argsAdd
+                         + argsAdd;
+            } catch (OutOfMemoryError e) {
+                logger.warn("Send size: " + value.length());
+                lastnb = i;
+                break;
+            }
+            packet = new BusinessRequestPacket(
+                    TestExecJavaTask.class.getName() + value, 0);
+            TestBusinessRequest transaction2 =
+                    new TestBusinessRequest(networkTransaction, arrayFuture[i],
+                                            host.getHostid(), packet);
+            executorService.execute(transaction2);
+        }
+        int success2 = 0;
+        int error2 = 0;
+        for (int i = 0; i < lastnb; i++) {
+            arrayFuture[i].awaitForDoneOrInterruptible();
+            if (arrayFuture[i].isSuccess()) {
+                success2++;
+            } else {
+                error2++;
+            }
+        }
+        time2 = System.currentTimeMillis();
+        logger.warn(
+                "Simple TestExecJavaTask with increasing argument size Success: " +
+                success2 + " Error: " + error2
+                + " NB/s: " + success2 * nb * 1000 / (time2 - time1));
+        executorService.shutdown();
+        return error + error2;
     }
-    success = 0;
-    error = 0;
-    for (int i = 0; i < lastnb; i++) {
-      arrayFuture[i].awaitUninterruptibly();
-      if (arrayFuture[i].isSuccess()) {
-        success++;
-      } else {
-        error++;
-      }
-    }
-    time2 = System.currentTimeMillis();
-    logger.warn(
-        "Simple TestExecJavaTask with increasing argument size Success: " +
-        success + " Error: " + error
-        + " NB/s: " +
-        success * 100 * 1000 / (time2 - time1));
-
-    executorService.shutdown();
-    networkTransaction.closeAll();
-  }
 
 }

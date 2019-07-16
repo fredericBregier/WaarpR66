@@ -22,6 +22,8 @@ package org.waarp.openr66.protocol.test;
 import org.waarp.common.command.exception.CommandAbstractException;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
+import org.waarp.common.utility.UUID;
 import org.waarp.openr66.client.DirectTransfer;
 import org.waarp.openr66.context.ErrorCode;
 import org.waarp.openr66.context.R66Result;
@@ -30,6 +32,9 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 import org.waarp.openr66.protocol.networkhandler.NetworkTransaction;
 import org.waarp.openr66.protocol.utils.R66Future;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,7 +44,9 @@ import java.util.concurrent.Executors;
  * @author Frederic Bregier
  */
 public class TestTransferNoDb extends DirectTransfer {
-  static int nb = 100;
+    static int nb = 100;
+    static int size = 1000;
+    static long bandwidth = 0;
 
   public TestTransferNoDb(R66Future future, String remoteHost,
                           String filename, String rulename, String fileinfo,
@@ -62,9 +69,35 @@ public class TestTransferNoDb extends DirectTransfer {
       if (DbConstant.admin != null && DbConstant.admin.isActive()) {
         DbConstant.admin.close();
       }
-      System.exit(1);
+      DetectionUtils.SystemExit(1);
+      return;
     }
     getSpecialParams(args, 1);
+    File file = new File(localFilename);
+    boolean exists = file.exists();
+    if (!exists) {
+      localFilename =
+          file.getAbsolutePath() + UUID.jvmProcessId() + ".txt";
+      file = new File(localFilename);
+      FileWriter fileWriterBig;
+      try {
+        fileWriterBig = new FileWriter(file);
+        for (int i = 0; i < size / 10; i++) {
+          fileWriterBig.write("0123456789");
+        }
+        fileWriterBig.flush();
+        fileWriterBig.close();
+      } catch (IOException e) {
+        logger.error(e);
+        return;
+      }
+    }
+    if (bandwidth > 0) {
+      Configuration.configuration.setServerChannelReadLimit(bandwidth);
+      Configuration.configuration.setServerChannelWriteLimit(bandwidth);
+      Configuration.configuration.setServerGlobalReadLimit(bandwidth);
+      Configuration.configuration.setServerGlobalWriteLimit(bandwidth);
+    }
     Configuration.configuration.setCLIENT_THREAD(nb);
     Configuration.configuration.pipelineInit();
     NetworkTransaction networkTransaction = new NetworkTransaction();
@@ -94,7 +127,7 @@ public class TestTransferNoDb extends DirectTransfer {
       int error = 0;
       int warn = 0;
       for (int i = 0; i < nb; i++) {
-        arrayFuture[i].awaitUninterruptibly();
+        arrayFuture[i].awaitForDoneOrInterruptible();
         R66Result result = arrayFuture[i].getResult();
         if (arrayFuture[i].isSuccess()) {
           if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
@@ -130,6 +163,9 @@ public class TestTransferNoDb extends DirectTransfer {
                   error + " delay: " + delay + " NB/s: " + nbs + " KB/s: " +
                   mbs);
       executorService.shutdown();
+      if (!exists) {
+        file.delete();
+      }
     } finally {
       networkTransaction.closeAll();
     }
@@ -146,6 +182,12 @@ public class TestTransferNoDb extends DirectTransfer {
       if (args[i].equalsIgnoreCase("-nb")) {
         i++;
         nb = Integer.parseInt(args[i]);
+      } else if (args[i].equalsIgnoreCase("-size")) {
+        i++;
+        size = Integer.parseInt(args[i]);
+      } else if (args[i].equalsIgnoreCase("-bandwidth")) {
+        i++;
+        bandwidth = Long.parseLong(args[i]);
       } else if (args[i].equalsIgnoreCase("-md5")) {
       } else if (args[i].charAt(0) == '-') {
         i++;// jump one

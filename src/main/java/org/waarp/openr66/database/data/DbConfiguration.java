@@ -84,7 +84,6 @@ public class DbConfiguration extends AbstractDbData {
   private Limit limit = null;
 
   /**
-   * @param dbSession
    * @param hostid
    * @param rg Read Global Limit
    * @param wg Write Global Limit
@@ -106,7 +105,6 @@ public class DbConfiguration extends AbstractDbData {
   /**
    * Constructor from Json
    *
-   * @param dbSession
    * @param source
    *
    * @throws WaarpDatabaseSqlException
@@ -140,7 +138,6 @@ public class DbConfiguration extends AbstractDbData {
   }
 
   /**
-   * @param dbSession
    * @param hostid
    *
    * @throws WaarpDatabaseException
@@ -299,21 +296,29 @@ public class DbConfiguration extends AbstractDbData {
 
   @Override
   protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(limit.getHostid(),
-                Columns.HOSTID.name()) };
-        otherFields = new DbValue[] {
-                new DbValue(limit.getReadGlobalLimit(), Columns.READGLOBALLIMIT.name()),
-                new DbValue(limit.getWriteGlobalLimit(), Columns.WRITEGLOBALLIMIT.name()),
-                new DbValue(limit.getReadSessionLimit(), Columns.READSESSIONLIMIT.name()),
-                new DbValue(limit.getWriteSessionLimit(), Columns.WRITESESSIONLIMIT.name()),
-                new DbValue(limit.getDelayLimit(), Columns.DELAYLIMIT.name()),
-                new DbValue(limit.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
-        allFields = new DbValue[] {
-                otherFields[0], otherFields[1], otherFields[2], otherFields[3],
-                otherFields[4], otherFields[5], primaryKey[0] };
-
-         */
+    // FIXME : Still NEEDED Dooh !
+    /*
+    primaryKey = new DbValue[] {
+        new DbValue(limit.getHostid(),
+                    Columns.HOSTID.name())
+    };
+    otherFields = new DbValue[] {
+        new DbValue(limit.getReadGlobalLimit(), Columns.READGLOBALLIMIT.name()),
+        new DbValue(limit.getWriteGlobalLimit(),
+                    Columns.WRITEGLOBALLIMIT.name()),
+        new DbValue(limit.getReadSessionLimit(),
+                    Columns.READSESSIONLIMIT.name()),
+        new DbValue(limit.getWriteSessionLimit(),
+                    Columns.WRITESESSIONLIMIT.name()),
+        new DbValue(limit.getDelayLimit(), Columns.DELAYLIMIT.name()),
+        new DbValue(limit.getUpdatedInfo().ordinal(),
+                    Columns.UPDATEDINFO.name())
+    };
+    allFields = new DbValue[] {
+        otherFields[0], otherFields[1], otherFields[2], otherFields[3],
+        otherFields[4], otherFields[5], primaryKey[0]
+    };
+    */
   }
 
   @Override

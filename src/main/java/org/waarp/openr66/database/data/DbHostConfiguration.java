@@ -167,7 +167,6 @@ public class DbHostConfiguration extends AbstractDbData {
   private Business business;
 
   /**
-   * @param dbSession
    * @param hostid
    * @param business Business configuration
    * @param roles Roles configuration
@@ -189,7 +188,6 @@ public class DbHostConfiguration extends AbstractDbData {
   /**
    * Constructor from Json
    *
-   * @param dbSession
    * @param source
    *
    * @throws WaarpDatabaseSqlException
@@ -255,7 +253,6 @@ public class DbHostConfiguration extends AbstractDbData {
   }
 
   /**
-   * @param dbSession
    * @param hostid
    *
    * @throws WaarpDatabaseException
@@ -266,6 +263,9 @@ public class DbHostConfiguration extends AbstractDbData {
     try {
       businessAccess = DAOFactory.getInstance().getBusinessDAO();
       this.business = businessAccess.select(hostid);
+      if (this.business == null) {
+        this.business = new Business();
+      }
     } catch (DAOException e) {
       throw new WaarpDatabaseException(e);
     } finally {
@@ -426,7 +426,6 @@ public class DbHostConfiguration extends AbstractDbData {
   }
 
   /**
-   * @param dbSession
    * @param hostid
    *
    * @return the version of the database from HostConfiguration table
@@ -477,15 +476,17 @@ public class DbHostConfiguration extends AbstractDbData {
   /**
    * Update the version for this HostId
    *
-   * @param dbSession
    * @param hostid
    * @param version
    */
   public static void updateVersionDb(String hostid, String version) {
+    logger.debug("Start updateVersionDb");
     DbHostConfiguration hostConfiguration;
     try {
       hostConfiguration = new DbHostConfiguration(hostid);
+      logger.debug("hostConfiguration reloaded");
     } catch (WaarpDatabaseNoDataException e) {
+      logger.debug("hostConfiguration creation");
       hostConfiguration = new DbHostConfiguration(hostid, "", "", "", "");
       try {
         hostConfiguration.insert();
@@ -499,6 +500,7 @@ public class DbHostConfiguration extends AbstractDbData {
       // ignore and return
       return;
     }
+    logger.debug("hostConfiguration continue");
     Element others = hostConfiguration.getOtherElement();
     if (others != null) {
       Element eversion = (Element) others
@@ -515,7 +517,9 @@ public class DbHostConfiguration extends AbstractDbData {
       others.addElement(DbHostConfiguration.OtherFields.version.name())
             .addText(Version.ID);
     }
+    logger.debug("hostConfiguration other to set: {}", others.asXML());
     hostConfiguration.setOtherElement(others);
+    logger.debug("hostConfiguration do update");
     try {
       hostConfiguration.update();
     } catch (WaarpDatabaseException e) {
@@ -523,6 +527,7 @@ public class DbHostConfiguration extends AbstractDbData {
       // ignore
       return;
     }
+    logger.debug("hostConfiguration updated");
   }
 
   @Override
@@ -565,20 +570,24 @@ public class DbHostConfiguration extends AbstractDbData {
 
   @Override
   protected void initObject() {
-        /*
-        primaryKey = new DbValue[] {
-                new DbValue(business.getHostid(), Columns.HOSTID.name()) };
-        otherFields = new DbValue[] {
-                new DbValue(business.getBusiness(), Columns.BUSINESS.name(), true),
-                new DbValue(business.getRoles(), Columns.ROLES.name(), true),
-                new DbValue(business.getAliases(), Columns.ALIASES.name(), true),
-                new DbValue(business.getOthers(), Columns.OTHERS.name(), true),
-                new DbValue(business.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
-        allFields = new DbValue[] {
-                otherFields[0], otherFields[1], otherFields[2], otherFields[3],
-                otherFields[4], primaryKey[0] };
-
-         */
+    // FIXME : Still NEEDED Dooh !
+    /*
+    primaryKey = new DbValue[] {
+        new DbValue(business.getHostid(), Columns.HOSTID.name())
+    };
+    otherFields = new DbValue[] {
+        new DbValue(business.getBusiness(), Columns.BUSINESS.name(), true),
+        new DbValue(business.getRoles(), Columns.ROLES.name(), true),
+        new DbValue(business.getAliases(), Columns.ALIASES.name(), true),
+        new DbValue(business.getOthers(), Columns.OTHERS.name(), true),
+        new DbValue(business.getUpdatedInfo().ordinal(),
+                    Columns.UPDATEDINFO.name())
+    };
+    allFields = new DbValue[] {
+        otherFields[0], otherFields[1], otherFields[2], otherFields[3],
+        otherFields[4], primaryKey[0]
+    };
+     */
   }
 
   @Override
@@ -633,10 +642,13 @@ public class DbHostConfiguration extends AbstractDbData {
     int len;
     do {
       len = this.business.getOthers().length();
+      logger.debug("{} {}", len, business.getOthers());
       this.business
           .setOthers(this.business.getOthers().replaceAll("\\s+", " "));
     } while (len != this.business.getOthers().length());
+    logger.debug("{}", business.getOthers());
     allFields[Columns.OTHERS.ordinal()].setValue(others);
+    logger.debug("{}", business.getOthers());
     isSaved = false;
   }
 

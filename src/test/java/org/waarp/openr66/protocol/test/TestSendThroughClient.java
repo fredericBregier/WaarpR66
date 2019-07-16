@@ -26,6 +26,8 @@ import org.waarp.common.exception.FileTransferException;
 import org.waarp.common.file.DataBlock;
 import org.waarp.common.logging.WaarpLoggerFactory;
 import org.waarp.common.logging.WaarpSlf4JLoggerFactory;
+import org.waarp.common.utility.DetectionUtils;
+import org.waarp.common.utility.WaarpNettyUtil;
 import org.waarp.openr66.client.SendThroughClient;
 import org.waarp.openr66.context.ErrorCode;
 import org.waarp.openr66.context.R66Result;
@@ -78,7 +80,8 @@ public class TestSendThroughClient extends SendThroughClient {
       if (DbConstant.admin != null && DbConstant.admin.isActive()) {
         DbConstant.admin.close();
       }
-      System.exit(1);
+      DetectionUtils.SystemExit(1);
+      return;
     }
     Configuration.configuration.pipelineInit();
     NetworkTransaction networkTransaction = new NetworkTransaction();
@@ -103,7 +106,7 @@ public class TestSendThroughClient extends SendThroughClient {
       } else {
         transaction.transferInError(null);
       }
-      future.awaitUninterruptibly();
+      future.awaitForDoneOrInterruptible();
 
       long time2 = System.currentTimeMillis();
       long delay = time2 - time1;
@@ -136,18 +139,19 @@ public class TestSendThroughClient extends SendThroughClient {
         if (result == null || result.getRunner() == null) {
           logger.warn("Transfer in Error with no Id", future.getCause());
           networkTransaction.closeAll();
-          System.exit(1);
+          DetectionUtils.SystemExit(1);
+          return;
         }
         if (result.getRunner().getErrorInfo() == ErrorCode.Warning) {
           logger.warn("Transfer in Warning with Id: " +
                       result.getRunner().getSpecialId(), future.getCause());
           networkTransaction.closeAll();
-          System.exit(result.getCode().ordinal());
+          DetectionUtils.SystemExit(result.getCode().ordinal());
         } else {
           logger.error("Transfer in Error with Id: " +
                        result.getRunner().getSpecialId(), future.getCause());
           networkTransaction.closeAll();
-          System.exit(result.getCode().ordinal());
+          DetectionUtils.SystemExit(result.getCode().ordinal());
         }
       }
     } finally {
@@ -180,10 +184,7 @@ public class TestSendThroughClient extends SendThroughClient {
       }
       // While not last block
       while (block != null && !block.isEOF()) {
-        try {
-          future1.await();
-        } catch (InterruptedException e) {
-        }
+        WaarpNettyUtil.awaitDoneOrInterrupted(future1);
         if (!future1.isSuccess()) {
           return false;
         }
@@ -192,10 +193,7 @@ public class TestSendThroughClient extends SendThroughClient {
         } catch (FileEndOfTransferException e) {
           // Wait for last write
           retrieveDone = true;
-          try {
-            future1.await();
-          } catch (InterruptedException e1) {
-          }
+          WaarpNettyUtil.awaitDoneOrInterrupted(future1);
           return future1.isSuccess();
         }
         block.getBlock().retain();
@@ -204,10 +202,7 @@ public class TestSendThroughClient extends SendThroughClient {
       }
       // Wait for last write
       if (future1 != null) {
-        try {
-          future1.await();
-        } catch (InterruptedException e) {
-        }
+        WaarpNettyUtil.awaitDoneOrInterrupted(future1);
         return future1.isSuccess();
       }
       retrieveDone = true;
