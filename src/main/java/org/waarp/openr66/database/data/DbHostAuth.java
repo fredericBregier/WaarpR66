@@ -134,26 +134,21 @@ public class DbHostAuth extends AbstractDbData {
 
     @Override
     protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(host.getHostid(), Columns.HOSTID
-                .name()) };
+        primaryKey = new DbValue[] { new DbValue("", Columns.HOSTID.name()) };
         otherFields = new DbValue[] {
-                new DbValue(host.getAddress(), Columns.ADDRESS.name()),
-                new DbValue(host.getPort(), Columns.PORT.name()),
-                new DbValue(host.isSSL(), Columns.ISSSL.name()),
-                new DbValue(host.getHostkey(), Columns.HOSTKEY.name()),
-                new DbValue(host.isAdmin(), Columns.ADMINROLE.name()),
-                new DbValue(host.isClient(), Columns.ISCLIENT.name()),
-                new DbValue(host.isActive(), Columns.ISACTIVE.name()),
-                new DbValue(host.isProxified(), Columns.ISPROXIFIED.name()),
-                new DbValue(host.getUpdatedInfo().ordinal(),
-                        Columns.UPDATEDINFO.name()) };
+                new DbValue("", Columns.ADDRESS.name()),
+                new DbValue(0, Columns.PORT.name()),
+                new DbValue(false, Columns.ISSSL.name()),
+                new DbValue(new byte[0], Columns.HOSTKEY.name()),
+                new DbValue(false, Columns.ADMINROLE.name()),
+                new DbValue(false, Columns.ISCLIENT.name()),
+                new DbValue(false, Columns.ISACTIVE.name()),
+                new DbValue(false, Columns.ISPROXIFIED.name()),
+                new DbValue(0, Columns.UPDATEDINFO.name()) };
         allFields = new DbValue[] {
                 otherFields[0], otherFields[1], otherFields[2],
                 otherFields[3], otherFields[4], otherFields[5], otherFields[6], otherFields[7], otherFields[8],
                 primaryKey[0] };
-
-         */
     }
 
     @Override

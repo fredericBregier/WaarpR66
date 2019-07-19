@@ -299,34 +299,34 @@ public class DbTaskRunner extends AbstractDbData {
         // empty transfer for initObject
         transfer = new Transfer();
         primaryKey = new DbValue[] {
-                new DbValue(transfer.getOwnerRequest(), Columns.OWNERREQ.name()),
-                new DbValue(transfer.getRequester(), Columns.REQUESTER.name()),
-                new DbValue(transfer.getRequested(), Columns.REQUESTED.name()),
-                new DbValue(transfer.getId(), Columns.SPECIALID.name()) };
+                new DbValue("", Columns.OWNERREQ.name()),
+                new DbValue("", Columns.REQUESTER.name()),
+                new DbValue("", Columns.REQUESTED.name()),
+                new DbValue(0l, Columns.SPECIALID.name()) };
         otherFields = new DbValue[] {
                 // GLOBALSTEP, GLOBALLASTSTEP, STEP, RANK, STEPSTATUS, RETRIEVEMODE,
                 // FILENAME, ISMOVED, IDRULE,
                 // BLOCKSZ, ORIGINALNAME, FILEINFO, MODETRANS,
                 // STARTTRANS, STOPTRANS
                 // INFOSTATUS, UPDATEDINFO
-                new DbValue(transfer.getGlobalStep().ordinal(), Columns.GLOBALSTEP.name()),
-                new DbValue(transfer.getLastGlobalStep().ordinal(), Columns.GLOBALLASTSTEP.name()),
-                new DbValue(transfer.getStep(), Columns.STEP.name()),
-                new DbValue(transfer.getRank(), Columns.RANK.name()),
-                new DbValue(ErrorCode.Unknown.getCode(), Columns.STEPSTATUS.name()), // status.getCode()
-                new DbValue(transfer.getRetrieveMode(), Columns.RETRIEVEMODE.name()),
-                new DbValue(transfer.getFilename(), Columns.FILENAME.name()),
-                new DbValue(transfer.getIsMoved(), Columns.ISMOVED.name()),
-                new DbValue(transfer.getRule(), Columns.IDRULE.name()),
-                new DbValue(transfer.getBlockSize(), Columns.BLOCKSZ.name()),
-                new DbValue(transfer.getOriginalName(), Columns.ORIGINALNAME.name()),
-                new DbValue(transfer.getFileInfo(), Columns.FILEINFO.name(), true),
-                new DbValue(transfer.getTransferInfo(), Columns.TRANSFERINFO.name(), true),
-                new DbValue(transfer.getTransferMode(), Columns.MODETRANS.name()),
-                new DbValue(transfer.getStart(), Columns.STARTTRANS.name()),
-                new DbValue(transfer.getStop(), Columns.STOPTRANS.name()),
-                new DbValue(ErrorCode.Unknown.getCode(), Columns.INFOSTATUS.name()),// infostatus.getCode()
-                new DbValue(transfer.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
+                new DbValue(0, Columns.GLOBALSTEP.name()),
+                new DbValue(0, Columns.GLOBALLASTSTEP.name()),
+                new DbValue(0, Columns.STEP.name()),
+                new DbValue(0, Columns.RANK.name()),
+                new DbValue("", Columns.STEPSTATUS.name()), // status.getCode()
+                new DbValue(false, Columns.RETRIEVEMODE.name()),
+                new DbValue("", Columns.FILENAME.name()),
+                new DbValue(false, Columns.ISMOVED.name()),
+                new DbValue("", Columns.IDRULE.name()),
+                new DbValue(0, Columns.BLOCKSZ.name()),
+                new DbValue("", Columns.ORIGINALNAME.name()),
+                new DbValue("", Columns.FILEINFO.name(), true),
+                new DbValue("", Columns.TRANSFERINFO.name(), true),
+                new DbValue(0, Columns.MODETRANS.name()),
+                new DbValue(new Timestamp(0l), Columns.STARTTRANS.name()),
+                new DbValue(new Timestamp(0l), Columns.STOPTRANS.name()),
+                new DbValue("", Columns.INFOSTATUS.name()),// infostatus.getCode()
+                new DbValue(0, Columns.UPDATEDINFO.name()) };
 
         allFields = new DbValue[] {
                 otherFields[0], otherFields[1], otherFields[2], otherFields[3],

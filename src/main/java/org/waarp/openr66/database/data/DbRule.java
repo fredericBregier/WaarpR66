@@ -234,31 +234,28 @@ public class DbRule extends AbstractDbData {
 
     @Override
     protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(getIdRule(),
-                Columns.IDRULE.name()) };
+        primaryKey = new DbValue[] { new DbValue("", Columns.IDRULE.name()) };
         otherFields = new DbValue[] {
                 // HOSTIDS, MODETRANS, RECVPATH, SENDPATH, ARCHIVEPATH, WORKPATH,
                 // PRETASKS, POSTTASKS, ERRORTASKS
-                new DbValue(rule.getXMLHostids(), Columns.HOSTIDS.name(), true),
-                new DbValue(rule.getMode(), Columns.MODETRANS.name()),
-                new DbValue(rule.getRecvPath(), Columns.RECVPATH.name()),
-                new DbValue(rule.getSendPath(), Columns.SENDPATH.name()),
-                new DbValue(rule.getArchivePath(), Columns.ARCHIVEPATH.name()),
-                new DbValue(rule.getWorkPath(), Columns.WORKPATH.name()),
-                new DbValue(rule.getXMLRPreTasks(), Columns.RPRETASKS.name(), true),
-                new DbValue(rule.getXMLRPostTasks(), Columns.RPOSTTASKS.name(), true),
-                new DbValue(rule.getXMLRErrorTasks(), Columns.RERRORTASKS.name(), true),
-                new DbValue(rule.getXMLSPreTasks(), Columns.SPRETASKS.name(), true),
-                new DbValue(rule.getXMLSPostTasks(), Columns.SPOSTTASKS.name(), true),
-                new DbValue(rule.getXMLSErrorTasks(), Columns.SERRORTASKS.name(), true),
-                new DbValue(rule.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
+                new DbValue("", Columns.HOSTIDS.name(), true),
+                new DbValue(0, Columns.MODETRANS.name()),
+                new DbValue("", Columns.RECVPATH.name()),
+                new DbValue("", Columns.SENDPATH.name()),
+                new DbValue("", Columns.ARCHIVEPATH.name()),
+                new DbValue("", Columns.WORKPATH.name()),
+                new DbValue("", Columns.RPRETASKS.name(), true),
+                new DbValue("", Columns.RPOSTTASKS.name(), true),
+                new DbValue("", Columns.RERRORTASKS.name(), true),
+                new DbValue("", Columns.SPRETASKS.name(), true),
+                new DbValue("", Columns.SPOSTTASKS.name(), true),
+                new DbValue("", Columns.SERRORTASKS.name(), true),
+                new DbValue(0, Columns.UPDATEDINFO.name()) };
         allFields = new DbValue[] {
                 otherFields[0], otherFields[1], otherFields[2], otherFields[3],
                 otherFields[4], otherFields[5], otherFields[6], otherFields[7],
                 otherFields[8], otherFields[9], otherFields[10],
                 otherFields[11], otherFields[12], primaryKey[0] };
-         */
     }
 
     @Override
