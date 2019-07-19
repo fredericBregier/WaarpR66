@@ -1,17 +1,17 @@
 /**
  * This file is part of Waarp Project.
- * 
+ *
  * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
  * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
+ *
  * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
  * the GNU General Public License as published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
  * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -42,9 +42,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Configuration Table object
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class DbConfiguration extends AbstractDbData {
     public static enum Columns {
@@ -101,21 +101,18 @@ public class DbConfiguration extends AbstractDbData {
 
     @Override
     protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(limit.getHostid(),
-                Columns.HOSTID.name()) };
+        primaryKey = new DbValue[] { new DbValue("", Columns.HOSTID.name()) };
         otherFields = new DbValue[] {
-                new DbValue(limit.getReadGlobalLimit(), Columns.READGLOBALLIMIT.name()),
-                new DbValue(limit.getWriteGlobalLimit(), Columns.WRITEGLOBALLIMIT.name()),
-                new DbValue(limit.getReadSessionLimit(), Columns.READSESSIONLIMIT.name()),
-                new DbValue(limit.getWriteSessionLimit(), Columns.WRITESESSIONLIMIT.name()),
-                new DbValue(limit.getDelayLimit(), Columns.DELAYLIMIT.name()),
-                new DbValue(limit.getUpdatedInfo().ordinal(), Columns.UPDATEDINFO.name()) };
+                new DbValue(0l, Columns.READGLOBALLIMIT.name()),
+                new DbValue(0l, Columns.WRITEGLOBALLIMIT.name()),
+                new DbValue(0l, Columns.READSESSIONLIMIT.name()),
+                new DbValue(0l, Columns.WRITESESSIONLIMIT.name()),
+                new DbValue(0l, Columns.DELAYLIMIT.name()),
+                new DbValue(0, Columns.UPDATEDINFO.name()) };
         allFields = new DbValue[] {
                 otherFields[0], otherFields[1], otherFields[2], otherFields[3],
                 otherFields[4], otherFields[5], primaryKey[0] };
 
-         */
     }
 
     @Override
@@ -198,7 +195,7 @@ public class DbConfiguration extends AbstractDbData {
 
     /**
      * Constructor from Json
-     * 
+     *
      * @param dbSession
      * @param source
      * @throws WaarpDatabaseSqlException
@@ -348,7 +345,7 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     * 
+     *
      * @return the DbPreparedStatement for getting Updated Object
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
@@ -443,7 +440,7 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     * 
+     *
      * @return True if this Configuration refers to the current host
      */
     public boolean isOwnConfiguration() {
@@ -452,7 +449,7 @@ public class DbConfiguration extends AbstractDbData {
     }
 
     /**
-     * 
+     *
      * @return the DbValue associated with this table
      */
     public static DbValue[] getAllType() {

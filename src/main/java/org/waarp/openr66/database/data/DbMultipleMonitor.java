@@ -1,17 +1,17 @@
 /**
  * This file is part of Waarp Project.
- * 
+ *
  * Copyright 2009, Frederic Bregier, and individual contributors by the @author tags. See the
  * COPYRIGHT.txt in the distribution for a full listing of individual contributors.
- * 
+ *
  * All Waarp Project is free software: you can redistribute it and/or modify it under the terms of
  * the GNU General Public License as published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * Waarp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
  * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Waarp . If not, see
  * <http://www.gnu.org/licenses/>.
  */
@@ -35,9 +35,9 @@ import org.waarp.openr66.protocol.configuration.Configuration;
 
 /**
  * Configuration Table object
- * 
+ *
  * @author Frederic Bregier
- * 
+ *
  */
 public class DbMultipleMonitor extends AbstractDbData {
     public static enum Columns {
@@ -82,16 +82,13 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     @Override
     protected void initObject() {
-        /*
-        primaryKey = new DbValue[] { new DbValue(multipleMonitor.getHostid(),
-                Columns.HOSTID.name()) };
+        primaryKey = new DbValue[] { new DbValue("", Columns.HOSTID.name()) };
         otherFields = new DbValue[] {
-                new DbValue(getCountConfig(), Columns.COUNTCONFIG.name()),
-                new DbValue(getCountHost(), Columns.COUNTHOST.name()),
-                new DbValue(getCountRule(), Columns.COUNTRULE.name()) };
+                new DbValue(0, Columns.COUNTCONFIG.name()),
+                new DbValue(0, Columns.COUNTHOST.name()),
+                new DbValue(0, Columns.COUNTRULE.name()) };
         allFields = new DbValue[] {
                 otherFields[0], otherFields[1], otherFields[2], primaryKey[0] };
-         */
     }
 
     @Override
@@ -260,7 +257,7 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     /**
      * For instance from Commander when getting updated information
-     * 
+     *
      * @param preparedStatement
      * @return the next updated Configuration
      * @throws WaarpDatabaseNoConnectionException
@@ -276,7 +273,7 @@ public class DbMultipleMonitor extends AbstractDbData {
     }
 
     /**
-     * 
+     *
      * @return the DbPreparedStatement for getting Updated Object in "FOR UPDATE" mode
      * @throws WaarpDatabaseNoConnectionException
      * @throws WaarpDatabaseSqlException
@@ -302,7 +299,7 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     /**
      * On Commander side
-     * 
+     *
      * @return True if this is the last update
      */
     public boolean checkUpdateConfig() {
@@ -319,7 +316,7 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     /**
      * On Commander side
-     * 
+     *
      * @return True if this is the last update
      */
     public boolean checkUpdateHost() {
@@ -336,7 +333,7 @@ public class DbMultipleMonitor extends AbstractDbData {
 
     /**
      * On Commander side
-     * 
+     *
      * @return True if this is the last update
      */
     public boolean checkUpdateRule() {
